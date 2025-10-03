@@ -154,7 +154,7 @@ a {
 
 /* Torna o placeholder nativo (dd/mm/aaaa) transparente apenas quando o campo está vazio */
 .date-filter:invalid {
-    color: transparent;
+    color: transparent; /* Esconde o "dd/mm/aaaa" */
 }
 
 /* Usa a label como placeholder personalizado */
