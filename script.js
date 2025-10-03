@@ -6,8 +6,10 @@ let allEvents = []; // Armazena todos os eventos para filtragem
 document.addEventListener('DOMContentLoaded', () => {
     const sheetId = '1LAfG4Nt2g_P12HMCx-wEmWpXoX3yp1qAKdw89eLbeWU';
     const googleSheetUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/export?format=csv`;
+    
+    // Primeiro, lê os parâmetros da URL para saber se um evento específico deve ser aberto.
+    applyFiltersFromURL();
     loadAndDisplayEvents(googleSheetUrl);
-    setupFilters();
     setupModal();
     setupContactModal();
     setupBackToTopButton();
@@ -49,8 +51,8 @@ async function loadAndDisplayEvents(csvPath) {
             const eventToOpen = allEvents.find(e => createEventSlug(getProp(e, 'Evento') || getProp(e, 'Nome')) === eventSlugFromUrl);
             if (eventToOpen) openModal(eventToOpen);
         }
-        // Aplica filtros iniciais com base nos parâmetros da URL, se houver
-        applyFiltersFromURL();
+        // Configura os filtros (que também aplicam os valores da URL aos inputs)
+        setupFilters();
 
     } catch (error) {
         console.error("Falha ao carregar ou renderizar os eventos:", error);
@@ -72,7 +74,7 @@ function applyFiltersFromURL() {
     const search = params.get('search');
     const date = params.get('date');
     const genre = params.get('genre');
-    eventSlugFromUrl = params.get('event'); // Captura o slug do evento
+    eventSlugFromUrl = params.get('event'); // Apenas captura o slug do evento para uso posterior
 
     let filtersApplied = false;
 
