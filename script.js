@@ -48,6 +48,8 @@ async function loadAndDisplayEvents(csvPath) {
         renderEvents(getSortedEvents(allEvents), grid);
         // Preenche o filtro de gênero com base nos eventos carregados
         populateGenreFilter(allEvents);
+        // Aplica filtros iniciais com base nos parâmetros da URL, se houver
+        populateGenreFilter(allEvents);
 
     } catch (error) {
         console.error("Falha ao carregar ou renderizar os eventos:", error);
@@ -61,6 +63,37 @@ async function loadAndDisplayEvents(csvPath) {
     }
 }
 
+/**
+ * Lê os parâmetros da URL na inicialização e aplica os filtros correspondentes.
+ */
+function applyFiltersFromURL() {
+    const params = new URLSearchParams(window.location.search);
+    const search = params.get('search');
+    const date = params.get('date');
+    const genre = params.get('genre');
+
+    let filtersApplied = false;
+
+    if (search) {
+        document.getElementById('search-input').value = search;
+        filtersApplied = true;
+    }
+    if (date) {
+        document.getElementById('date-filter').value = date;
+        filtersApplied = true;
+    }
+    if (genre) {
+        document.getElementById('genre-filter').value = genre;
+        filtersApplied = true;
+    }
+
+    if (filtersApplied) {
+        // A função applyFilters() é chamada dentro do setupFilters,
+        // então aqui apenas garantimos que os valores estão nos inputs.
+        // A chamada explícita será feita após o setup.
+        document.querySelector('#search-input').dispatchEvent(new Event('input', { bubbles: true }));
+    }
+}
 /**
  * Analisa uma string de texto CSV em um array de objetos de produto.
  * Esta função é mais robusta e lida com campos entre aspas que podem conter vírgulas.
@@ -144,18 +177,24 @@ function renderEvents(events, gridElement) {
 function populateGenreFilter(events) {
     const genreFilter = document.getElementById('genre-filter');
     if (!genreFilter) return;
-
-    const allGenres = new Set();
+    
+    // Usamos um Map para garantir que os gêneros sejam únicos, ignorando maiúsculas/minúsculas.
+    // A chave será o gênero em minúsculas, e o valor será o gênero com a capitalização original.
+    const uniqueGenres = new Map();
 
     events.forEach(event => {
         const genresString = getProp(event, 'Gênero');
         if (genresString) {
             const genres = genresString.split(',').map(g => g.trim());
-            genres.forEach(genre => allGenres.add(genre));
+            genres.forEach(genre => {
+                if (genre && !uniqueGenres.has(genre.toLowerCase())) {
+                    uniqueGenres.set(genre.toLowerCase(), genre);
+                }
+            });
         }
     });
 
-    const sortedGenres = Array.from(allGenres).sort();
+    const sortedGenres = Array.from(uniqueGenres.values()).sort((a, b) => a.localeCompare(b));
     sortedGenres.forEach(genre => {
         const option = document.createElement('option');
         option.value = genre.toLowerCase();
@@ -226,6 +265,20 @@ function setupFilters() {
         clearSearchBtn.hidden = !searchTerm;
         clearDateBtn.hidden = !selectedDate;
         clearAllBtn.hidden = !searchTerm && !selectedDate && !selectedGenre;
+
+        // Atualiza a URL com os parâmetros de filtro
+        const params = new URLSearchParams();
+        if (searchTerm) params.set('search', searchTerm);
+        if (selectedDate) params.set('date', selectedDate);
+        if (selectedGenre) params.set('genre', selectedGenre);
+
+        const queryString = params.toString();
+        const newUrl = queryString 
+            ? `${window.location.pathname}?${queryString}`
+            : window.location.pathname;
+        
+        // Usa replaceState para não poluir o histórico do navegador a cada tecla
+        window.history.replaceState({ path: newUrl }, '', newUrl);
 
         let filteredEvents = allEvents;
 

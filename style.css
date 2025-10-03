@@ -84,16 +84,22 @@ a {
 
 .date-filter {
     /* Adiciona espaço à direita para o botão de limpar */
-    padding: 0.75rem 2.5rem 0.75rem 1rem;
+    padding: 0.75rem 3.5rem 0.75rem 1rem;
     font-size: 1rem;
     border-radius: 8px;
     border: 1px solid var(--border-color);
-    background-color: transparent;
     transition: border-color 0.2s, box-shadow 0.2s;
     font-family: inherit;
     color: var(--subtle-text);
     height: 50px; /* Altura fixa para alinhar com a busca */
     color-scheme: dark; /* Garante que o calendário do seletor de data use o tema escuro */
+    -webkit-appearance: none;
+    appearance: none;
+    background-color: transparent;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23A7A7A7' viewBox='0 0 16 16'%3e%3cpath d='M8 7a.5.5 0 0 1 .5.5V9H10a.5.5 0 0 1 0 1H8.5v1.5a.5.5 0 0 1-1 0V10H6a.5.5 0 0 1 0-1h1.5V7.5A.5.5 0 0 1 8 7z'/%3e%3cpath d='M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4H1z'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    background-size: 1em;
 }
 
 .genre-filter {
@@ -117,6 +123,10 @@ a {
     background-repeat: no-repeat;
     background-position: right 1rem center;
     background-size: 1em;
+    /* Garante que o texto não sobreponha a seta */
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
 }
 
 .genre-filter option {
@@ -213,7 +223,7 @@ a {
 .clear-date-btn {
     position: absolute;
     top: 50%;
-    right: 2rem; /* Ajusta para não sobrepor o ícone do calendário */
+    right: 2.75rem; /* Posição ajustada para o lado do novo ícone */
     transform: translateY(-50%);
     background: none;
     border: none;
@@ -223,7 +233,7 @@ a {
     padding: 0 0.5rem;
     line-height: 1;
     transition: color 0.2s;
-    z-index: 2; /* Garante que fique sobre o ícone do calendário */
+    z-index: 3; /* Garante que fique sobre o ícone do calendário */
 }
 
 .search-loader {
