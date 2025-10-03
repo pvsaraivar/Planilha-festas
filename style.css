@@ -20,7 +20,7 @@
 }
 
 body {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-family: 'Satoshi', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     line-height: 1.6;
     font-weight: 300; /* Define o peso da fonte padrão como "Light" */
     background: var(--background-start);
@@ -39,7 +39,6 @@ a {
 .site-header {
     padding-top: 2rem;
     padding-bottom: 1rem;
-    font-family: modern 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
 }
 
 .container {
@@ -51,7 +50,7 @@ a {
 .site-header h1 {
     margin: 0 0 0.5rem 0;
     font-size: 2.5rem;
-    font-weight: 800; /* Mais peso para o título */
+    font-weight: 700; /* Peso "Bold" para o título */
     color: var(--text-color);
 }
 
@@ -107,7 +106,7 @@ a {
 
 /* Posiciona o texto do placeholder sobre o input */
 .date-filter::before {
-    content: "Filtre por data no calendário";
+    content: "Escolha uma data";
     color: var(--subtle-text);
     position: absolute;
     left: 1rem;
@@ -169,7 +168,7 @@ a {
 .clear-date-btn {
     position: absolute;
     top: 50%;
-    right: 0.5rem;
+    right: 2rem; /* Ajusta para não sobrepor o ícone do calendário */
     transform: translateY(-50%);
     background: none;
     border: none;
@@ -215,6 +214,12 @@ a {
     opacity: 0;
 }
 
+.empty-grid-message {
+    grid-column: 1 / -1; /* Faz a mensagem ocupar a largura total da grade */
+    text-align: center;
+    color: var(--subtle-text);
+}
+
 .event-card {
     background-color: var(--card-background);
     box-shadow: var(--shadow);
@@ -256,14 +261,14 @@ a {
 
 .event-card__details {
     font-size: 0.75rem;
-    font-weight: 600;
+    font-weight: 500; /* Peso "Medium" para detalhes */
     color: var(--subtle-text);
     margin-bottom: 0.5rem;
 }
 
 .event-card__name {    
     font-size: 1.2rem;
-    font-weight: 600; /* Um pouco menos pesado para equilibrar */
+    font-weight: 700; /* Peso "Bold" para o nome do evento */
     margin: 0; /* Remove a margem para juntar com a data */
     /* flex-grow: 1; foi removido para juntar o nome e a data */
 }
@@ -287,7 +292,7 @@ a {
     gap: 0.5rem;
     color: var(--subtle-text);
     text-decoration: none;
-    font-weight: 600;
+    font-weight: 500; /* Peso "Medium" */
     transition: color 0.2s;
 }
 
@@ -295,6 +300,7 @@ a {
     font-size: 1.25rem; /* Ajuste para melhor responsividade */
     font-weight: 500;
     color: var(--primary-color);
+    margin-top: auto; /* Empurra o local para o fundo, alinhando-o em todos os cards */
     margin-bottom: 0.5rem;
 }
 
@@ -321,7 +327,7 @@ a {
     color: #fff;
     text-align: center;
     text-decoration: none;
-    font-weight: 600;
+    font-weight: 700; /* Peso "Bold" para o botão */
     border-radius: 8px;
     transition: background-color 0.2s;
 }
@@ -358,7 +364,7 @@ a {
     justify-content: center;
     align-items: center;
     gap: 0.5rem;
-}
+} 
 .footer-contact a {
     color: var(--subtle-text);
     text-decoration: none;
@@ -440,7 +446,7 @@ a {
 }
 
 .modal {
-    background-color: var(--card-background);
+    background-color: #333; /* Tom um pouco mais claro para destacar o modal */
     border-radius: var(--border-radius);
     padding: 2rem;
     width: 90%;
@@ -487,7 +493,7 @@ a {
 
 .modal-detail-label {
     font-size: 0.8rem;
-    font-weight: 500;
+    font-weight: 400; /* Peso "Regular" para os rótulos */
     color: var(--subtle-text);
     text-transform: uppercase;
     letter-spacing: 0.5px;
@@ -502,6 +508,8 @@ a {
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
+    color: var(--primary-color);
+    transition: color 0.2s;
 }
 
 .location-container {
@@ -568,7 +576,7 @@ a {
 
 .modal-content p a {
     color: var(--primary-color);
-    font-weight: 600;
+    font-weight: 500; /* Peso "Medium" */
 }
 
 .modal-separator {
@@ -577,6 +585,32 @@ a {
     background-color: var(--border-color);
     margin: 2rem 0;
 }
+
+/* --- Estilos para o Modal de Contato --- */
+.contact-options {
+    display: grid;
+    gap: 1rem;
+    margin-top: 2rem;
+}
+
+.contact-option {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    color: var(--text-color);
+    font-weight: 500;
+    transition: background-color 0.2s, border-color 0.2s;
+}
+
+.contact-option:hover {
+    background-color: var(--card-background);
+    border-color: var(--primary-color);
+}
+
 
 /* --- Estilos para o Botão Voltar ao Topo --- */
 .back-to-top-btn {

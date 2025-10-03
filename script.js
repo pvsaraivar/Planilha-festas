@@ -13,6 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
     loadAndDisplayEvents(googleSheetUrl);
     setupFilters();
     setupModal();
+    setupContactModal();
     setupBackToTopButton();
 });
 
@@ -118,9 +119,9 @@ function renderEvents(events, gridElement) {
             const filterDate = new Date(year, month - 1, day);
             const today = new Date();
             today.setHours(0, 0, 0, 0); // Normaliza para comparar apenas a data
-            gridElement.innerHTML = filterDate >= today ? '<p>Nenhum evento futuro encontrado para esta data.</p>' : '<p>Nenhum evento encontrado para esta data.</p>';
+            gridElement.innerHTML = filterDate >= today ? '<p class="empty-grid-message">Ainda não foi anunciada festa para esta data.</p>' : '<p class="empty-grid-message">Nenhum evento encontrado para esta data passada.</p>';
         } else {
-            gridElement.innerHTML = '<p>Nenhum evento encontrado com os filtros aplicados.</p>';
+            gridElement.innerHTML = '<p class="empty-grid-message">Nenhuma festa encontrada com os filtros aplicados.</p>';
         }
         return;
     }
@@ -173,10 +174,12 @@ function getSortedEvents(events) {
  * Configura os filtros de busca por texto e por data.
  */
 function setupFilters() {
+    let debounceTimer;
     const searchInput = document.getElementById('search-input');
     const dateInput = document.getElementById('date-filter');
     const clearSearchBtn = document.getElementById('clear-search-btn');
     const clearDateBtn = document.getElementById('clear-date-btn');
+    const searchLoader = document.getElementById('search-loader');
     const grid = document.getElementById('event-grid');
 
     const applyFilters = () => {
@@ -214,7 +217,24 @@ function setupFilters() {
     };
 
     // Adiciona listeners
-    searchInput.addEventListener('input', applyFilters);
+    searchInput.addEventListener('input', () => {
+        clearTimeout(debounceTimer);
+        
+        // Mostra o spinner imediatamente se houver texto
+        if (searchInput.value) {
+            searchLoader.hidden = false;
+            clearSearchBtn.hidden = true; // Esconde o 'x' para não sobrepor o spinner
+        } else {
+            searchLoader.hidden = true;
+            clearSearchBtn.hidden = true;
+        }
+
+        debounceTimer = setTimeout(() => {
+            applyFilters();
+            // Esconde o spinner após a filtragem
+            searchLoader.hidden = true;
+        }, 300); // Atraso de 300ms
+    });
     dateInput.addEventListener('change', applyFilters); // 'change' é melhor para input de data
 
     clearSearchBtn.addEventListener('click', () => {
@@ -393,6 +413,40 @@ function setupModal() {
 }
 
 /**
+ * Configura os listeners para abrir e fechar o modal de contato.
+ */
+function setupContactModal() {
+    const triggerBtn = document.getElementById('contact-trigger-btn');
+    const overlay = document.getElementById('contact-modal-overlay');
+    const closeBtn = document.getElementById('contact-modal-close-btn');
+
+    if (!triggerBtn || !overlay || !closeBtn) return;
+
+    const openModal = (e) => {
+        e.preventDefault();
+        overlay.classList.add('is-visible');
+        document.body.style.overflow = 'hidden';
+    };
+
+    const closeModal = () => {
+        overlay.classList.remove('is-visible');
+        document.body.style.overflow = '';
+    };
+
+    triggerBtn.addEventListener('click', openModal);
+    closeBtn.addEventListener('click', closeModal);
+    overlay.addEventListener('click', (e) => {
+        if (e.target === overlay) {
+            closeModal();
+        }
+    });
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && overlay.classList.contains('is-visible')) {
+            closeModal();
+        }
+    });
+}
+/**
  * Abre o modal e o preenche com os detalhes do evento.
  * @param {Object} event - O objeto do evento a ser exibido.
  */
@@ -418,7 +472,6 @@ function openModal(event) {
     }
 
     const timeString = formatTimeString(startTime, endTime);
-    const dateTimeString = timeString ? `${date}, ${timeString}` : date;
 
     const instagramIconSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>`;
     let instagramDetailHtml = '';
@@ -448,7 +501,7 @@ function openModal(event) {
     let ticketActionHtml = '';
     if (ticketUrl) {
         if (ticketUrl.toLowerCase().trim() === 'gratuito') {
-            ticketActionHtml = `<span class="share-btn tickets-btn tickets-btn--free">Evento Gratuito</span>`;
+            ticketActionHtml = `<span class="share-btn tickets-btn tickets-btn--free">Gratuito</span>`;
         } else {
             ticketActionHtml = `<a href="${ticketUrl}" target="_blank" rel="noopener noreferrer" class="share-btn tickets-btn">Ver Ingressos</a>`;
         }
@@ -458,9 +511,14 @@ function openModal(event) {
         <h2>${name}</h2>
         <div class="modal-details-grid">
             <div class="modal-detail-item">
-                <span class="modal-detail-label">Data & Horário</span>
-                <span class="modal-detail-value">${dateTimeString}</span>
+                <span class="modal-detail-label">Data</span>
+                <span class="modal-detail-value">${date}</span>
             </div>
+            ${timeString ? `
+            <div class="modal-detail-item">
+                <span class="modal-detail-label">Horário</span>
+                <span class="modal-detail-value">${timeString}</span>
+            </div>` : ''}
             <div class="modal-detail-item">
                 <span class="modal-detail-label">Local</span>
                 <span class="modal-detail-value location-container">${locationHtml}</span>
@@ -476,7 +534,7 @@ function openModal(event) {
         <div class="modal-actions">
             ${ticketActionHtml}
             <button class="share-btn whatsapp-btn">${whatsappIconSvg} Compartilhar no WhatsApp</button>
-            <button class="share-btn copy-link-btn">${copyLinkIconSvg} Copiar Link</button>
+            <button class="share-btn copy-link-btn">${copyLinkIconSvg} Copiar link</button>
         </div>
     `;
 
