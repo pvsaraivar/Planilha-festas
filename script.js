@@ -46,6 +46,8 @@ async function loadAndDisplayEvents(csvPath) {
         
         // Renderiza os eventos ordenados
         renderEvents(getSortedEvents(allEvents), grid);
+        // Preenche o filtro de gênero com base nos eventos carregados
+        populateGenreFilter(allEvents);
 
     } catch (error) {
         console.error("Falha ao carregar ou renderizar os eventos:", error);
@@ -119,7 +121,7 @@ function renderEvents(events, gridElement) {
             const filterDate = new Date(year, month - 1, day);
             const today = new Date();
             today.setHours(0, 0, 0, 0); // Normaliza para comparar apenas a data
-            gridElement.innerHTML = filterDate >= today ? '<p class="empty-grid-message">Ainda não foi anunciada festa para esta data.</p>' : '<p class="empty-grid-message">Nenhum evento encontrado para esta data passada.</p>';
+            gridElement.innerHTML = filterDate >= today ? '<p class="empty-grid-message">Nenhuma festa agendada para esta data.</p>' : '<p class="empty-grid-message">Nenhum evento encontrado para esta data passada.</p>';
         } else {
             gridElement.innerHTML = '<p class="empty-grid-message">Nenhuma festa encontrada com os filtros aplicados.</p>';
         }
@@ -135,6 +137,32 @@ function renderEvents(events, gridElement) {
     gridElement.appendChild(fragment);
 }
 
+/**
+ * Preenche o dropdown de filtro de gênero com base nos gêneros encontrados nos eventos.
+ * @param {Array<Object>} events - A lista de todos os eventos.
+ */
+function populateGenreFilter(events) {
+    const genreFilter = document.getElementById('genre-filter');
+    if (!genreFilter) return;
+
+    const allGenres = new Set();
+
+    events.forEach(event => {
+        const genresString = getProp(event, 'Gênero');
+        if (genresString) {
+            const genres = genresString.split(',').map(g => g.trim());
+            genres.forEach(genre => allGenres.add(genre));
+        }
+    });
+
+    const sortedGenres = Array.from(allGenres).sort();
+    sortedGenres.forEach(genre => {
+        const option = document.createElement('option');
+        option.value = genre.toLowerCase();
+        option.textContent = genre;
+        genreFilter.appendChild(option);
+    });
+}
 /**
  * Retorna uma cópia dos eventos ordenados por data.
  * @param {Array<Object>} events - A lista de eventos a ser ordenada.
@@ -177,18 +205,27 @@ function setupFilters() {
     let debounceTimer;
     const searchInput = document.getElementById('search-input');
     const dateInput = document.getElementById('date-filter');
+    const genreFilter = document.getElementById('genre-filter');
     const clearSearchBtn = document.getElementById('clear-search-btn');
     const clearDateBtn = document.getElementById('clear-date-btn');
+    const clearAllBtn = document.getElementById('clear-all-filters-btn');
     const searchLoader = document.getElementById('search-loader');
     const grid = document.getElementById('event-grid');
 
     const applyFilters = () => {
         const searchTerm = searchInput.value.toLowerCase();
         const selectedDate = dateInput.value; // Formato YYYY-MM-DD
+        const selectedGenre = genreFilter.value;
+
+        // Adiciona/remove a classe 'is-active' para feedback visual
+        searchInput.classList.toggle('is-active', !!searchTerm);
+        dateInput.classList.toggle('is-active', !!selectedDate);
+        genreFilter.classList.toggle('is-active', !!selectedGenre);
 
         // Mostra/esconde botões de limpar
         clearSearchBtn.hidden = !searchTerm;
         clearDateBtn.hidden = !selectedDate;
+        clearAllBtn.hidden = !searchTerm && !selectedDate && !selectedGenre;
 
         let filteredEvents = allEvents;
 
@@ -210,6 +247,16 @@ function setupFilters() {
             filteredEvents = filteredEvents.filter(event => {
                 const eventDate = getProp(event, 'Data') || getProp(event, 'Date');
                 return eventDate === formattedDate;
+            });
+        }
+
+        // 3. Filtra por gênero
+        if (selectedGenre) {
+            filteredEvents = filteredEvents.filter(event => {
+                const eventGenres = (getProp(event, 'Gênero') || '').toLowerCase();
+                // Verifica se a string de gêneros do evento inclui o gênero selecionado
+                // Isso funciona para "Techno, House" contendo "techno"
+                return eventGenres.split(',').map(g => g.trim()).includes(selectedGenre);
             });
         }
 
@@ -236,6 +283,7 @@ function setupFilters() {
         }, 300); // Atraso de 300ms
     });
     dateInput.addEventListener('change', applyFilters); // 'change' é melhor para input de data
+    genreFilter.addEventListener('change', applyFilters);
 
     clearSearchBtn.addEventListener('click', () => {
         searchInput.value = '';
@@ -245,6 +293,13 @@ function setupFilters() {
 
     clearDateBtn.addEventListener('click', () => {
         dateInput.value = '';
+        applyFilters();
+    });
+
+    clearAllBtn.addEventListener('click', () => {
+        searchInput.value = '';
+        dateInput.value = '';
+        genreFilter.value = '';
         applyFilters();
     });
 }
@@ -291,6 +346,7 @@ function createEventCardElement(event) {
     const endTime = getProp(event, 'Fim');
     const attractions = getProp(event, 'Atrações') || '';
     let imageUrl = getProp(event, 'Imagem (URL)');
+    const genres = getProp(event, 'Gênero');
     const ticketUrl = getProp(event, 'Ingressos (URL)');
     const instagramUrl = getProp(event, 'Instagram (URL)');
 
@@ -307,11 +363,9 @@ function createEventCardElement(event) {
         imageUrl = './assets/beije.PNG'; // Adicione a imagem correta para o evento "Beije" e ajuste a extensão.
     } else if (eventNameLower === 'wav & friends') {
         imageUrl = './assets/wav.PNG'; // Adicione a imagem correta para o evento "WAV" e ajuste a extensão.
-    }
-    else if (eventNameLower === 'wav & sunset') {
+    } else if (eventNameLower === 'wav & sunset') {
         imageUrl = './assets/wavsunset.PNG'; // Adicione a imagem correta para o evento "WAV" e ajuste a extensão.
-    }
-    else if (eventNameLower === 'kolaje na estação') {
+    } else if (eventNameLower === 'kolaje na estação') {
         imageUrl = './assets/kolaje.PNG'; // Adicione a imagem correta para o evento "WAV" e ajuste a extensão.
     }
 
@@ -321,6 +375,14 @@ function createEventCardElement(event) {
     const dateTimeString = timeString ? `${date} - ${timeString}` : date;
 
     const instagramIconSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>`;
+
+    let genreTagsHtml = '';
+    if (genres) {
+        const genreList = genres.split(',').map(g => g.trim());
+        // Junta os gêneros em uma única string, separados por um ponto.
+        const genreText = genreList.join(' &bull; ');
+        genreTagsHtml = `<p class="event-card__genres">${genreText}</p>`;
+    }
 
     let ticketHtml = '';
     if (ticketUrl) {
@@ -335,6 +397,7 @@ function createEventCardElement(event) {
         <img src="${imageUrl || placeholderSvg}" alt="${name}" class="event-card__image" loading="lazy" onerror="this.onerror=null;this.src='${errorSvg}';">
         <div class="event-card__info">
             <h2 class="event-card__name">${name}</h2>
+            ${genreTagsHtml}
             <p class="event-card__details">${dateTimeString}</p>
             ${attractions ? `<p class="event-card__attractions">${attractions}</p>` : ''}
             ${instagramUrl ? `<p class="event-card__instagram"><a href="${instagramUrl}" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">${instagramIconSvg} Instagram</a></p>` : ''}
@@ -564,7 +627,7 @@ function openModal(event) {
     const whatsappBtn = modalContent.querySelector('.whatsapp-btn');
     if (whatsappBtn) {
         whatsappBtn.addEventListener('click', () => {
-            const shareText = `Confira este evento: *${name}* em ${date}! Saiba mais em: ${window.location.href}`;
+            const shareText = `Confira este evento: *${name}* em ${date}! Saiba mais em: ${window.location.origin}${window.location.pathname}`;
             const whatsappUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareText)}`;
             window.open(whatsappUrl, '_blank');
         });

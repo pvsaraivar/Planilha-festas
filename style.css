@@ -74,6 +74,10 @@ a {
     min-width: 250px;
 }
 
+.genre-filter-container {
+    min-width: 200px;
+}
+
 .date-filter-container {
     position: relative;
 }
@@ -92,6 +96,34 @@ a {
     color-scheme: dark; /* Garante que o calendário do seletor de data use o tema escuro */
 }
 
+.genre-filter {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    padding-right: 2.5rem; /* Espaço para a seta personalizada */
+    font-size: 1rem;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    transition: border-color 0.2s, box-shadow 0.2s;
+    font-family: inherit;
+    color: var(--subtle-text);
+    height: 50px;
+    color-scheme: dark;
+    /* Remove a aparência padrão do navegador */
+    -webkit-appearance: none;
+    appearance: none;
+    /* Adiciona a seta personalizada */
+    background-color: transparent;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23A7A7A7'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    background-size: 1em;
+}
+
+.genre-filter option {
+    background-color: var(--card-background);
+    color: var(--text-color);
+}
+
 .date-filter:focus {
     outline: 2px solid transparent;
     outline-offset: 2px;
@@ -99,8 +131,15 @@ a {
     box-shadow: 0 0 0 2px var(--primary-color);
 }
 
+.genre-filter:focus {
+    outline: 2px solid transparent;
+    outline-offset: 2px;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px var(--primary-color);
+}
+
 /* Muda a cor do texto quando uma data é selecionada */
-.date-filter:valid {
+.date-filter:valid, .genre-filter option:checked:not([value='']) {
     color: var(--text-color);
 }
 
@@ -165,6 +204,12 @@ a {
     color: var(--text-color);
 }
 
+.date-filter.is-active,
+.genre-filter.is-active,
+#search-input.is-active {
+    border-color: var(--primary-color);
+}
+
 .clear-date-btn {
     position: absolute;
     top: 50%;
@@ -200,6 +245,22 @@ a {
     }
 }
 
+.clear-all-filters-btn {
+    height: 50px;
+    padding: 0 1.5rem;
+    background-color: transparent;
+    border: 1px solid var(--border-color);
+    color: var(--subtle-text);
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: inherit;
+    font-size: 1rem;
+}
+.clear-all-filters-btn:hover {
+    border-color: var(--primary-color);
+    color: var(--text-color);
+}
 
 #event-grid {
     display: grid;
@@ -271,6 +332,15 @@ a {
     font-weight: 700; /* Peso "Bold" para o nome do evento */
     margin: 0; /* Remove a margem para juntar com a data */
     /* flex-grow: 1; foi removido para juntar o nome e a data */
+}
+
+.event-card__genres {
+    margin: 0.1rem 0 0 0; /* Margem pequena para aproximar do título */
+    font-size: 0.7rem;
+    font-weight: 500;
+    color: var(--subtle-text);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
 .event-card__attractions {
@@ -648,6 +718,35 @@ a {
 
 /* --- Responsividade para Cards no Mobile --- */
 @media (max-width: 600px) {
+    .site-header {
+        padding-top: 1.5rem;
+        padding-bottom: 0.5rem;
+    }
+    .site-header h1 {
+        font-size: 2rem;
+    }
+    .site-header h2 {
+        font-size: 0.9rem;
+        line-height: 1.4;
+    }
+
+    .filters-wrapper {
+        flex-direction: column; /* Empilha os filtros verticalmente */
+        align-items: stretch;
+        margin-top: 1rem;
+        gap: 0.75rem;
+    }
+
+    #search-input,
+    .date-filter,
+    .genre-filter {
+        height: 44px; /* Altura dos filtros reduzida */
+    }
+
+    .clear-all-filters-btn {
+        height: 44px;
+    }
+
     #event-grid {
         /* Reduz o tamanho mínimo do card para permitir 2 colunas em telas menores */
         grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
