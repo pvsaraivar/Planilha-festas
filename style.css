@@ -743,6 +743,11 @@ a {
         height: 44px; /* Altura dos filtros reduzida */
     }
 
+    .genre-filter {
+        padding-left: 0.75rem;
+        padding-right: 2.25rem; /* Menos espaço para a seta no mobile */
+    }
+
     .clear-all-filters-btn {
         height: 44px;
     }
