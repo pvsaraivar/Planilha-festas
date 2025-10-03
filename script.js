@@ -2,12 +2,7 @@
 
 let allEvents = []; // Armazena todos os eventos para filtragem
 
-/**
- * Ponto de entrada principal. Aguarda o DOM carregar antes de executar.
- */
 document.addEventListener('DOMContentLoaded', () => {
-    // URL da sua planilha do Google publicada como CSV.
-    // Qualquer alteração na planilha será refletida aqui automaticamente.
     const sheetId = '1LAfG4Nt2g_P12HMCx-wEmWpXoX3yp1qAKdw89eLbeWU';
     const googleSheetUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/export?format=csv`;
     loadAndDisplayEvents(googleSheetUrl);

@@ -93,6 +93,7 @@ a {
     z-index: 1;
     transition: opacity 0.2s, visibility 0.2s;
 }
+.date-filter-placeholder { display: none; } /* Oculta por padrão (desktop) */
 
 .date-filter-container.has-value .date-filter-placeholder {
     opacity: 0;
@@ -848,4 +849,9 @@ input[type="date"]::placeholder {
     .modal-separator {
         margin: 1rem 0; /* Espaçamento do separador reduzido */
     }
+}
+
+/* Exibe o placeholder do calendário apenas em telas menores */
+@media (max-width: 600px) {
+    .date-filter-placeholder { display: block; }
 }
