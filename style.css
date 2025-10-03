@@ -1,14 +1,14 @@
 /* style.css */
 :root {
-    --primary-color: #4A90E2; /* Um azul mais suave e moderno */
-    --background-start: #ffffff;
-    --background-end: #f4f7f9;
-    --card-background: #ffffff;
-    --text-color: #212529;
-    --subtle-text: #6c757d;
-    --border-color: #dee2e6;
-    --shadow: 0 2px 8px rgba(0, 0, 0, 0.06); /* Sombra mais sutil e difusa */
-    --border-radius: 12px; /* Bordas mais arredondadas */
+    --primary-color: #8A2BE2; /* Roxo vibrante como nova cor de destaque */
+    --background-start: #121212; /* Fundo escuro principal */
+    --background-end: #181818;
+    --card-background: #282828; /* Fundo dos cards, um pouco mais claro */
+    --text-color: #FFFFFF;
+    --subtle-text: #A7A7A7;
+    --border-color: #404040; /* Cor da borda sutil */
+    --shadow: 0 4px 12px rgba(0, 0, 0, 0.2); /* Sombra para tema escuro */
+    --border-radius: 8px; /* Bordas um pouco menos arredondadas para um look mais sharp */
     --transition-speed: 0.3s;
 }
 
@@ -22,7 +22,8 @@
 body {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     line-height: 1.6;
-    background: linear-gradient(180deg, var(--background-start) 0%, var(--background-end) 200px);
+    font-weight: 300; /* Define o peso da fonte padrão como "Light" */
+    background: var(--background-start);
     color: var(--text-color);
     margin: 0;
     min-height: 100vh;
@@ -33,6 +34,7 @@ body {
 .site-header {
     padding-top: 2rem;
     padding-bottom: 1rem;
+    font-family: modern 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
 }
 
 .container {
@@ -44,7 +46,7 @@ body {
 .site-header h1 {
     margin: 0 0 0.5rem 0;
     font-size: 2.5rem;
-    font-weight: 700;
+    font-weight: 800; /* Mais peso para o título */
     color: var(--text-color);
 }
 
@@ -78,7 +80,7 @@ body {
     font-size: 1rem;
     border-radius: 8px;
     border: 1px solid var(--border-color);
-    background-color: var(--card-background);
+    background-color: transparent;
     transition: border-color 0.2s, box-shadow 0.2s;
     font-family: inherit;
     color: var(--subtle-text);
@@ -86,9 +88,10 @@ body {
 }
 
 .date-filter:focus {
-    outline: none;
+    outline: 2px solid transparent;
+    outline-offset: 2px;
     border-color: var(--primary-color);
-    box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.25);
+    box-shadow: 0 0 0 2px var(--primary-color);
 }
 
 /* Muda a cor do texto quando uma data é selecionada */
@@ -125,15 +128,17 @@ body {
     font-size: 1rem;
     border-radius: 8px;
     border: 1px solid var(--border-color);
-    background-color: var(--card-background);
+    background-color: transparent;
     transition: border-color 0.2s, box-shadow 0.2s;
     height: 50px;
+    color: var(--text-color); /* Garante que o texto digitado seja branco */
 }
 
 #search-input:focus {
-    outline: none;
+    outline: 2px solid transparent;
+    outline-offset: 2px;
     border-color: var(--primary-color);
-    box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.25);
+    box-shadow: 0 0 0 2px var(--primary-color);
 }
 
 .clear-search-btn {
@@ -208,18 +213,19 @@ body {
     background-color: var(--card-background);
     box-shadow: var(--shadow);
     overflow: hidden;
+    border: 1px solid var(--border-color);
     display: flex;
     flex-direction: column;
     transition: transform var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
     cursor: pointer;
     border-radius: var(--border-radius);
 }
-
 .event-card:hover {
     transform: translateY(-6px);
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.07), 0 12px 32px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+    border-color: var(--primary-color);
+    background-color: #333; /* Ilumina um pouco o card no hover */
 }
-
 .event-card:active {
     transform: translateY(-2px) scale(0.98);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
@@ -228,7 +234,7 @@ body {
 .event-card__image {
     width: 100%;
     height: 220px;
-    object-fit: cover;
+    object-fit: cover; /* Mantém o cover que é ótimo */
     object-position: center; /* Garante o alinhamento central */
 }
 
@@ -248,15 +254,15 @@ body {
 
 .event-card__name {    
     font-size: 1.2rem;
-    font-weight: 700; /* Mais destaque para o nome */
-    margin: 0 0 1rem 0;
-    flex-grow: 1; /* Empurra o preço para baixo */
+    font-weight: 600; /* Um pouco menos pesado para equilibrar */
+    margin: 0; /* Remove a margem para juntar com a data */
+    /* flex-grow: 1; foi removido para juntar o nome e a data */
 }
 
 .event-card__attractions {
     font-size: 0.9rem;
     color: var(--subtle-text);
-    margin: -0.5rem 0 1rem 0;
+    margin: 0.5rem 0 1rem 0; /* Aumenta o espaço acima das atrações */
     font-style: italic;
 }
 
@@ -278,7 +284,7 @@ body {
 
 .event-card__location {
     font-size: 1.25rem; /* Ajuste para melhor responsividade */
-    font-weight: 600;
+    font-weight: 500;
     color: var(--primary-color);
     margin-bottom: 0.5rem;
 }
@@ -312,7 +318,7 @@ body {
 }
 
 .event-card__tickets-btn:hover {
-    background-color: #3a7bc8; /* Um tom mais escuro do azul primário */
+    background-color: #7B1FA2; /* Um tom mais escuro do roxo para o hover */
 }
 
 .event-card__tickets-btn--free {
@@ -326,24 +332,41 @@ body {
 
 .site-footer {
     text-align: center;
-    padding: 2rem 0;
-    margin-top: 3rem; /* Mais espaço antes do rodapé */
-    background-color: #e9ecef;
+    padding: 1.5rem 0; /* Padding reduzido */
+    margin-top: 2rem; /* Margem superior reduzida */
+    background-color: var(--background-end);
     color: var(--subtle-text);
-    font-size: 0.9rem;
+    font-size: 0.8rem; /* Fonte reduzida */
+}
+
+.site-footer p {
+    margin: 0;
+}
+
+.footer-contact {
+    margin-top: 0.5rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+}
+.footer-contact a {
+    color: var(--subtle-text);
+    text-decoration: none;
+    transition: color 0.2s;
 }
 
 /* --- Estilos para o Skeleton Loader --- */
 
 .skeleton-card {
-    background-color: var(--card-background);
+    background-color: transparent;
     border: 1px solid var(--border-color);
     border-radius: var(--border-radius);
     overflow: hidden;
 }
 
 .skeleton {
-    opacity: 0.7;
+    opacity: 0.4;
     animation: shimmer 1.5s infinite linear;
     background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
     background-size: 200% 100%;
@@ -381,7 +404,7 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.6);
+    background-color: rgba(0, 0, 0, 0.8); /* Overlay mais escuro */
     display: flex;
     align-items: center;
     justify-content: center;
@@ -450,24 +473,10 @@ body {
     gap: 0.5rem;
 }
 
-.copy-address-btn {
-    background-color: #f0f0f0;
-    border: 1px solid #e0e0e0;
-    border-radius: 6px;
-    padding: 0.2rem 0.6rem;
-    font-size: 0.8rem;
-    font-weight: 600;
-    color: var(--subtle-text);
-    cursor: pointer;
-    transition: all 0.2s;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.4rem;
-}
-
-.copy-address-btn:hover {
-    background-color: #e0e0e0;
-    color: var(--text-color);
+.modal-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2rem;
 }
 
 .share-btn {
@@ -483,9 +492,18 @@ body {
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
-    margin-top: 1.5rem;
     width: 100%;
     justify-content: center;
+}
+
+.whatsapp-btn {
+    background-color: #25D366;
+    color: #fff;
+}
+
+.whatsapp-btn:hover {
+    background-color: #20b058;
+    color: #fff;
 }
 
 .modal-content p a {
@@ -505,6 +523,40 @@ body {
         grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
     }
 
+    .event-card__image {
+        height: 120px; /* Altura da imagem ainda mais reduzida */
+    }
+
+    .event-card__info {
+        padding: 0.5rem 0.75rem; /* Padding vertical ainda menor */
+    }
+
+    .event-card__name {
+        font-size: 1rem; /* Fonte do nome do evento menor */
+    }
+
+    .event-card__location {
+        font-size: 1rem; /* Fonte do local menor */
+    }
+
+    .event-card__details {
+        font-size: 0.7rem;
+        margin-bottom: 0.25rem;
+    }
+
+    .event-card__attractions, .event-card__instagram {
+        font-size: 0.8rem;
+        margin: 0.25rem 0;
+    }
+
+    .event-card__footer {
+        padding: 0 0.75rem 0.75rem;
+    }
+
+    .event-card__tickets-btn {
+        padding: 0.5rem;
+    }
+
     .modal {
         width: calc(100% - 2rem); /* Garante uma margem nas laterais */
         padding: 1.5rem;
@@ -512,5 +564,15 @@ body {
 
     .modal-content h2 {
         font-size: 1.5rem;
+    }
+
+    .modal-content p {
+        font-size: 0.9rem; /* Fonte menor para os parágrafos */
+        line-height: 1.5; /* Linhas mais próximas */
+    }
+
+    .modal-actions {
+        margin-top: 1.5rem; /* Menos espaço antes dos botões */
+        flex-direction: column; /* Empilha os botões verticalmente */
     }
 }

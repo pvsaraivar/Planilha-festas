@@ -161,71 +161,32 @@ function getSortedEvents(events) {
  */
 function setupSearchFilter() {
     const searchInput = document.getElementById('search-input');
-    const dateInput = document.getElementById('date-filter');
     const clearBtn = document.getElementById('clear-search-btn');
-    const clearDateBtn = document.getElementById('clear-date-btn');
-    const loader = document.getElementById('search-loader');
     const grid = document.getElementById('event-grid');
 
-    let searchTimeout;
+    searchInput.addEventListener('input', (e) => {
+        const searchTerm = e.target.value.toLowerCase();
 
-    const applyFilters = () => {
-        clearTimeout(searchTimeout);
-        grid.classList.add('event-grid--filtering');
-        loader.hidden = false;
-        clearBtn.hidden = true;
+        // Mostra ou esconde o botão de limpar
+        clearBtn.hidden = !searchTerm;
 
-        searchTimeout = setTimeout(() => {
-            const searchTerm = searchInput.value.toLowerCase();
-            const selectedDate = dateInput.value; // Formato YYYY-MM-DD
-
-            // Mostra ou esconde o botão de limpar
-            clearBtn.hidden = !searchTerm;
-            clearDateBtn.hidden = !selectedDate;
-            loader.hidden = true;
-
-            let filteredEvents = allEvents.filter(event => {
-                // Filtro de texto
-                const name = (getProp(event, 'Evento') || getProp(event, 'Nome') || '').toLowerCase();
-                const location = (getProp(event, 'Local') || '').toLowerCase();
-                const textMatch = name.includes(searchTerm) || location.includes(searchTerm);
-
-                // Filtro de data
-                if (selectedDate) {
-                    const eventDateStr = getProp(event, 'Data') || getProp(event, 'Date');
-                    if (!eventDateStr) return false;
-
-                    // Converte DD/MM/YYYY para YYYY-MM-DD para comparação
-                    const [day, month, year] = eventDateStr.split('/');
-                    const formattedEventDate = `${year}-${month}-${day}`;
-                    
-                    return textMatch && formattedEventDate === selectedDate;
-                }
-
-                return textMatch;
-            });
-
-            // Renderiza os eventos filtrados e ordenados
-            renderEvents(getSortedEvents(filteredEvents), grid);
+        const filteredEvents = allEvents.filter(event => {
+            const name = (getProp(event, 'Evento') || getProp(event, 'Nome') || '').toLowerCase();
+            const location = (getProp(event, 'Local') || '').toLowerCase();
             
-            grid.classList.remove('event-grid--filtering');
-        }, 300); // Aguarda 300ms para a animação de fade-out
-    };
+            return name.includes(searchTerm) || location.includes(searchTerm);
+        });
 
-    searchInput.addEventListener('input', applyFilters);
-    dateInput.addEventListener('change', applyFilters);
+        // Renderiza os eventos filtrados e ordenados
+        renderEvents(getSortedEvents(filteredEvents), grid);
+    });
 
     clearBtn.addEventListener('click', () => {
         searchInput.value = '';
         clearBtn.hidden = true;
-        applyFilters(); // Re-aplica filtros (agora sem o texto)
+        // Renderiza todos os eventos novamente
+        renderEvents(getSortedEvents(allEvents), grid);
         searchInput.focus(); // Devolve o foco para a barra de busca
-    });
-
-    clearDateBtn.addEventListener('click', () => {
-        dateInput.value = '';
-        clearDateBtn.hidden = true;
-        applyFilters(); // Re-aplica filtros (agora sem a data)
     });
 }
 
@@ -279,12 +240,17 @@ function createEventCardElement(event) {
     const placeholderSvg = "data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 300'%3e%3crect width='100%25' height='100%25' fill='%23e9ecef'/%3e%3ctext x='50%25' y='50%25' fill='%236c757d' font-size='20' text-anchor='middle' dominant-baseline='middle'%3eEvento%3c/text%3e%3c/svg%3e";
     const errorSvg = "data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 300'%3e%3crect width='100%25' height='100%25' fill='%23e9ecef'/%3e%3ctext x='50%25' y='50%25' fill='%23dc3545' font-size='20' text-anchor='middle' dominant-baseline='middle'%3eImagem Inválida%3c/text%3e%3c/svg%3e";
 
-    // Sobrescreve a imagem para eventos específicos
+    // Sobrescreve a imagem para o evento "Na Pista"
     const eventNameLower = name.trim().toLowerCase();
     if (eventNameLower === 'na pista') {
-        imageUrl = './assets/napista.PNG'; // Exemplo: alterado para .png. Ajuste para a extensão correta do seu arquivo.
+        imageUrl = './assets/napista.PNG'; // Ajuste para a extensão correta do seu arquivo.
     } else if (eventNameLower === 'beije') {
-        imageUrl = './assets/beije.PNG'; // Ajuste a extensão (.jpg, .png, etc.) para corresponder ao seu arquivo.
+        imageUrl = './assets/beije.PNG'; // Adicione a imagem correta para o evento "Beije" e ajuste a extensão.
+    } else if (eventNameLower === 'wav & friends') {
+        imageUrl = './assets/wav.PNG'; // Adicione a imagem correta para o evento "WAV" e ajuste a extensão.
+    }
+    else if (eventNameLower === 'wav & sunset') {
+        imageUrl = './assets/wavsunset.PNG'; // Adicione a imagem correta para o evento "WAV" e ajuste a extensão.
     }
 
     // Formata a string de horário
@@ -306,8 +272,8 @@ function createEventCardElement(event) {
     card.innerHTML = `
         <img src="${imageUrl || placeholderSvg}" alt="${name}" class="event-card__image" loading="lazy" onerror="this.onerror=null;this.src='${errorSvg}';">
         <div class="event-card__info">
-            <p class="event-card__details">${dateTimeString}</p>
             <h2 class="event-card__name">${name}</h2>
+            <p class="event-card__details">${dateTimeString}</p>
             ${attractions ? `<p class="event-card__attractions">${attractions}</p>` : ''}
             ${instagramUrl ? `<p class="event-card__instagram"><a href="${instagramUrl}" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">${instagramIconSvg} Instagram</a></p>` : ''}
             <p class="event-card__location">${location}</p>
@@ -398,7 +364,6 @@ function openModal(event) {
     const attractions = getProp(event, 'Atrações') || 'Não informado';
     const startTime = getProp(event, 'Início');
     const endTime = getProp(event, 'Fim');
-    const imageUrl = getProp(event, 'Imagem (URL)');
     const ticketUrl = getProp(event, 'Ingressos (URL)');
     const instagramUrl = getProp(event, 'Instagram (URL)');
 
@@ -427,7 +392,8 @@ function openModal(event) {
         ? `<p><strong>Instagram:</strong> <a href="${instagramUrl}" target="_blank" rel="noopener noreferrer" class="event-card__instagram a">${instagramIconSvg} Perfil do Evento</a></p>`
         : '';
 
-    const shareIconSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path><polyline points="16 6 12 2 8 6"></polyline><line x1="12" y1="2" x2="12" y2="15"></line></svg>`;
+    const copyLinkIconSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.72"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.72-1.72"></path></svg>`;
+    const whatsappIconSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.894 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.886-.001 2.269.655 4.357 1.849 6.081l-1.214 4.425 4.56-1.195z"/></svg>`;
 
     modalContent.innerHTML = `
         <h2>${name}</h2>
@@ -436,28 +402,41 @@ function openModal(event) {
         <p><strong>Local:</strong> <span class="location-container">${locationHtml}</span></p>
         ${instagramHtml}
         ${ticketHtml}
-        <button class="share-btn">${shareIconSvg} Compartilhar Evento</button>
+        <div class="modal-actions">
+            <button class="share-btn whatsapp-btn">${whatsappIconSvg} Compartilhar no WhatsApp</button>
+            <button class="share-btn copy-link-btn">${copyLinkIconSvg} Copiar Link</button>
+        </div>
     `;
 
     overlay.classList.add('is-visible');
     document.body.style.overflow = 'hidden'; // Impede o scroll da página ao fundo
 
     // Adiciona a funcionalidade de compartilhamento
-    const shareBtn = modalContent.querySelector('.share-btn');
-    if (shareBtn) {
-        shareBtn.addEventListener('click', () => {
+    const copyLinkBtn = modalContent.querySelector('.copy-link-btn');
+    if (copyLinkBtn) {
+        copyLinkBtn.addEventListener('click', () => {
             navigator.clipboard.writeText(window.location.href).then(() => {
                 const checkIconSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
-                const originalHtml = shareBtn.innerHTML;
-                shareBtn.innerHTML = `${checkIconSvg} Link Copiado!`;
-                shareBtn.disabled = true;
+                const originalHtml = copyLinkBtn.innerHTML;
+                copyLinkBtn.innerHTML = `${checkIconSvg} Link Copiado!`;
+                copyLinkBtn.disabled = true;
                 setTimeout(() => {
-                    shareBtn.innerHTML = originalHtml;
-                    shareBtn.disabled = false;
+                    copyLinkBtn.innerHTML = originalHtml;
+                    copyLinkBtn.disabled = false;
                 }, 2000);
             }).catch(err => {
                 console.error('Falha ao copiar o link: ', err);
             });
+        });
+    }
+
+    // Adiciona a funcionalidade de compartilhar no WhatsApp
+    const whatsappBtn = modalContent.querySelector('.whatsapp-btn');
+    if (whatsappBtn) {
+        whatsappBtn.addEventListener('click', () => {
+            const shareText = `Confira este evento: *${name}* em ${date}! Saiba mais em: ${window.location.href}`;
+            const whatsappUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareText)}`;
+            window.open(whatsappUrl, '_blank');
         });
     }
 }
