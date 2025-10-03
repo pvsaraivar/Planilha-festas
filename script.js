@@ -47,9 +47,9 @@ async function loadAndDisplayEvents(csvPath) {
         // Renderiza os eventos ordenados
         renderEvents(getSortedEvents(allEvents), grid);
         // Preenche o filtro de gênero com base nos eventos carregados
-        populateGenreFilter(allEvents);
+        populateGenreFilter(allEvents); 
         // Aplica filtros iniciais com base nos parâmetros da URL, se houver
-        populateGenreFilter(allEvents);
+        applyFiltersFromURL();
 
     } catch (error) {
         console.error("Falha ao carregar ou renderizar os eventos:", error);
@@ -150,11 +150,7 @@ function renderEvents(events, gridElement) {
     gridElement.innerHTML = ''; // Limpa os skeletons ou a mensagem "Carregando..."
     if (events.length === 0) {
         if (selectedDate) {
-            const [year, month, day] = selectedDate.split('-');
-            const filterDate = new Date(year, month - 1, day);
-            const today = new Date();
-            today.setHours(0, 0, 0, 0); // Normaliza para comparar apenas a data
-            gridElement.innerHTML = filterDate >= today ? '<p class="empty-grid-message">Nenhuma festa agendada para esta data.</p>' : '<p class="empty-grid-message">Nenhum evento encontrado para esta data passada.</p>';
+            gridElement.innerHTML = '<p class="empty-grid-message">Nenhuma festa agendada para esta data.</p>';
         } else {
             gridElement.innerHTML = '<p class="empty-grid-message">Nenhuma festa encontrada com os filtros aplicados.</p>';
         }
@@ -253,7 +249,7 @@ function setupFilters() {
 
     const applyFilters = () => {
         const searchTerm = searchInput.value.toLowerCase();
-        const selectedDate = dateInput.value; // Formato YYYY-MM-DD
+        const selectedDate = dateInput.value;
         const selectedGenre = genreFilter.value;
 
         // Adiciona/remove a classe 'is-active' para feedback visual
@@ -335,7 +331,12 @@ function setupFilters() {
             searchLoader.hidden = true;
         }, 300); // Atraso de 300ms
     });
-    dateInput.addEventListener('change', applyFilters); // 'change' é melhor para input de data
+    dateInput.addEventListener('change', applyFilters);
+    // Impede a digitação manual no campo de data, forçando o uso do calendário.
+    dateInput.addEventListener('keydown', (e) => {
+        e.preventDefault();
+    });
+
     genreFilter.addEventListener('change', applyFilters);
 
     clearSearchBtn.addEventListener('click', () => {
