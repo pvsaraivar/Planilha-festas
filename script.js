@@ -431,6 +431,18 @@ function createEventCardElement(event) {
         imageUrl = './assets/nandi.PNG'; // Adicione a imagem correta para o evento "WAV" e ajuste a extensão.
     } else if (eventNameLower === 'bateu convida badsista & friends') {
         imageUrl = './assets/bateubadsista.PNG'; // Adicione a imagem correta para o evento "WAV" e ajuste a extensão.
+    } else if (eventNameLower === 'fritaria') {
+        imageUrl = './assets/fritaria.PNG'; // Adicione a imagem correta para o evento "WAV" e ajuste a extensão.
+    } else if (eventNameLower === 'bunker') {
+        imageUrl = './assets/bunker.jpg'; // Adicione a imagem correta para o evento "WAV" e ajuste a extensão.
+    } else if (eventNameLower === 'baile do ddzin') {
+        imageUrl = './assets/bailedoddzin.jpg'; // Adicione a imagem correta para o evento "WAV" e ajuste a extensão.
+    } else if (eventNameLower === 'titanica') {
+        imageUrl = './assets/titanica.jpg'; // Adicione a imagem correta para o evento "WAV" e ajuste a extensão.
+    } else if (eventNameLower === 'fabrika') {
+        imageUrl = './assets/fabrika.jpg'; // Adicione a imagem correta para o evento "WAV" e ajuste a extensão.
+    } else if (eventNameLower === 'baile do ddzin') {
+        imageUrl = './assets/bailedoddzin.jpg'; // Adicione a imagem correta para o evento "WAV" e ajuste a extensão.
     }
 
 
