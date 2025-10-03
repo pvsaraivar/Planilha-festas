@@ -648,7 +648,6 @@ function openModal(event) {
     // Se houver um local válido, cria um link para o Google Maps
     if (location && location !== 'Localização não divulgada') {
         const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(location)}`;
-        locationHtml = `<a href="${mapsUrl}" target="_blank" rel="noopener noreferrer">${location}</a>`;
         locationHtml = `<a href="${mapsUrl}" target="_blank" rel="noopener noreferrer">${mapPinIconSvg} ${location}</a>`;
     }
 
@@ -657,13 +656,15 @@ function openModal(event) {
     const instagramIconSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>`;
     let instagramDetailHtml = '';
     if (instagramUrl) {
-        let profileName = 'Perfil do Evento'; // Texto padrão
+        let profileName = 'Instagram'; // Texto padrão
         try {
             // Extrai o nome do perfil da URL do Instagram
             const url = new URL(instagramUrl.startsWith('http') ? instagramUrl : `https://${instagramUrl}`);
             const pathParts = url.pathname.split('/').filter(part => part); // Remove partes vazias
             if (pathParts.length > 0) {
-                profileName = `@${pathParts[0]}`;
+                // Pega a primeira parte do caminho que não seja 'p', 'reel', etc.
+                const handle = pathParts.find(p => !['p', 'reel', 'reels', 'tv', 'stories'].includes(p.toLowerCase()));
+                if (handle) profileName = `@${handle}`;
             }
         } catch (e) {
             console.error("URL do Instagram inválida:", instagramUrl, e);
