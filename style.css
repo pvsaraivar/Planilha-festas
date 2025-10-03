@@ -756,6 +756,10 @@ input[type="date"]::placeholder {
         /* A regra de flex-basis não é mais necessária com flex-direction: column */
     }
 
+    .date-filter-label::before {
+        content: "Calendário"; /* Texto específico para mobile */
+    }
+
     .date-filter {
         padding-right: 3rem; /* Aumenta o espaço para o botão X no mobile */
     }
