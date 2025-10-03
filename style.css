@@ -64,7 +64,6 @@ a {
 .filters-wrapper {
     display: flex;
     flex-wrap: wrap;
-    align-items: flex-end; /* Alinha os filtros pela base */
     gap: 1rem;
     margin-top: 1.5rem;
     margin-bottom: -1rem; /* Compensa o padding-top do event-grid */
@@ -84,14 +83,27 @@ a {
     position: relative;
 }
 
+/* Adiciona o placeholder personalizado "Calendário" */
 .date-filter-container::before {
-    content: 'Calendário';
-    font-size: 0.8rem;
-    font-weight: 500;
+    content: "Calendário";
     color: var(--subtle-text);
     position: absolute;
-    top: -1.2rem; /* Posiciona o rótulo acima do campo */
-    left: 0;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none; /* Permite que o clique passe através do texto para o input */
+    z-index: 1;
+    transition: opacity 0.2s;
+}
+
+/* Esconde o placeholder personalizado quando uma data é selecionada */
+.date-filter-container:has(.date-filter:valid)::before {
+    opacity: 0;
+}
+
+/* Torna o placeholder nativo (dd/mm/aaaa) transparente apenas quando o campo está vazio */
+.date-filter:invalid {
+    color: transparent;
 }
 
 .date-filter {
@@ -102,7 +114,7 @@ a {
     border: 1px solid var(--border-color);
     transition: border-color 0.2s, box-shadow 0.2s;
     font-family: inherit;
-    color: var(--text-color); /* Garante que o texto seja visível por padrão */
+    color: var(--text-color); /* Garante que a data selecionada seja visível */
     height: 50px;
     background-color: transparent;
 }
