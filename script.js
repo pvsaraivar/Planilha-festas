@@ -11,8 +11,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const sheetId = '1LAfG4Nt2g_P12HMCx-wEmWpXoX3yp1qAKdw89eLbeWU';
     const googleSheetUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/export?format=csv`;
     loadAndDisplayEvents(googleSheetUrl);
-    setupSearchFilter();
+    setupFilters();
     setupModal();
+    setupBackToTopButton();
 });
 
 /**
@@ -107,15 +108,27 @@ function parseCSV(text) {
  * @param {HTMLElement} gridElement - O elemento container onde os eventos serão inseridos.
  */
 function renderEvents(events, gridElement) {
+    const dateInput = document.getElementById('date-filter');
+    const selectedDate = dateInput ? dateInput.value : null;
+
     gridElement.innerHTML = ''; // Limpa os skeletons ou a mensagem "Carregando..."
     if (events.length === 0) {
-        gridElement.innerHTML = '<p>Nenhum evento encontrado.</p>';
+        if (selectedDate) {
+            const [year, month, day] = selectedDate.split('-');
+            const filterDate = new Date(year, month - 1, day);
+            const today = new Date();
+            today.setHours(0, 0, 0, 0); // Normaliza para comparar apenas a data
+            gridElement.innerHTML = filterDate >= today ? '<p>Nenhum evento futuro encontrado para esta data.</p>' : '<p>Nenhum evento encontrado para esta data.</p>';
+        } else {
+            gridElement.innerHTML = '<p>Nenhum evento encontrado com os filtros aplicados.</p>';
+        }
         return;
     }
 
     const fragment = document.createDocumentFragment();
-    events.forEach(event => {
+    events.forEach((event, index) => {
         const card = createEventCardElement(event);
+        card.style.animationDelay = `${index * 75}ms`; // Adiciona um atraso escalonado
         fragment.appendChild(card);
     });
     gridElement.appendChild(fragment);
@@ -157,35 +170,56 @@ function getSortedEvents(events) {
 }
 
 /**
- * Configura o filtro de busca.
+ * Configura os filtros de busca por texto e por data.
  */
-function setupSearchFilter() {
+function setupFilters() {
     const searchInput = document.getElementById('search-input');
-    const clearBtn = document.getElementById('clear-search-btn');
+    const dateInput = document.getElementById('date-filter');
+    const clearSearchBtn = document.getElementById('clear-search-btn');
+    const clearDateBtn = document.getElementById('clear-date-btn');
     const grid = document.getElementById('event-grid');
 
-    searchInput.addEventListener('input', (e) => {
-        const searchTerm = e.target.value.toLowerCase();
+    const applyFilters = () => {
+        const searchTerm = searchInput.value.toLowerCase();
+        const selectedDate = dateInput.value; // Formato YYYY-MM-DD
 
-        // Mostra ou esconde o botão de limpar
-        clearBtn.hidden = !searchTerm;
+        // Mostra/esconde botões de limpar
+        clearSearchBtn.hidden = !searchTerm;
+        clearDateBtn.hidden = !selectedDate;
 
-        const filteredEvents = allEvents.filter(event => {
-            const name = (getProp(event, 'Evento') || getProp(event, 'Nome') || '').toLowerCase();
-            const location = (getProp(event, 'Local') || '').toLowerCase();
+        let filteredEvents = allEvents;
+
+        // 1. Filtra por texto
+        if (searchTerm) {
+            filteredEvents = filteredEvents.filter(event => {
+                const name = (getProp(event, 'Evento') || getProp(event, 'Nome') || '').toLowerCase();
+                const location = (getProp(event, 'Local') || '').toLowerCase();
+                return name.includes(searchTerm) || location.includes(searchTerm);
+            });
+        }
+
+        // 2. Filtra por data
+        if (selectedDate) {
+            // Converte YYYY-MM-DD para DD/MM/YYYY para comparar com o formato da planilha
+            const [year, month, day] = selectedDate.split('-');
+            const formattedDate = `${day}/${month}/${year}`;
             
-            return name.includes(searchTerm) || location.includes(searchTerm);
-        });
+            filteredEvents = filteredEvents.filter(event => {
+                const eventDate = getProp(event, 'Data') || getProp(event, 'Date');
+                return eventDate === formattedDate;
+            });
+        }
 
-        // Renderiza os eventos filtrados e ordenados
         renderEvents(getSortedEvents(filteredEvents), grid);
-    });
+    };
 
-    clearBtn.addEventListener('click', () => {
+    // Adiciona listeners
+    searchInput.addEventListener('input', applyFilters);
+    dateInput.addEventListener('change', applyFilters); // 'change' é melhor para input de data
+
+    clearSearchBtn.addEventListener('click', () => {
         searchInput.value = '';
-        clearBtn.hidden = true;
-        // Renderiza todos os eventos novamente
-        renderEvents(getSortedEvents(allEvents), grid);
+        applyFilters();
         searchInput.focus(); // Devolve o foco para a barra de busca
     });
 }
@@ -439,4 +473,30 @@ function openModal(event) {
             window.open(whatsappUrl, '_blank');
         });
     }
+}
+
+/**
+ * Configura o botão "Voltar ao Topo".
+ */
+function setupBackToTopButton() {
+    const backToTopBtn = document.getElementById('back-to-top-btn');
+    if (!backToTopBtn) return;
+
+    // Mostra ou esconde o botão com base na rolagem
+    window.addEventListener('scroll', () => {
+        if (window.scrollY > 300) { // Mostra o botão após rolar 300px
+            backToTopBtn.classList.add('visible');
+        } else {
+            backToTopBtn.classList.remove('visible');
+        }
+    });
+
+    // Rola para o topo ao clicar
+    backToTopBtn.addEventListener('click', (e) => {
+        e.preventDefault(); // Previne o comportamento padrão do link '#'
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth' // Rolagem suave
+        });
+    });
 }

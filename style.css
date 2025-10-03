@@ -50,7 +50,7 @@ body {
     color: var(--text-color);
 }
 
-.site-header p {
+.site-header h2, .site-header p {
     margin-top: 0.25rem;
     font-size: 1.1rem;
     color: var(--subtle-text);
@@ -85,6 +85,7 @@ body {
     font-family: inherit;
     color: var(--subtle-text);
     height: 50px; /* Altura fixa para alinhar com a busca */
+    color-scheme: dark; /* Garante que o calendário do seletor de data use o tema escuro */
 }
 
 .date-filter:focus {
@@ -198,7 +199,7 @@ body {
 
 #event-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
     gap: 1.5rem;
     padding-top: 2rem;
     padding-bottom: 2rem;
@@ -219,6 +220,9 @@ body {
     transition: transform var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
     cursor: pointer;
     border-radius: var(--border-radius);
+    /* Animação de fade-in */
+    opacity: 0; /* Começa invisível */
+    animation: fadeIn 0.5s ease-out forwards;
 }
 .event-card:hover {
     transform: translateY(-6px);
@@ -396,6 +400,17 @@ body {
     }
 }
 
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
 /* --- Estilos para o Modal --- */
 
 .modal-overlay {
@@ -514,6 +529,40 @@ body {
 
 .modal-content p a:hover {
     text-decoration: underline;
+}
+
+/* --- Estilos para o Botão Voltar ao Topo --- */
+.back-to-top-btn {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: var(--primary-color);
+    color: white;
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s, visibility 0.3s, transform 0.3s, background-color 0.2s;
+    z-index: 999;
+    transform: translateY(20px);
+}
+
+.back-to-top-btn.visible {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.back-to-top-btn:hover {
+    background-color: #7B1FA2; /* Tom mais escuro do roxo */
 }
 
 /* --- Responsividade para Cards no Mobile --- */
