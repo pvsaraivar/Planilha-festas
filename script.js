@@ -395,7 +395,7 @@ function createEventCardElement(event) {
     // Tenta buscar por "Evento" e, se não encontrar, tenta por "Nome".
     const name = getProp(event, 'Evento') || getProp(event, 'Nome') || 'Evento sem nome';
     const date = getProp(event, 'Data') || getProp(event, 'Date') || 'Data a confirmar';
-    const location = getProp(event, 'Local') || 'Local a confirmar';
+    const location = getProp(event, 'Local') || 'Localização não divulgada';
     const startTime = getProp(event, 'Início');
     const endTime = getProp(event, 'Fim');
     const attractions = getProp(event, 'Atrações') || '';
@@ -421,7 +421,18 @@ function createEventCardElement(event) {
         imageUrl = './assets/wavsunset.PNG'; // Adicione a imagem correta para o evento "WAV" e ajuste a extensão.
     } else if (eventNameLower === 'kolaje na estação') {
         imageUrl = './assets/kolaje.PNG'; // Adicione a imagem correta para o evento "WAV" e ajuste a extensão.
+    } else if (eventNameLower === 'papoco: ignição') {
+        imageUrl = './assets/papoco.jpg'; // Adicione a imagem correta para o evento "WAV" e ajuste a extensão.
+    } else if (eventNameLower === 'numalaje 3 anos') {
+        imageUrl = './assets/numalaje.PNG'; // Adicione a imagem correta para o evento "WAV" e ajuste a extensão.
+    } else if (eventNameLower === 'numalaje 3 anos - after') {
+        imageUrl = './assets/numalaje.PNG'; // Adicione a imagem correta para o evento "WAV" e ajuste a extensão.
+    } else if (eventNameLower === 'nandi bota tudo') {
+        imageUrl = './assets/nandi.PNG'; // Adicione a imagem correta para o evento "WAV" e ajuste a extensão.
+    } else if (eventNameLower === 'bateu convida badsista & friends') {
+        imageUrl = './assets/bateubadsista.PNG'; // Adicione a imagem correta para o evento "WAV" e ajuste a extensão.
     }
+
 
     // Formata a string de horário
     const timeString = formatTimeString(startTime, endTime);
@@ -445,6 +456,8 @@ function createEventCardElement(event) {
         } else {
             ticketHtml = `<div class="event-card__footer"><a href="${ticketUrl}" target="_blank" rel="noopener noreferrer" class="event-card__tickets-btn" onclick="event.stopPropagation()">Ver Ingressos</a></div>`;
         }
+    } else {
+        ticketHtml = `<div class="event-card__footer"><span class="event-card__tickets-btn event-card__tickets-btn--free">Vendas não divulgadas</span></div>`;
     }
 
     card.innerHTML = `
@@ -573,7 +586,7 @@ function openModal(event) {
 
     const name = getProp(event, 'Evento') || getProp(event, 'Nome') || 'Evento sem nome';
     const date = getProp(event, 'Data') || getProp(event, 'Date') || 'Data a confirmar';
-    const location = getProp(event, 'Local') || 'Local a confirmar';
+    const location = getProp(event, 'Local') || 'Localização não divulgada';
     const attractions = getProp(event, 'Atrações') || 'Não informado';
     const startTime = getProp(event, 'Início');
     const endTime = getProp(event, 'Fim');
@@ -583,7 +596,7 @@ function openModal(event) {
     let locationHtml = `<span>${location}</span>`;
 
     // Se houver um local válido, cria um link para o Google Maps
-    if (location && location !== 'Local a confirmar') {
+    if (location && location !== 'Localização não divulgada') {
         const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(location)}`;
         locationHtml = `<a href="${mapsUrl}" target="_blank" rel="noopener noreferrer">${location}</a>`;
     }

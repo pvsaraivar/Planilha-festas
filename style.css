@@ -820,13 +820,13 @@ input[type="date"]::placeholder {
 
     .modal {
         width: calc(100% - 2rem); /* Garante uma margem nas laterais */
-        padding: 1.25rem; /* Padding geral reduzido */
-        max-height: 85vh; /* Garante que o modal não ocupe a tela inteira */
+        padding: 1rem; /* Padding geral ainda mais reduzido */
+        max-height: 80vh; /* Reduz a altura máxima para não ocupar a tela inteira */
         overflow-y: auto; /* Adiciona scroll se o conteúdo for muito grande */
     }
 
     .modal-details-grid {
-        gap: 0.75rem; /* Espaçamento ainda menor entre os detalhes */
+        gap: 0.6rem; /* Espaçamento mínimo entre os detalhes */
     }
 
     .modal-detail-label {
@@ -834,25 +834,25 @@ input[type="date"]::placeholder {
     }
 
     .modal-detail-value {
-        font-size: 0.9rem; /* Fonte do valor menor */
+        font-size: 0.85rem; /* Fonte do valor ainda menor */
     }
 
     .modal-content h2 {
-        font-size: 1.3rem; /* Título menor */
+        font-size: 1.2rem; /* Título ainda menor */
     }
 
     .modal-actions {
-        margin-top: 1.25rem; /* Menos espaço antes dos botões */
+        margin-top: 1rem; /* Menos espaço antes dos botões */
         flex-direction: column; /* Empilha os botões verticalmente */
         gap: 0.75rem;
     }
 
     .share-btn {
-        padding: 0.6rem; /* Padding dos botões reduzido */
+        padding: 0.5rem; /* Padding dos botões ainda menor */
         font-size: 0.8rem;
     }
 
     .modal-separator {
-        margin: 1.25rem 0; /* Espaçamento menor para o separador */
+        margin: 1rem 0; /* Espaçamento do separador reduzido */
     }
 }
