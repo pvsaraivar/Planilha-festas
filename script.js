@@ -1,4 +1,5 @@
 // script.js
+let eventSlugFromUrl = null; // Armazena o slug do evento da URL para uso posterior
 
 let allEvents = []; // Armazena todos os eventos para filtragem
 
@@ -42,7 +43,12 @@ async function loadAndDisplayEvents(csvPath) {
         // Renderiza os eventos ordenados
         renderEvents(getSortedEvents(allEvents), grid);
         // Preenche o filtro de gênero com base nos eventos carregados
-        populateGenreFilter(allEvents); 
+        populateGenreFilter(allEvents);
+        // Se um slug de evento foi passado na URL, tenta abrir o modal correspondente
+        if (eventSlugFromUrl) {
+            const eventToOpen = allEvents.find(e => createEventSlug(getProp(e, 'Evento') || getProp(e, 'Nome')) === eventSlugFromUrl);
+            if (eventToOpen) openModal(eventToOpen);
+        }
         // Aplica filtros iniciais com base nos parâmetros da URL, se houver
         applyFiltersFromURL();
 
@@ -66,6 +72,7 @@ function applyFiltersFromURL() {
     const search = params.get('search');
     const date = params.get('date');
     const genre = params.get('genre');
+    eventSlugFromUrl = params.get('event'); // Captura o slug do evento
 
     let filtersApplied = false;
 
@@ -438,6 +445,8 @@ function createEventCardElement(event) {
         imageUrl = './assets/fabrika.jpg'; // Adicione a imagem correta para o evento "WAV" e ajuste a extensão.
     } else if (eventNameLower === 'baile do ddzin') {
         imageUrl = './assets/bailedoddzin.jpg'; // Adicione a imagem correta para o evento "WAV" e ajuste a extensão.
+    } else if (eventNameLower === 'cade o funk que tava aqui?') {
+        imageUrl = './assets/funkbateu.PNG';
     }
 
 
@@ -480,13 +489,39 @@ function createEventCardElement(event) {
         ${ticketHtml}
     `;
 
+    // card.addEventListener('click', () => {
+    //     openModal(event);
+    // });
+
     card.addEventListener('click', () => {
+        const eventSlug = createEventSlug(name);
+        const params = new URLSearchParams(window.location.search);
+        params.set('event', eventSlug);
+        const newUrl = `${window.location.pathname}?${params.toString()}`;
+
+        // Atualiza a URL sem recarregar a página
+        window.history.pushState({ path: newUrl }, '', newUrl);
+
         openModal(event);
     });
 
     return card;
 }
 
+/**
+ * Formata a string de horário com a primeira letra maiúscula.
+ * @param {string} name O nome do evento.
+ * @returns {string} O slug formatado para URL.
+ */
+function createEventSlug(name) {
+    if (!name) return 'evento-sem-nome';
+    return name
+        .toLowerCase()
+        .normalize("NFD").replace(/[\u0300-\u036f]/g, "") // Remove acentos
+        .replace(/[^a-z0-9\s-]/g, '') // Remove caracteres especiais, exceto espaços e hífens
+        .trim()
+        .replace(/\s+/g, '-'); // Substitui espaços por hífens
+}
 /**
  * Formata a string de horário com a primeira letra maiúscula.
  * @param {string} startTime - O horário de início.
@@ -529,6 +564,12 @@ function setupModal() {
     const closeModal = () => {
         overlay.classList.remove('is-visible');
         document.body.style.overflow = '';
+
+        // Limpa o parâmetro 'event' da URL ao fechar o modal
+        const params = new URLSearchParams(window.location.search);
+        params.delete('event');
+        const newUrl = params.toString() ? `${window.location.pathname}?${params.toString()}` : window.location.pathname;
+        window.history.pushState({ path: newUrl }, '', newUrl);
     };
 
     // Fecha ao clicar no botão
@@ -602,10 +643,13 @@ function openModal(event) {
 
     let locationHtml = `<span>${location}</span>`;
 
+    const mapPinIconSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>`;
+
     // Se houver um local válido, cria um link para o Google Maps
     if (location && location !== 'Localização não divulgada') {
         const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(location)}`;
         locationHtml = `<a href="${mapsUrl}" target="_blank" rel="noopener noreferrer">${location}</a>`;
+        locationHtml = `<a href="${mapsUrl}" target="_blank" rel="noopener noreferrer">${mapPinIconSvg} ${location}</a>`;
     }
 
     const timeString = formatTimeString(startTime, endTime);
@@ -683,8 +727,14 @@ function openModal(event) {
     // Adiciona a funcionalidade de compartilhamento
     const copyLinkBtn = modalContent.querySelector('.copy-link-btn');
     if (copyLinkBtn) {
+        // Garante que a URL com o parâmetro 'event' seja copiada
+        const eventSlug = createEventSlug(name);
+        const params = new URLSearchParams(window.location.search);
+        params.set('event', eventSlug);
+        const shareUrl = `${window.location.origin}${window.location.pathname}?${params.toString()}`;
+
         copyLinkBtn.addEventListener('click', () => {
-            navigator.clipboard.writeText(window.location.href).then(() => {
+            navigator.clipboard.writeText(shareUrl).then(() => {
                 const checkIconSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
                 const originalHtml = copyLinkBtn.innerHTML;
                 copyLinkBtn.innerHTML = `${checkIconSvg} Link Copiado!`;
@@ -703,8 +753,13 @@ function openModal(event) {
     const whatsappBtn = modalContent.querySelector('.whatsapp-btn');
     if (whatsappBtn) {
         whatsappBtn.addEventListener('click', () => {
-            const shareText = `Confira este evento: *${name}* em ${date}! Saiba mais em: ${window.location.origin}${window.location.pathname}`;
-            const whatsappUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareText)}`;
+            // Gera a URL de compartilhamento específica do evento
+            const eventSlug = createEventSlug(name);
+            const params = new URLSearchParams(window.location.search);
+            params.set('event', eventSlug);
+            const shareUrl = `${window.location.origin}${window.location.pathname}?${params.toString()}`;
+            const shareText = `Confira este evento: *${name}* em ${date}! Saiba mais aqui: ${shareUrl}`;
+            const whatsappUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareText)}`;            
             window.open(whatsappUrl, '_blank');
         });
     }

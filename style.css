@@ -311,7 +311,7 @@ input[type="date"]::placeholder {
 .event-card:hover {
     transform: translateY(-6px);
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
-    border-color: var(--primary-color);
+    border-color: var(--text-color);
     background-color: #333; /* Ilumina um pouco o card no hover */
 }
 .event-card:active {
@@ -382,7 +382,7 @@ input[type="date"]::placeholder {
 .event-card__location {
     font-size: 1.25rem; /* Ajuste para melhor responsividade */
     font-weight: 500;
-    color: var(--primary-color);
+    color: var(--text-color);
     margin-top: auto; /* Empurra o local para o fundo, alinhando-o em todos os cards */
     margin-bottom: 0.5rem;
 }
@@ -405,18 +405,20 @@ input[type="date"]::placeholder {
 .event-card__tickets-btn {
     display: block;
     width: 100%;
-    padding: 0.75rem;
-    background-color: var(--primary-color);
-    color: #fff;
+    padding: 0.65rem; /* Leve ajuste no padding */
+    background-color: var(--card-background);
+    color: var(--text-color);
     text-align: center;
     text-decoration: none;
     font-weight: 700; /* Peso "Bold" para o botão */
     border-radius: 8px;
-    transition: background-color 0.2s;
+    border: 1px solid var(--border-color); /* Adiciona uma borda sutil */
+    transition: background-color 0.2s, border-color 0.2s;
 }
 
 .event-card__tickets-btn:hover {
-    background-color: #7B1FA2; /* Um tom mais escuro do roxo para o hover */
+    background-color: #1f1f1f; /* Escurece sutilmente o fundo */
+    border-color: var(--text-color); /* Destaca a borda em branco */
 }
 
 .event-card__tickets-btn--free {
@@ -558,7 +560,7 @@ input[type="date"]::placeholder {
 
 .modal-content h2 {
     font-size: 2rem;
-    color: var(--primary-color);
+    color: var(--text-color);
     margin-top: 0;
 }
 
@@ -590,9 +592,17 @@ input[type="date"]::placeholder {
 .modal-detail-value a {
     display: inline-flex;
     align-items: center;
-    gap: 0.5rem;
-    color: var(--primary-color);
-    transition: color 0.2s;
+    gap: 0.5rem;    
+    color: var(--text-color);    
+    padding: 0.25rem 0.5rem; /* Adiciona um respiro */
+    margin: -0.25rem -0.5rem; /* Compensa o padding para não quebrar o layout */
+    border-radius: 4px;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+.modal-detail-value a:hover {
+    background-color: var(--card-background);
+    text-decoration: underline;
 }
 
 .location-container {
@@ -640,9 +650,9 @@ input[type="date"]::placeholder {
 }
 
 .tickets-btn {
-    background-color: var(--primary-color);
-    color: #fff;
-    border-color: var(--primary-color);
+    background-color: var(--card-background);
+    color: var(--text-color);
+    border-color: var(--border-color);
 }
 
 .share-btn.tickets-btn--free {
