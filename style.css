@@ -83,22 +83,20 @@ a {
     position: relative;
 }
 
-/* Adiciona o placeholder personalizado "Calendário" */
-.date-filter-container::before {
-    content: "Calendário";
+.date-filter-placeholder {
     color: var(--subtle-text);
     position: absolute;
     left: 1rem;
     top: 50%;
     transform: translateY(-50%);
-    pointer-events: none; /* Permite que o clique passe através do texto para o input */
+    pointer-events: none;
     z-index: 1;
-    transition: opacity 0.2s;
+    transition: opacity 0.2s, visibility 0.2s;
 }
 
-/* Esconde o placeholder personalizado quando uma data é selecionada */
-.date-filter-container:has(.date-filter:valid)::before {
+.date-filter-container.has-value .date-filter-placeholder {
     opacity: 0;
+    visibility: hidden;
 }
 
 /* Torna o placeholder nativo (dd/mm/aaaa) transparente apenas quando o campo está vazio */
