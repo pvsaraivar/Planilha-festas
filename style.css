@@ -424,12 +424,9 @@ input[type="date"]::placeholder {
 }
 
 .event-card__tickets-btn--free {
-    background-color: var(--subtle-text);
+    color: var(--subtle-text);
     cursor: default;
-}
-
-.event-card__tickets-btn--free:hover {
-    background-color: var(--subtle-text);
+    /* Herda o background e a borda do botão padrão */
 }
 
 .site-footer {
@@ -599,6 +596,7 @@ input[type="date"]::placeholder {
     padding: 0.25rem 0.5rem; /* Adiciona um respiro para o fundo no hover */
     margin: -0.25rem -0.5rem; /* Compensa o padding para não quebrar o layout */
     border-radius: 6px; /* Bordas arredondadas para o fundo no hover */
+    background-color: #2e2e2e; /* Fundo bem leve para destacar a área clicável */
     transition: color 0.2s, background-color 0.2s;
 }
 

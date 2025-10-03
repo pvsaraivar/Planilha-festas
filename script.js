@@ -472,7 +472,7 @@ function createEventCardElement(event) {
         if (ticketUrl.toLowerCase().trim() === 'gratuito') {
             ticketHtml = `<div class="event-card__footer"><span class="event-card__tickets-btn event-card__tickets-btn--free">Gratuito</span></div>`;
         } else {
-            ticketHtml = `<div class="event-card__footer"><a href="${ticketUrl}" target="_blank" rel="noopener noreferrer" class="event-card__tickets-btn" onclick="event.stopPropagation()">Ver Ingressos</a></div>`;
+            ticketHtml = `<div class="event-card__footer"><a href="${ticketUrl}" target="_blank" rel="noopener noreferrer" class="event-card__tickets-btn" onclick="event.stopPropagation()">Comprar ingresso</a></div>`;
         }
     } else {
         ticketHtml = `<div class="event-card__footer"><span class="event-card__tickets-btn event-card__tickets-btn--free">Vendas não divulgadas</span></div>`;
@@ -687,7 +687,7 @@ function openModal(event) {
         if (ticketUrl.toLowerCase().trim() === 'gratuito') {
             ticketActionHtml = `<span class="share-btn tickets-btn tickets-btn--free">Gratuito</span>`;
         } else {
-            ticketActionHtml = `<a href="${ticketUrl}" target="_blank" rel="noopener noreferrer" class="share-btn tickets-btn">Ver Ingressos</a>`;
+            ticketActionHtml = `<a href="${ticketUrl}" target="_blank" rel="noopener noreferrer" class="share-btn tickets-btn">Comprar ingresso</a>`;
         }
     } else {
         ticketActionHtml = `<span class="share-btn tickets-btn tickets-btn--free">Vendas não divulgadas</span>`;
