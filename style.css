@@ -64,6 +64,7 @@ a {
 .filters-wrapper {
     display: flex;
     flex-wrap: wrap;
+    align-items: flex-end; /* Alinha os filtros pela base */
     gap: 1rem;
     margin-top: 1.5rem;
     margin-bottom: -1rem; /* Compensa o padding-top do event-grid */
@@ -83,9 +84,14 @@ a {
     position: relative;
 }
 
-.date-filter-label {
-    display: block;
-    position: relative;
+.date-filter-container::before {
+    content: 'Calendário';
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--subtle-text);
+    position: absolute;
+    top: -1.2rem; /* Posiciona o rótulo acima do campo */
+    left: 0;
 }
 
 .date-filter {
@@ -150,25 +156,6 @@ a {
 .date-filter:valid,
 .genre-filter option:checked:not([value='']) {
     color: var(--text-color);
-}
-
-/* Usa a label como placeholder personalizado */
-.date-filter-label::before {
-    content: "Busque por data";
-    color: var(--subtle-text);
-    position: absolute;
-    left: 1rem;
-    top: 50%;
-    transform: translateY(-50%);
-    pointer-events: none; /* Permite que o clique passe através do texto para o input */
-    z-index: 1;
-    transition: opacity 0.2s, visibility 0.2s;
-}
-
-/* Esconde o placeholder da label quando uma data é selecionada */
-.date-filter:valid + label::before, .date-filter-label:has(:valid)::before {
-    opacity: 0;
-    visibility: hidden;
 }
 
 #search-input {
@@ -754,10 +741,6 @@ input[type="date"]::placeholder {
 
     .search-container {
         /* A regra de flex-basis não é mais necessária com flex-direction: column */
-    }
-
-    .date-filter-label::before {
-        content: "Calendário"; /* Texto específico para mobile */
     }
 
     .date-filter {
