@@ -160,6 +160,7 @@ a {
     left: 1rem;
     top: 50%;
     transform: translateY(-50%);
+    pointer-events: none; /* Permite que o clique passe através do texto para o input */
     z-index: 1;
     transition: opacity 0.2s, visibility 0.2s;
 }
