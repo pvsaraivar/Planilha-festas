@@ -31,6 +31,11 @@ body {
     -moz-osx-font-smoothing: grayscale;
 }
 
+/* Remove o sublinhado de todos os links por padrão */
+a {
+    text-decoration: none;
+}
+
 .site-header {
     padding-top: 2rem;
     padding-bottom: 1rem;
@@ -468,24 +473,39 @@ body {
     margin-top: 0;
 }
 
-.modal-content p {
-    font-size: 1.1rem;
-    line-height: 1.7;
+.modal-details-grid {
+    display: grid;
+    gap: 1.25rem;
+    margin-top: 1.5rem;
 }
-.modal-content .tickets-link {
-    display: inline-block;
-    margin-top: 1rem;
+
+.modal-detail-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
 }
-.modal-content .free-entry {
-    font-weight: 600;
+
+.modal-detail-label {
+    font-size: 0.8rem;
+    font-weight: 500;
     color: var(--subtle-text);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.modal-detail-value {
+    font-size: 1rem;
+    line-height: 1.5;
+}
+
+.modal-detail-value a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
 }
 
 .location-container {
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 0.5rem;
+    /* Estilos existentes já são suficientes */
 }
 
 .modal-actions {
@@ -495,12 +515,11 @@ body {
 }
 
 .share-btn {
-    background-color: #f0f0f0;
-    border: 1px solid #e0e0e0;
+    background-color: transparent;
+    border: 1px solid var(--border-color);
     border-radius: 6px;
     padding: 0.5rem 1rem;
     font-size: 0.9rem;
-    font-weight: 600;
     color: var(--subtle-text);
     cursor: pointer;
     transition: all 0.2s;
@@ -511,24 +530,52 @@ body {
     justify-content: center;
 }
 
+.share-btn:hover {
+    background-color: var(--card-background);
+    border-color: var(--primary-color);
+    color: var(--text-color);
+}
+
 .whatsapp-btn {
     background-color: #25D366;
     color: #fff;
+    border-color: #25D366;
 }
 
 .whatsapp-btn:hover {
     background-color: #20b058;
+    border-color: #20b058;
     color: #fff;
+}
+
+.tickets-btn {
+    background-color: var(--primary-color);
+    color: #fff;
+    border-color: var(--primary-color);
+}
+
+.share-btn.tickets-btn--free {
+    background-color: var(--card-background);
+    color: var(--subtle-text);
+    cursor: default;
+}
+
+.share-btn.tickets-btn--free:hover {
+    background-color: var(--card-background);
+    border-color: var(--border-color);
+    color: var(--subtle-text); /* Garante que a cor do texto não mude no hover */
 }
 
 .modal-content p a {
     color: var(--primary-color);
-    text-decoration: none;
     font-weight: 600;
 }
 
-.modal-content p a:hover {
-    text-decoration: underline;
+.modal-separator {
+    border: none;
+    height: 1px;
+    background-color: var(--border-color);
+    margin: 2rem 0;
 }
 
 /* --- Estilos para o Botão Voltar ao Topo --- */
@@ -608,20 +655,39 @@ body {
 
     .modal {
         width: calc(100% - 2rem); /* Garante uma margem nas laterais */
-        padding: 1.5rem;
+        padding: 1.25rem; /* Padding geral reduzido */
+        max-height: 85vh; /* Garante que o modal não ocupe a tela inteira */
+        overflow-y: auto; /* Adiciona scroll se o conteúdo for muito grande */
+    }
+
+    .modal-details-grid {
+        gap: 0.75rem; /* Espaçamento ainda menor entre os detalhes */
+    }
+
+    .modal-detail-label {
+        font-size: 0.7rem; /* Fonte do rótulo menor */
+    }
+
+    .modal-detail-value {
+        font-size: 0.9rem; /* Fonte do valor menor */
     }
 
     .modal-content h2 {
-        font-size: 1.5rem;
-    }
-
-    .modal-content p {
-        font-size: 0.9rem; /* Fonte menor para os parágrafos */
-        line-height: 1.5; /* Linhas mais próximas */
+        font-size: 1.3rem; /* Título menor */
     }
 
     .modal-actions {
-        margin-top: 1.5rem; /* Menos espaço antes dos botões */
+        margin-top: 1.25rem; /* Menos espaço antes dos botões */
         flex-direction: column; /* Empilha os botões verticalmente */
+        gap: 0.75rem;
+    }
+
+    .share-btn {
+        padding: 0.6rem; /* Padding dos botões reduzido */
+        font-size: 0.8rem;
+    }
+
+    .modal-separator {
+        margin: 1.25rem 0; /* Espaçamento menor para o separador */
     }
 }

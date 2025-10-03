@@ -222,6 +222,11 @@ function setupFilters() {
         applyFilters();
         searchInput.focus(); // Devolve o foco para a barra de busca
     });
+
+    clearDateBtn.addEventListener('click', () => {
+        dateInput.value = '';
+        applyFilters();
+    });
 }
 
 /**
@@ -285,6 +290,9 @@ function createEventCardElement(event) {
     }
     else if (eventNameLower === 'wav & sunset') {
         imageUrl = './assets/wavsunset.PNG'; // Adicione a imagem correta para o evento "WAV" e ajuste a extensão.
+    }
+    else if (eventNameLower === 'kolaje na estação') {
+        imageUrl = './assets/kolaje.PNG'; // Adicione a imagem correta para o evento "WAV" e ajuste a extensão.
     }
 
     // Formata a string de horário
@@ -412,31 +420,61 @@ function openModal(event) {
     const timeString = formatTimeString(startTime, endTime);
     const dateTimeString = timeString ? `${date}, ${timeString}` : date;
 
-    let ticketHtml = '';
-    if (ticketUrl) {
-        if (ticketUrl.toLowerCase().trim() === 'gratuito') {
-            ticketHtml = `<p><strong>Ingressos:</strong> <span class="free-entry">Gratuito</span></p>`;
-        } else {
-            ticketHtml = `<p><a href="${ticketUrl}" target="_blank" rel="noopener noreferrer" class="tickets-link"><strong>Comprar Ingressos &rarr;</strong></a></p>`;
-        }
-    }
-    
     const instagramIconSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>`;
-    const instagramHtml = instagramUrl
-        ? `<p><strong>Instagram:</strong> <a href="${instagramUrl}" target="_blank" rel="noopener noreferrer" class="event-card__instagram a">${instagramIconSvg} Perfil do Evento</a></p>`
-        : '';
+    let instagramDetailHtml = '';
+    if (instagramUrl) {
+        let profileName = 'Perfil do Evento'; // Texto padrão
+        try {
+            // Extrai o nome do perfil da URL do Instagram
+            const url = new URL(instagramUrl.startsWith('http') ? instagramUrl : `https://${instagramUrl}`);
+            const pathParts = url.pathname.split('/').filter(part => part); // Remove partes vazias
+            if (pathParts.length > 0) {
+                profileName = `@${pathParts[0]}`;
+            }
+        } catch (e) {
+            console.error("URL do Instagram inválida:", instagramUrl, e);
+        }
+        instagramDetailHtml = `
+            <div class="modal-detail-item">
+                <span class="modal-detail-label">Instagram</span>
+                <span class="modal-detail-value"><a href="${instagramUrl}" target="_blank" rel="noopener noreferrer">${instagramIconSvg} ${profileName}</a></span>
+            </div>
+        `;
+    }
 
     const copyLinkIconSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.72"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.72-1.72"></path></svg>`;
     const whatsappIconSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.894 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.886-.001 2.269.655 4.357 1.849 6.081l-1.214 4.425 4.56-1.195z"/></svg>`;
 
+    let ticketActionHtml = '';
+    if (ticketUrl) {
+        if (ticketUrl.toLowerCase().trim() === 'gratuito') {
+            ticketActionHtml = `<span class="share-btn tickets-btn tickets-btn--free">Evento Gratuito</span>`;
+        } else {
+            ticketActionHtml = `<a href="${ticketUrl}" target="_blank" rel="noopener noreferrer" class="share-btn tickets-btn">Ver Ingressos</a>`;
+        }
+    }
+
     modalContent.innerHTML = `
         <h2>${name}</h2>
-        <p><strong>Data:</strong> ${dateTimeString}</p>
-        <p><strong>Atrações:</strong> ${attractions}</p>
-        <p><strong>Local:</strong> <span class="location-container">${locationHtml}</span></p>
-        ${instagramHtml}
-        ${ticketHtml}
+        <div class="modal-details-grid">
+            <div class="modal-detail-item">
+                <span class="modal-detail-label">Data & Horário</span>
+                <span class="modal-detail-value">${dateTimeString}</span>
+            </div>
+            <div class="modal-detail-item">
+                <span class="modal-detail-label">Local</span>
+                <span class="modal-detail-value location-container">${locationHtml}</span>
+            </div>
+            <div class="modal-detail-item">
+                <span class="modal-detail-label">Atrações</span>
+                <span class="modal-detail-value">${attractions}</span>
+            </div>
+            ${instagramDetailHtml}
+        </div>
+
+        <hr class="modal-separator">
         <div class="modal-actions">
+            ${ticketActionHtml}
             <button class="share-btn whatsapp-btn">${whatsappIconSvg} Compartilhar no WhatsApp</button>
             <button class="share-btn copy-link-btn">${copyLinkIconSvg} Copiar Link</button>
         </div>
