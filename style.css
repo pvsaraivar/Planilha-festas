@@ -54,10 +54,69 @@ body {
     color: var(--subtle-text);
 }
 
-.search-container {
+.filters-wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
     margin-top: 1.5rem;
     margin-bottom: -1rem; /* Compensa o padding-top do event-grid */
+}
+
+.search-container {
     position: relative; /* Para posicionar o botão de limpar */
+    flex-grow: 1;
+    min-width: 250px;
+}
+
+.date-filter-container {
+    position: relative;
+}
+
+.date-filter {
+    /* Adiciona espaço à direita para o botão de limpar */
+    padding: 0.75rem 2.5rem 0.75rem 1rem;
+    font-size: 1rem;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    background-color: var(--card-background);
+    transition: border-color 0.2s, box-shadow 0.2s;
+    font-family: inherit;
+    color: var(--subtle-text);
+    height: 50px; /* Altura fixa para alinhar com a busca */
+}
+
+.date-filter:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.25);
+}
+
+/* Muda a cor do texto quando uma data é selecionada */
+.date-filter:valid {
+    color: var(--text-color);
+}
+
+/* Posiciona o texto do placeholder sobre o input */
+.date-filter::before {
+    content: "Filtre por data no calendário";
+    color: var(--subtle-text);
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none; /* Permite clicar através do texto */
+    z-index: 1;
+}
+
+/* Esconde o placeholder quando uma data é selecionada ou o campo está em foco */
+.date-filter:valid::before,
+.date-filter:focus::before {
+    display: none;
+}
+
+/* Esconde o texto padrão "dd/mm/aaaa" quando o campo está vazio */
+.date-filter:invalid {
+    color: transparent;
 }
 
 #search-input {
@@ -68,6 +127,7 @@ body {
     border: 1px solid var(--border-color);
     background-color: var(--card-background);
     transition: border-color 0.2s, box-shadow 0.2s;
+    height: 50px;
 }
 
 #search-input:focus {
@@ -95,6 +155,41 @@ body {
     color: var(--text-color);
 }
 
+.clear-date-btn {
+    position: absolute;
+    top: 50%;
+    right: 0.5rem;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: var(--subtle-text);
+    cursor: pointer;
+    padding: 0 0.5rem;
+    line-height: 1;
+    transition: color 0.2s;
+    z-index: 2; /* Garante que fique sobre o ícone do calendário */
+}
+
+.search-loader {
+    position: absolute;
+    top: 50%;
+    right: 0.75rem;
+    transform: translateY(-50%);
+    width: 16px;
+    height: 16px;
+    border: 2px solid var(--primary-color);
+    border-top-color: transparent;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: translateY(-50%) rotate(360deg);
+    }
+}
+
 
 #event-grid {
     display: grid;
@@ -102,6 +197,11 @@ body {
     gap: 1.5rem;
     padding-top: 2rem;
     padding-bottom: 2rem;
+    transition: opacity 0.2s ease-in-out;
+}
+
+.event-grid--filtering {
+    opacity: 0;
 }
 
 .event-card {
@@ -396,4 +496,21 @@ body {
 
 .modal-content p a:hover {
     text-decoration: underline;
+}
+
+/* --- Responsividade para Cards no Mobile --- */
+@media (max-width: 600px) {
+    #event-grid {
+        /* Reduz o tamanho mínimo do card para permitir 2 colunas em telas menores */
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    }
+
+    .modal {
+        width: calc(100% - 2rem); /* Garante uma margem nas laterais */
+        padding: 1.5rem;
+    }
+
+    .modal-content h2 {
+        font-size: 1.5rem;
+    }
 }

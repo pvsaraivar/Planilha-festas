@@ -161,32 +161,71 @@ function getSortedEvents(events) {
  */
 function setupSearchFilter() {
     const searchInput = document.getElementById('search-input');
+    const dateInput = document.getElementById('date-filter');
     const clearBtn = document.getElementById('clear-search-btn');
+    const clearDateBtn = document.getElementById('clear-date-btn');
+    const loader = document.getElementById('search-loader');
     const grid = document.getElementById('event-grid');
 
-    searchInput.addEventListener('input', (e) => {
-        const searchTerm = e.target.value.toLowerCase();
+    let searchTimeout;
 
-        // Mostra ou esconde o botão de limpar
-        clearBtn.hidden = !searchTerm;
+    const applyFilters = () => {
+        clearTimeout(searchTimeout);
+        grid.classList.add('event-grid--filtering');
+        loader.hidden = false;
+        clearBtn.hidden = true;
 
-        const filteredEvents = allEvents.filter(event => {
-            const name = (getProp(event, 'Evento') || getProp(event, 'Nome') || '').toLowerCase();
-            const location = (getProp(event, 'Local') || '').toLowerCase();
+        searchTimeout = setTimeout(() => {
+            const searchTerm = searchInput.value.toLowerCase();
+            const selectedDate = dateInput.value; // Formato YYYY-MM-DD
+
+            // Mostra ou esconde o botão de limpar
+            clearBtn.hidden = !searchTerm;
+            clearDateBtn.hidden = !selectedDate;
+            loader.hidden = true;
+
+            let filteredEvents = allEvents.filter(event => {
+                // Filtro de texto
+                const name = (getProp(event, 'Evento') || getProp(event, 'Nome') || '').toLowerCase();
+                const location = (getProp(event, 'Local') || '').toLowerCase();
+                const textMatch = name.includes(searchTerm) || location.includes(searchTerm);
+
+                // Filtro de data
+                if (selectedDate) {
+                    const eventDateStr = getProp(event, 'Data') || getProp(event, 'Date');
+                    if (!eventDateStr) return false;
+
+                    // Converte DD/MM/YYYY para YYYY-MM-DD para comparação
+                    const [day, month, year] = eventDateStr.split('/');
+                    const formattedEventDate = `${year}-${month}-${day}`;
+                    
+                    return textMatch && formattedEventDate === selectedDate;
+                }
+
+                return textMatch;
+            });
+
+            // Renderiza os eventos filtrados e ordenados
+            renderEvents(getSortedEvents(filteredEvents), grid);
             
-            return name.includes(searchTerm) || location.includes(searchTerm);
-        });
+            grid.classList.remove('event-grid--filtering');
+        }, 300); // Aguarda 300ms para a animação de fade-out
+    };
 
-        // Renderiza os eventos filtrados e ordenados
-        renderEvents(getSortedEvents(filteredEvents), grid);
-    });
+    searchInput.addEventListener('input', applyFilters);
+    dateInput.addEventListener('change', applyFilters);
 
     clearBtn.addEventListener('click', () => {
         searchInput.value = '';
         clearBtn.hidden = true;
-        // Renderiza todos os eventos novamente
-        renderEvents(getSortedEvents(allEvents), grid);
+        applyFilters(); // Re-aplica filtros (agora sem o texto)
         searchInput.focus(); // Devolve o foco para a barra de busca
+    });
+
+    clearDateBtn.addEventListener('click', () => {
+        dateInput.value = '';
+        clearDateBtn.hidden = true;
+        applyFilters(); // Re-aplica filtros (agora sem a data)
     });
 }
 
@@ -240,9 +279,12 @@ function createEventCardElement(event) {
     const placeholderSvg = "data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 300'%3e%3crect width='100%25' height='100%25' fill='%23e9ecef'/%3e%3ctext x='50%25' y='50%25' fill='%236c757d' font-size='20' text-anchor='middle' dominant-baseline='middle'%3eEvento%3c/text%3e%3c/svg%3e";
     const errorSvg = "data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 300'%3e%3crect width='100%25' height='100%25' fill='%23e9ecef'/%3e%3ctext x='50%25' y='50%25' fill='%23dc3545' font-size='20' text-anchor='middle' dominant-baseline='middle'%3eImagem Inválida%3c/text%3e%3c/svg%3e";
 
-    // Sobrescreve a imagem para o evento "Na Pista"
-    if (name.trim().toLowerCase() === 'na pista') {
+    // Sobrescreve a imagem para eventos específicos
+    const eventNameLower = name.trim().toLowerCase();
+    if (eventNameLower === 'na pista') {
         imageUrl = './assets/napista.PNG'; // Exemplo: alterado para .png. Ajuste para a extensão correta do seu arquivo.
+    } else if (eventNameLower === 'beije') {
+        imageUrl = './assets/beije.PNG'; // Ajuste a extensão (.jpg, .png, etc.) para corresponder ao seu arquivo.
     }
 
     // Formata a string de horário

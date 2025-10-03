@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Agenda de Festas</title>
+    <title>Logística Clubber</title>
     <meta name="description" content="Uma agenda de festas moderna gerada a partir de uma planilha.">
     
     <!-- Google Fonts para uma tipografia mais elegante -->
@@ -17,9 +17,15 @@
     <header class="site-header">
         <div class="container">
             <h1>Logística Clubber</h1>
-            <p>Confira as próximas festas.</p>
-            <div class="search-container">
-                <input type="text" id="search-input" placeholder="Buscar por nome ou local..."><button id="clear-search-btn" class="clear-search-btn" hidden>&times;</button>
+            <p>Confira as próximas festas e se organize. Vamos viver!</p>
+            <div class="filters-wrapper">
+                <div class="search-container">
+                    <input type="text" id="search-input" placeholder="Buscar por nome ou local..."><span id="search-loader" class="search-loader" hidden></span><button id="clear-search-btn" class="clear-search-btn" hidden>&times;</button>
+                </div>
+                <div class="date-filter-container">
+                    <input type="date" id="date-filter" class="date-filter">
+                    <button id="clear-date-btn" class="clear-date-btn" hidden>&times;</button>
+                </div>
             </div>
         </div>
     </header>
