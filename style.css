@@ -1,0 +1,399 @@
+/* style.css */
+:root {
+    --primary-color: #4A90E2; /* Um azul mais suave e moderno */
+    --background-start: #ffffff;
+    --background-end: #f4f7f9;
+    --card-background: #ffffff;
+    --text-color: #212529;
+    --subtle-text: #6c757d;
+    --border-color: #dee2e6;
+    --shadow: 0 2px 8px rgba(0, 0, 0, 0.06); /* Sombra mais sutil e difusa */
+    --border-radius: 12px; /* Bordas mais arredondadas */
+    --transition-speed: 0.3s;
+}
+
+/* Reset básico e box-sizing */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    line-height: 1.6;
+    background: linear-gradient(180deg, var(--background-start) 0%, var(--background-end) 200px);
+    color: var(--text-color);
+    margin: 0;
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased; /* Melhora a renderização da fonte */
+    -moz-osx-font-smoothing: grayscale;
+}
+
+.site-header {
+    padding-top: 2rem;
+    padding-bottom: 1rem;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 1rem 2rem;
+}
+
+.site-header h1 {
+    margin: 0 0 0.5rem 0;
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--text-color);
+}
+
+.site-header p {
+    margin-top: 0.25rem;
+    font-size: 1.1rem;
+    color: var(--subtle-text);
+}
+
+.search-container {
+    margin-top: 1.5rem;
+    margin-bottom: -1rem; /* Compensa o padding-top do event-grid */
+    position: relative; /* Para posicionar o botão de limpar */
+}
+
+#search-input {
+    width: 100%;
+    padding: 0.75rem 2.5rem 0.75rem 1rem; /* Adiciona espaço à direita para o botão */
+    font-size: 1rem;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    background-color: var(--card-background);
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+#search-input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.25);
+}
+
+.clear-search-btn {
+    position: absolute;
+    top: 50%;
+    right: 0.5rem;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: var(--subtle-text);
+    cursor: pointer;
+    padding: 0 0.5rem;
+    line-height: 1;
+    transition: color 0.2s;
+}
+
+.clear-search-btn:hover {
+    color: var(--text-color);
+}
+
+
+#event-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.5rem;
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+}
+
+.event-card {
+    background-color: var(--card-background);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: transform var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
+    cursor: pointer;
+    border-radius: var(--border-radius);
+}
+
+.event-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.07), 0 12px 32px rgba(0, 0, 0, 0.05);
+}
+
+.event-card:active {
+    transform: translateY(-2px) scale(0.98);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+}
+
+.event-card__image {
+    width: 100%;
+    height: 220px;
+    object-fit: cover;
+    object-position: center; /* Garante o alinhamento central */
+}
+
+.event-card__info {
+    padding: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1; /* Garante que o rodapé do card se alinhe */
+}
+
+.event-card__details {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--subtle-text);
+    margin-bottom: 0.5rem;
+}
+
+.event-card__name {    
+    font-size: 1.2rem;
+    font-weight: 700; /* Mais destaque para o nome */
+    margin: 0 0 1rem 0;
+    flex-grow: 1; /* Empurra o preço para baixo */
+}
+
+.event-card__attractions {
+    font-size: 0.9rem;
+    color: var(--subtle-text);
+    margin: -0.5rem 0 1rem 0;
+    font-style: italic;
+}
+
+.event-card__instagram {
+    font-size: 0.9rem;
+    color: var(--subtle-text);
+    margin: -0.5rem 0 0.5rem 0;
+}
+
+.event-card__instagram a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--subtle-text);
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.2s;
+}
+
+.event-card__location {
+    font-size: 1.25rem; /* Ajuste para melhor responsividade */
+    font-weight: 600;
+    color: var(--primary-color);
+    margin-bottom: 0.5rem;
+}
+
+.event-card__status {
+    font-size: 0.9rem;
+    color: var(--subtle-text);
+}
+
+.event-card__status--highlight {
+    color: #dc3545;
+    font-weight: 600;
+}
+
+.event-card__footer {
+    padding: 0 1.25rem 1.25rem;
+    margin-top: auto; /* Empurra o rodapé para o fundo do card */
+}
+
+.event-card__tickets-btn {
+    display: block;
+    width: 100%;
+    padding: 0.75rem;
+    background-color: var(--primary-color);
+    color: #fff;
+    text-align: center;
+    text-decoration: none;
+    font-weight: 600;
+    border-radius: 8px;
+    transition: background-color 0.2s;
+}
+
+.event-card__tickets-btn:hover {
+    background-color: #3a7bc8; /* Um tom mais escuro do azul primário */
+}
+
+.event-card__tickets-btn--free {
+    background-color: var(--subtle-text);
+    cursor: default;
+}
+
+.event-card__tickets-btn--free:hover {
+    background-color: var(--subtle-text);
+}
+
+.site-footer {
+    text-align: center;
+    padding: 2rem 0;
+    margin-top: 3rem; /* Mais espaço antes do rodapé */
+    background-color: #e9ecef;
+    color: var(--subtle-text);
+    font-size: 0.9rem;
+}
+
+/* --- Estilos para o Skeleton Loader --- */
+
+.skeleton-card {
+    background-color: var(--card-background);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    overflow: hidden;
+}
+
+.skeleton {
+    opacity: 0.7;
+    animation: shimmer 1.5s infinite linear;
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+}
+
+.skeleton-image {
+    width: 100%;
+    height: 220px;
+}
+
+.skeleton-info {
+    padding: 1.25rem;
+}
+
+.skeleton-text {
+    height: 1em;
+    margin-bottom: 0.75rem;
+    border-radius: 4px;
+}
+
+@keyframes shimmer {
+    0% {
+        background-position: 200% 0;
+    }
+    100% {
+        background-position: -200% 0;
+    }
+}
+
+/* --- Estilos para o Modal --- */
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+    z-index: 1000;
+}
+
+.modal-overlay.is-visible {
+    opacity: 1;
+    visibility: visible;
+}
+
+.modal {
+    background-color: var(--card-background);
+    border-radius: var(--border-radius);
+    padding: 2rem;
+    width: 90%;
+    max-width: 600px;
+    position: relative;
+    transform: scale(0.95);
+    transition: transform 0.3s ease;
+}
+
+.modal-overlay.is-visible .modal {
+    transform: scale(1);
+}
+
+.modal-close-btn {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    background: none;
+    border: none;
+    font-size: 2rem;
+    color: var(--subtle-text);
+    cursor: pointer;
+    line-height: 1;
+    padding: 0;
+}
+
+.modal-content h2 {
+    font-size: 2rem;
+    color: var(--primary-color);
+    margin-top: 0;
+}
+
+.modal-content p {
+    font-size: 1.1rem;
+    line-height: 1.7;
+}
+.modal-content .tickets-link {
+    display: inline-block;
+    margin-top: 1rem;
+}
+.modal-content .free-entry {
+    font-weight: 600;
+    color: var(--subtle-text);
+}
+
+.location-container {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.copy-address-btn {
+    background-color: #f0f0f0;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    padding: 0.2rem 0.6rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--subtle-text);
+    cursor: pointer;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.copy-address-btn:hover {
+    background-color: #e0e0e0;
+    color: var(--text-color);
+}
+
+.share-btn {
+    background-color: #f0f0f0;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--subtle-text);
+    cursor: pointer;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 1.5rem;
+    width: 100%;
+    justify-content: center;
+}
+
+.modal-content p a {
+    color: var(--primary-color);
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.modal-content p a:hover {
+    text-decoration: underline;
+}

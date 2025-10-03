@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agenda de Festas</title>
+    <meta name="description" content="Uma agenda de festas moderna gerada a partir de uma planilha.">
+    
+    <!-- Google Fonts para uma tipografia mais elegante -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header class="site-header">
+        <div class="container">
+            <h1>Logística Clubber</h1>
+            <p>Confira as próximas festas.</p>
+            <div class="search-container">
+                <input type="text" id="search-input" placeholder="Buscar por nome ou local..."><button id="clear-search-btn" class="clear-search-btn" hidden>&times;</button>
+            </div>
+        </div>
+    </header>
+
+    <main id="event-grid" class="container">
+        <!-- Os cartões de evento serão injetados aqui pelo JavaScript -->
+        <p>Carregando eventos...</p>
+    </main>
+
+    <!-- Estrutura do Modal -->
+    <div id="modal-overlay" class="modal-overlay">
+        <div id="modal" class="modal">
+            <button id="modal-close-btn" class="modal-close-btn">&times;</button>
+            <div id="modal-content" class="modal-content">
+                <!-- O conteúdo do evento será injetado aqui -->
+            </div>
+        </div>
+    </div>
+
+    <footer class="site-footer">
+        <div class="container">
+            <p>&copy; 2024 Agenda de Festas. Todos os direitos reservados.</p>
+        </div>
+    </footer>
+
+    <!-- O script é carregado no final para não bloquear a renderização da página -->
+    <script src="script.js"></script>
+</body>
+</html>
