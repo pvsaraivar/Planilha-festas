@@ -420,7 +420,7 @@ function createEventCardElement(event) {
     } else if (eventNameLower === 'wav & sunset') {
         imageUrl = './assets/wavsunset.PNG'; // Adicione a imagem correta para o evento "WAV" e ajuste a extensão.
     } else if (eventNameLower === 'kolaje na estação') {
-        imageUrl = './assets/kolaje.PNG'; // Adicione a imagem correta para o evento "WAV" e ajuste a extensão.
+        imageUrl = './assets/kolaje.jpg'; // Adicione a imagem correta para o evento "WAV" e ajuste a extensão.
     } else if (eventNameLower === 'papoco: ignição') {
         imageUrl = './assets/papoco.jpg'; // Adicione a imagem correta para o evento "WAV" e ajuste a extensão.
     } else if (eventNameLower === 'numalaje 3 anos') {
@@ -647,6 +647,8 @@ function openModal(event) {
         } else {
             ticketActionHtml = `<a href="${ticketUrl}" target="_blank" rel="noopener noreferrer" class="share-btn tickets-btn">Ver Ingressos</a>`;
         }
+    } else {
+        ticketActionHtml = `<span class="share-btn tickets-btn tickets-btn--free">Vendas não divulgadas</span>`;
     }
 
     modalContent.innerHTML = `
