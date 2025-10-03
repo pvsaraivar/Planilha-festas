@@ -96,7 +96,7 @@ a {
     border: 1px solid var(--border-color);
     transition: border-color 0.2s, box-shadow 0.2s;
     font-family: inherit;
-    color: transparent; /* Torna o texto nativo (dd/mm/aaaa) transparente por padrão */
+    color: var(--text-color); /* Garante que o texto seja visível por padrão */
     height: 50px;
     background-color: transparent;
 }
@@ -150,6 +150,11 @@ a {
 .date-filter:valid,
 .genre-filter option:checked:not([value='']) {
     color: var(--text-color);
+}
+
+/* Torna o placeholder nativo (dd/mm/aaaa) transparente apenas quando o campo está vazio */
+.date-filter:invalid {
+    color: transparent;
 }
 
 /* Usa a label como placeholder personalizado */
