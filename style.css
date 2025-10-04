@@ -802,10 +802,12 @@ input[type="date"]::placeholder {
 
     .clear-all-filters-btn {
         height: 40px;
+        order: 2; /* Move para depois do botão de compartilhar */
     }
 
     .share-filters-btn {
         height: 40px;
+        order: 1; /* Move para antes do botão de limpar */
     }
 
     #event-grid {
