@@ -795,7 +795,8 @@ input[type="date"]::placeholder {
     }
 
     .genre-filter {
-        padding-top: 0; /* Corrige o alinhamento vertical do texto no select */
+        padding-top: 0; /* Remove o padding vertical padrão do select */
+        padding-bottom: 0; /* Remove o padding vertical padrão do select */
         padding-left: 1rem; /* Alinha com o padding do campo de busca */
         padding-right: 2.25rem; /* Menos espaço para a seta no mobile */
     }
