@@ -37,7 +37,8 @@ const eventImageMap = {
     'titanica': './assets/titanica.jpg',
     'fabrika': './assets/fabrika.jpg',
     'cade o funk que tava aqui?': './assets/funkbateu.PNG',
-    'mare alta': './assets/marealta.PNG'
+    'mare alta': './assets/marealta.PNG',
+    'psy club vs progressive psy': './assets/psy.PNG'
 }
 
 /**
@@ -666,13 +667,31 @@ function openModal(event) {
         instagramDetailHtml = `
             <div class="modal-detail-item">
                 <span class="modal-detail-label">Instagram</span>
-                <span class="modal-detail-value"><a href="${instagramUrl}" target="_blank" rel="noopener noreferrer">${instagramIconSvg} ${profileName}</a></span>
+                <span class="modal-detail-value"><a href="${instagramUrl}" target="_blank" rel="noopener noreferrer" class="modal-link">${instagramIconSvg} ${profileName}</a></span>
             </div>
         `;
     }
 
     const copyLinkIconSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.72"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.72-1.72"></path></svg>`;
     const whatsappIconSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.894 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.886-.001 2.269.655 4.357 1.849 6.081l-1.214 4.425 4.56-1.195z"/></svg>`;
+    const calendarIconSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>`;
+
+    let calendarActionHtml = '';
+    if (date && date.split('/').length === 3) {
+        const [day, month, year] = date.split('/');
+        const formattedDate = `${year}${month}${day}`;
+        
+        const params = new URLSearchParams({
+            action: 'TEMPLATE',
+            text: name,
+            dates: `${formattedDate}/${formattedDate}`, // Para um evento de dia único
+            details: `Mais informações sobre o evento ${name}.\n\nIngressos: ${ticketUrl || 'Não informado'}`,
+            location: location,
+            trp: 'false' // Não mostrar como ocupado
+        });
+        const googleCalendarUrl = `https://www.google.com/calendar/render?${params.toString()}`;
+        calendarActionHtml = `<a href="${googleCalendarUrl}" target="_blank" rel="noopener noreferrer" class="share-btn">${calendarIconSvg} Adicionar ao Calendário</a>`;
+    }
 
     let ticketActionHtml = '';
     if (ticketUrl) {
@@ -711,6 +730,7 @@ function openModal(event) {
         <hr class="modal-separator">
         <div class="modal-actions">
             ${ticketActionHtml}
+            ${calendarActionHtml}
             <button class="share-btn whatsapp-btn">${whatsappIconSvg} Compartilhar no WhatsApp</button>
             <button class="share-btn copy-link-btn">${copyLinkIconSvg} Copiar link</button>
         </div>
