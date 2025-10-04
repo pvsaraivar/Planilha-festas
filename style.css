@@ -25,29 +25,21 @@ body {
     font-family: 'Satoshi', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     line-height: 1.6;
     font-weight: 300; /* Define o peso da fonte padrão como "Light" */
-    background: var(--background-start);
     color: var(--text-color);
     margin: 0;
     min-height: 100vh;
     -webkit-font-smoothing: antialiased; /* Melhora a renderização da fonte */
     -moz-osx-font-smoothing: grayscale;
     color-scheme: dark; /* Garante que componentes nativos (como o calendário) usem o tema escuro */
-}
 
-/* Adiciona o mapa como plano de fundo sutil */
-body::before {
-    content: '';
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background-image: url('./assets/mapa.png'); /* Usa o arquivo mapa.png da pasta assets */
-    background-size: cover;
+    /* Aplica o mapa e a cor de fundo em camadas para garantir a visibilidade */
+    background: 
+        linear-gradient(rgba(18, 18, 18, 0.96), rgba(18, 18, 18, 0.96)), /* Camada de cor com opacidade */
+        url('./assets/mapa.png'); /* Imagem de fundo */
+    background-attachment: fixed; /* Mantém o fundo fixo durante o scroll */
     background-position: center;
-    opacity: 0.04; /* Opacidade bem baixa para não atrapalhar a leitura. Ajuste se necessário. */
-    z-index: -1; /* Coloca o mapa atrás de todo o conteúdo */
-    pointer-events: none; /* Garante que o mapa não interfira com cliques */
+    background-size: cover;
+    background-color: var(--background-start); /* Cor de fallback caso a imagem não carregue */
 }
 
 /* Remove o sublinhado de todos os links por padrão */
