@@ -34,6 +34,22 @@ body {
     color-scheme: dark; /* Garante que componentes nativos (como o calendário) usem o tema escuro */
 }
 
+/* Adiciona o mapa como plano de fundo sutil */
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-image: url('./assets/mapa.png'); /* Usa o arquivo mapa.png da pasta assets */
+    background-size: cover;
+    background-position: center;
+    opacity: 0.04; /* Opacidade bem baixa para não atrapalhar a leitura. Ajuste se necessário. */
+    z-index: -1; /* Coloca o mapa atrás de todo o conteúdo */
+    pointer-events: none; /* Garante que o mapa não interfira com cliques */
+}
+
 /* Remove o sublinhado de todos os links por padrão */
 a {
     text-decoration: none;
