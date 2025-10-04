@@ -35,7 +35,7 @@ body {
     /* Aplica o mapa e a cor de fundo em camadas para garantir a visibilidade */
     background: 
         linear-gradient(rgba(18, 18, 18, 0.96), rgba(18, 18, 18, 0.96)), /* Camada de cor com opacidade */
-        url('./assets/mapa.jpg'); /* Caminho relativo explícito para máxima compatibilidade */
+        url('./assets/mapa.JPG'); /* Caminho relativo explícito para máxima compatibilidade */
     background-attachment: fixed; /* Mantém o fundo fixo durante o scroll */
     background-position: center;
     background-size: cover;
