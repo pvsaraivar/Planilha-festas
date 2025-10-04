@@ -16,6 +16,31 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 /**
+ * Mapeamento de nomes de eventos para imagens locais específicas.
+ * Isso substitui a longa cadeia de if/else if, tornando o código mais limpo e fácil de manter.
+ * As chaves devem estar em minúsculas para corresponder à verificação.
+ */
+const eventImageMap = {
+    'na pista': './assets/napista.PNG',
+    'beije': './assets/beije.PNG',
+    'wav & friends': './assets/wav.PNG',
+    'wav & sunset': './assets/wavsunset.PNG',
+    'kolaje na estação': './assets/kolaje.jpg',
+    'papoco: ignição': './assets/papoco.jpg',
+    'numalaje 3 anos': './assets/numalaje.PNG',
+    'numalaje 3 anos - after': './assets/numalaje.PNG',
+    'nandi bota tudo': './assets/nandi.PNG',
+    'bateu convida badsista & friends': './assets/bateubadsista.PNG',
+    'fritaria': './assets/fritaria.PNG',
+    'bunker': './assets/bunker.jpg',
+    'baile do ddzin': './assets/bailedoddzin.jpg',
+    'titanica': './assets/titanica.jpg',
+    'fabrika': './assets/fabrika.jpg',
+    'cade o funk que tava aqui?': './assets/funkbateu.PNG',
+    'mare alta': './assets/marealta.PNG'
+}
+
+/**
  * Orquestra o carregamento, análise e exibição dos eventos.
  * @param {string} csvPath - O caminho para o arquivo CSV.
  */
@@ -413,44 +438,11 @@ function createEventCardElement(event) {
     const placeholderSvg = "data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 300'%3e%3crect width='100%25' height='100%25' fill='%23e9ecef'/%3e%3ctext x='50%25' y='50%25' fill='%236c757d' font-size='20' text-anchor='middle' dominant-baseline='middle'%3eEvento%3c/text%3e%3c/svg%3e";
     const errorSvg = "data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 300'%3e%3crect width='100%25' height='100%25' fill='%23e9ecef'/%3e%3ctext x='50%25' y='50%25' fill='%23dc3545' font-size='20' text-anchor='middle' dominant-baseline='middle'%3eImagem Inválida%3c/text%3e%3c/svg%3e";
 
-    // Sobrescreve a imagem para o evento "Na Pista"
+    // Verifica se há uma imagem local específica para este evento no mapa.
     const eventNameLower = name.trim().toLowerCase();
-    if (eventNameLower === 'na pista') {
-        imageUrl = './assets/napista.PNG'; // Ajuste para a extensão correta do seu arquivo.
-    } else if (eventNameLower === 'beije') {
-        imageUrl = './assets/beije.PNG'; // Adicione a imagem correta para o evento "Beije" e ajuste a extensão.
-    } else if (eventNameLower === 'wav & friends') {
-        imageUrl = './assets/wav.PNG'; // Adicione a imagem correta para o evento "WAV" e ajuste a extensão.
-    } else if (eventNameLower === 'wav & sunset') {
-        imageUrl = './assets/wavsunset.PNG'; // Adicione a imagem correta para o evento "WAV" e ajuste a extensão.
-    } else if (eventNameLower === 'kolaje na estação') {
-        imageUrl = './assets/kolaje.jpg'; // Adicione a imagem correta para o evento "WAV" e ajuste a extensão.
-    } else if (eventNameLower === 'papoco: ignição') {
-        imageUrl = './assets/papoco.jpg'; // Adicione a imagem correta para o evento "WAV" e ajuste a extensão.
-    } else if (eventNameLower === 'numalaje 3 anos') {
-        imageUrl = './assets/numalaje.PNG'; // Adicione a imagem correta para o evento "WAV" e ajuste a extensão.
-    } else if (eventNameLower === 'numalaje 3 anos - after') {
-        imageUrl = './assets/numalaje.PNG'; // Adicione a imagem correta para o evento "WAV" e ajuste a extensão.
-    } else if (eventNameLower === 'nandi bota tudo') {
-        imageUrl = './assets/nandi.PNG'; // Adicione a imagem correta para o evento "WAV" e ajuste a extensão.
-    } else if (eventNameLower === 'bateu convida badsista & friends') {
-        imageUrl = './assets/bateubadsista.PNG'; // Adicione a imagem correta para o evento "WAV" e ajuste a extensão.
-    } else if (eventNameLower === 'fritaria') {
-        imageUrl = './assets/fritaria.PNG'; // Adicione a imagem correta para o evento "WAV" e ajuste a extensão.
-    } else if (eventNameLower === 'bunker') {
-        imageUrl = './assets/bunker.jpg'; // Adicione a imagem correta para o evento "WAV" e ajuste a extensão.
-    } else if (eventNameLower === 'baile do ddzin') {
-        imageUrl = './assets/bailedoddzin.jpg'; // Adicione a imagem correta para o evento "WAV" e ajuste a extensão.
-    } else if (eventNameLower === 'titanica') {
-        imageUrl = './assets/titanica.jpg'; // Adicione a imagem correta para o evento "WAV" e ajuste a extensão.
-    } else if (eventNameLower === 'fabrika') {
-        imageUrl = './assets/fabrika.jpg'; // Adicione a imagem correta para o evento "WAV" e ajuste a extensão.
-    } else if (eventNameLower === 'baile do ddzin') {
-        imageUrl = './assets/bailedoddzin.jpg'; // Adicione a imagem correta para o evento "WAV" e ajuste a extensão.
-    } else if (eventNameLower === 'cade o funk que tava aqui?') {
-        imageUrl = './assets/funkbateu.PNG';
+    if (eventImageMap[eventNameLower]) {
+        imageUrl = eventImageMap[eventNameLower];
     }
-
 
     // Formata a string de horário
     const timeString = formatTimeString(startTime, endTime);
