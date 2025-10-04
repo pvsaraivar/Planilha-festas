@@ -777,7 +777,7 @@ input[type="date"]::placeholder {
         flex-direction: column; /* Empilha os filtros verticalmente */
         align-items: stretch; /* Garante que todos os filtros ocupem a largura total */
         margin-top: 1rem;
-        gap: 0.75rem;
+        gap: 0.5rem;
     }
 
     .search-container {
@@ -791,7 +791,7 @@ input[type="date"]::placeholder {
     #search-input,
     .date-filter,
     .genre-filter {
-        height: 44px; /* Altura dos filtros reduzida */
+        height: 40px; /* Altura dos filtros reduzida */
     }
 
     .genre-filter {
@@ -800,11 +800,11 @@ input[type="date"]::placeholder {
     }
 
     .clear-all-filters-btn {
-        height: 44px;
+        height: 40px;
     }
 
     .share-filters-btn {
-        height: 44px;
+        height: 40px;
     }
 
     #event-grid {

@@ -10,6 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Primeiro, lê os parâmetros da URL para saber se um evento específico deve ser aberto.
     applyFiltersFromURL();
     loadAndDisplayEvents(googleSheetUrl);
+    setupFilters();
     setupModal();
     setupContactModal();
     setupBackToTopButton();
@@ -77,8 +78,6 @@ async function loadAndDisplayEvents(csvPath) {
             const eventToOpen = allEvents.find(e => createEventSlug(getProp(e, 'Evento') || getProp(e, 'Nome')) === eventSlugFromUrl);
             if (eventToOpen) openModal(eventToOpen);
         }
-        // Configura os filtros (que também aplicam os valores da URL aos inputs)
-        setupFilters();
 
     } catch (error) {
         console.error("Falha ao carregar ou renderizar os eventos:", error);
@@ -117,12 +116,6 @@ function applyFiltersFromURL() {
         filtersApplied = true;
     }
 
-    if (filtersApplied) {
-        // A função applyFilters() é chamada dentro do setupFilters,
-        // então aqui apenas garantimos que os valores estão nos inputs.
-        // A chamada explícita será feita após o setup.
-        document.querySelector('#search-input').dispatchEvent(new Event('input', { bubbles: true }));
-    }
 }
 /**
  * Analisa uma string de texto CSV em um array de objetos de produto.
