@@ -274,6 +274,7 @@ function setupFilters() {
     const clearSearchBtn = document.getElementById('clear-search-btn');
     const clearDateBtn = document.getElementById('clear-date-btn');
     const clearAllBtn = document.getElementById('clear-all-filters-btn');
+    const shareFiltersBtn = document.getElementById('share-filters-btn');
     const searchLoader = document.getElementById('search-loader');
     const grid = document.getElementById('event-grid');
 
@@ -290,7 +291,9 @@ function setupFilters() {
         // Mostra/esconde botões de limpar
         clearSearchBtn.hidden = !searchTerm;
         clearDateBtn.hidden = !selectedDate;
-        clearAllBtn.hidden = !searchTerm && !selectedDate && !selectedGenre;
+        const anyFilterActive = !!searchTerm || !!selectedDate || (!!selectedGenre && selectedGenre !== '');
+        clearAllBtn.hidden = !anyFilterActive;
+        shareFiltersBtn.hidden = !anyFilterActive;
 
         // Atualiza a URL com os parâmetros de filtro
         const params = new URLSearchParams();
@@ -385,6 +388,27 @@ function setupFilters() {
         dateInput.value = '';
         genreFilter.value = '';
         applyFilters();
+    });
+
+    // Chama applyFilters uma vez na inicialização para definir o estado dos botões com base nos parâmetros da URL
+    applyFilters();
+
+    shareFiltersBtn.addEventListener('click', () => {
+        // A URL já está correta na barra de endereço
+        navigator.clipboard.writeText(window.location.href).then(() => {
+            const originalHtml = shareFiltersBtn.innerHTML;
+            const checkIconSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
+            shareFiltersBtn.innerHTML = `${checkIconSvg} <span>Link Copiado!</span>`;
+            shareFiltersBtn.disabled = true;
+            
+            setTimeout(() => {
+                shareFiltersBtn.innerHTML = originalHtml;
+                shareFiltersBtn.disabled = false;
+            }, 2000);
+        }).catch(err => {
+            console.error('Falha ao copiar o link do filtro: ', err);
+            alert('Não foi possível copiar o link.');
+        });
     });
 }
 
@@ -667,7 +691,7 @@ function openModal(event) {
         instagramDetailHtml = `
             <div class="modal-detail-item">
                 <span class="modal-detail-label">Instagram</span>
-                <span class="modal-detail-value"><a href="${instagramUrl}" target="_blank" rel="noopener noreferrer" class="modal-link">${instagramIconSvg} ${profileName}</a></span>
+                <span class="modal-detail-value"><a href="${instagramUrl}" target="_blank" rel="noopener noreferrer">${instagramIconSvg} ${profileName}</a></span>
             </div>
         `;
     }
@@ -723,11 +747,8 @@ function openModal(event) {
     // Adiciona a funcionalidade de compartilhamento
     const copyLinkBtn = modalContent.querySelector('.copy-link-btn');
     if (copyLinkBtn) {
-        // Garante que a URL com o parâmetro 'event' seja copiada
-        const eventSlug = createEventSlug(name);
-        const params = new URLSearchParams(window.location.search);
-        params.set('event', eventSlug);
-        const shareUrl = `${window.location.origin}${window.location.pathname}?${params.toString()}`;
+        // A URL na barra de endereço já contém todos os filtros e o slug do evento.
+        const shareUrl = window.location.href;
 
         copyLinkBtn.addEventListener('click', () => {
             navigator.clipboard.writeText(shareUrl).then(() => {
@@ -749,11 +770,8 @@ function openModal(event) {
     const whatsappBtn = modalContent.querySelector('.whatsapp-btn');
     if (whatsappBtn) {
         whatsappBtn.addEventListener('click', () => {
-            // Gera a URL de compartilhamento específica do evento
-            const eventSlug = createEventSlug(name);
-            const params = new URLSearchParams(window.location.search);
-            params.set('event', eventSlug);
-            const shareUrl = `${window.location.origin}${window.location.pathname}?${params.toString()}`;
+            // A URL na barra de endereço já contém todos os filtros e o slug do evento.
+            const shareUrl = window.location.href;
             const shareText = `Confira este evento: *${name}* em ${date}! Saiba mais aqui: ${shareUrl}`;
             const whatsappUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareText)}`;            
             window.open(whatsappUrl, '_blank');
