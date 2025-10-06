@@ -110,11 +110,10 @@ a {
     visibility: hidden;
 }
 
-/* Oculta o texto nativo "dd/mm/aaaa" do campo de data quando ele está vazio,
-   permitindo que nosso placeholder personalizado seja exibido sem sobreposição. */
-.date-filter::before {
-    content: attr(placeholder);
-    color: var(--subtle-text);
+/* Torna o texto do placeholder nativo (dd/mm/aaaa) transparente quando nenhuma data foi selecionada.
+   Isso unifica o comportamento entre iOS e Android. */
+.date-filter:not(:valid) {
+    color: transparent;
 }
 
 .date-filter {
