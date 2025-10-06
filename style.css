@@ -228,6 +228,7 @@ input[type="date"]::placeholder {
 .genre-filter.is-active,
 #search-input.is-active {
     border-color: var(--primary-color);
+    box-shadow: 0 0 0 1px var(--primary-color); /* Adiciona um brilho sutil para indicar atividade */
 }
 
 .clear-date-btn {
@@ -326,7 +327,7 @@ input[type="date"]::placeholder {
 }
 
 .event-card {
-    background-color: var(--card-background);
+    background-color: transparent;
     box-shadow: var(--shadow);
     overflow: hidden;
     border: 1px solid var(--border-color);
@@ -343,7 +344,7 @@ input[type="date"]::placeholder {
     transform: translateY(-6px);
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
     border-color: var(--text-color);
-    background-color: #333; /* Ilumina um pouco o card no hover */
+    background-color: rgba(255, 255, 255, 0.03); /* Adiciona um brilho sutil transparente no hover */
 }
 .event-card:active {
     transform: translateY(-2px) scale(0.98);
