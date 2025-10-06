@@ -22,24 +22,27 @@ document.addEventListener('DOMContentLoaded', () => {
  * As chaves devem estar em minúsculas para corresponder à verificação.
  */
 const eventImageMap = {
-    'na pista': 'assets/napista.PNG',
-    'beije': 'assets/beije.PNG',
-    'wav & friends': 'assets/wav.PNG',
-    'wav & sunset': 'assets/wavsunset.PNG',
+    'na pista': 'assets/napista.png',
+    'beije': 'assets/beije.png',
+    'wav & friends': 'assets/wav.png',
+    'wav & sunset': 'assets/wavsunset.png',
     'kolaje na estação': 'assets/kolaje.jpg',
     'papoco: ignição': 'assets/papoco.jpg',
-    'numalaje 3 anos': 'assets/numalaje.PNG',
-    'numalaje 3 anos - after': 'assets/numalaje.PNG',
-    'nandi bota tudo': 'assets/nandi.PNG',
-    'bateu convida badsista & friends': 'assets/bateubadsista.PNG',
-    'fritaria': 'assets/fritaria.PNG',
+    'numalaje 3 anos': 'assets/numalaje.png',
+    'numalaje 3 anos - after': 'assets/numalaje.png',
+    'nandi bota tudo': 'assets/nandi.png',
+    'bateu convida badsista & friends': 'assets/bateubadsista.png',
+    'fritaria': 'assets/fritaria.png',
     'bunker': 'assets/bunker.jpg',
     'baile do ddzin': 'assets/bailedoddzin.jpg',
     'titanica': 'assets/titanica.jpg',
     'fabrika': 'assets/fabrika.jpg',
-    'cade o funk que tava aqui?': 'assets/funkbateu.PNG',
-    'mare alta': 'assets/marealta.PNG',
-    'psy club vs progressive psy': 'assets/psy.PNG'
+    'insana 2': 'assets/insana.png',
+    'bleed': 'assets/bleed.png', // Corrigido para minúsculas
+    'cade o funk que tava aqui?': 'assets/funkbateu.png',
+    'mare alta': 'assets/marealta.png',
+    'psy club vs progressive psy': 'assets/psy.png',
+    'after da kolaje': 'assets/afterkolaje.jpg'
 }
 
 /**

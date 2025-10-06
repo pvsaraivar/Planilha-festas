@@ -110,9 +110,11 @@ a {
     visibility: hidden;
 }
 
-/* Torna o placeholder nativo (dd/mm/aaaa) transparente apenas quando o campo está vazio */
-.date-filter:invalid {
-    color: transparent;
+/* Oculta o texto nativo "dd/mm/aaaa" do campo de data quando ele está vazio,
+   permitindo que nosso placeholder personalizado seja exibido sem sobreposição. */
+.date-filter::before {
+    content: attr(placeholder);
+    color: var(--subtle-text);
 }
 
 .date-filter {
