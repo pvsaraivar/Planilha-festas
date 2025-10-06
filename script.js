@@ -31,7 +31,7 @@ const eventImageMap = {
     'numalaje 3 anos': 'assets/numalaje.PNG',
     'numalaje 3 anos - after': 'assets/numalaje.PNG',
     'nandi bota tudo': 'assets/nandi.PNG',
-    'bateu convida badsista & friends': 'assets/bateubadsista.png',
+    'bateu convida badsista & friends': 'assets/bateubadsista.PNG',
     'fritaria': 'assets/fritaria.PNG',
     'bunker': 'assets/bunker.jpg',
     'baile do ddzin': 'assets/bailedoddzin.jpg',
