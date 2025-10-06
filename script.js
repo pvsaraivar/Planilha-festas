@@ -69,8 +69,26 @@ async function loadAndDisplayEvents(csvPath) {
             return oculto !== 'sim' && oculto !== 'true';
         });
         
-        // Renderiza os eventos ordenados
-        renderEvents(getSortedEvents(allEvents), grid);
+        // Helper para converter "DD/MM/YYYY" para um objeto Date
+        const parseDate = (dateString) => {
+            if (!dateString || typeof dateString !== 'string') return null;
+            const parts = dateString.split('/');
+            if (parts.length !== 3) return null;
+            return new Date(parts[2], parts[1] - 1, parts[0]);
+        };
+
+        // Pega a data de hoje, zerando o horário para comparar apenas o dia
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        // Filtra para mostrar apenas eventos futuros na carga inicial
+        const futureEvents = allEvents.filter(event => {
+            const eventDate = parseDate(getProp(event, 'Data') || getProp(event, 'Date'));
+            return eventDate && eventDate >= today;
+        });
+
+        // Renderiza apenas os eventos futuros ordenados
+        renderEvents(getSortedEvents(futureEvents), grid);
         // Preenche o filtro de gênero com base nos eventos carregados
         populateGenreFilter(allEvents);
         // Se um slug de evento foi passado na URL, tenta abrir o modal correspondente
@@ -477,8 +495,24 @@ function createEventCardElement(event) {
         genreTagsHtml = `<p class="event-card__genres">${genreText}</p>`;
     }
 
+    // Helper para converter "DD/MM/YYYY" para um objeto Date
+    const parseDate = (dateString) => {
+        if (!dateString || typeof dateString !== 'string') return null;
+        const parts = dateString.split('/');
+        if (parts.length !== 3) return null;
+        return new Date(parts[2], parts[1] - 1, parts[0]);
+    };
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Zera o horário para comparar apenas o dia
+
+    const eventDate = parseDate(date);
+    const isPastEvent = eventDate && eventDate < today;
+
     let ticketHtml = '';
-    if (ticketUrl) {
+    if (isPastEvent) {
+        ticketHtml = `<div class="event-card__footer"><span class="event-card__tickets-btn event-card__tickets-btn--free">Evento já realizado</span></div>`;
+    } else if (ticketUrl) {
         if (ticketUrl.toLowerCase().trim() === 'gratuito') {
             ticketHtml = `<div class="event-card__footer"><span class="event-card__tickets-btn event-card__tickets-btn--free">Gratuito</span></div>`;
         } else {
