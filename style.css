@@ -890,17 +890,12 @@ input[type="date"]::placeholder {
 
 /* Exibe o placeholder do calendário apenas em telas menores */
 @media (max-width: 600px) {
-    .date-filter-placeholder {
-        display: block; /* Mostra o placeholder "Calendário" */
-    }
-
     /* Oculta o texto nativo "dd/mm/aaaa" do Android quando o campo está vazio. */
     .date-filter:not(:valid) {
         color: transparent;
     }
 
-    /* Oculta o placeholder "Calendário" quando uma data é selecionada. */
-    .date-filter:valid ~ .date-filter-placeholder {
-        display: none;
+    .date-filter:not(:valid) ~ .date-filter-placeholder {
+        display: block; /* Mostra o placeholder "Calendário" apenas quando o campo está vazio */
     }
 }
