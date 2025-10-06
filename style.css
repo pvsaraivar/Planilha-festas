@@ -103,12 +103,6 @@ a {
     z-index: 1;
     transition: opacity 0.2s, visibility 0.2s;
 }
-.date-filter-placeholder { display: none; } /* Oculta por padrão (desktop) */
-
-.date-filter-container.has-value .date-filter-placeholder {
-    opacity: 0;
-    visibility: hidden;
-}
 
 .date-filter {
     width: 100%;
@@ -896,26 +890,17 @@ input[type="date"]::placeholder {
 
 /* Exibe o placeholder do calendário apenas em telas menores */
 @media (max-width: 600px) {
-    /* 1. Oculta o texto nativo "dd/mm/aaaa" do Android quando o campo está vazio. */
+    .date-filter-placeholder {
+        display: block; /* Mostra o placeholder "Calendário" */
+    }
+
+    /* Oculta o texto nativo "dd/mm/aaaa" do Android quando o campo está vazio. */
     .date-filter:not(:valid) {
         color: transparent;
     }
 
-    /* 2. Cria um placeholder customizado "Calendário" que aparece em todos os dispositivos móveis. */
-    .date-filter-container::before {
-        content: 'Calendário';
-        position: absolute;
-        left: 1rem; /* Alinha com o padding do input */
-        top: 50%;
-        transform: translateY(-50%);
-        color: var(--subtle-text);
-        pointer-events: none; /* Garante que o clique vá para o input */
-        z-index: 2; /* Garante que fique acima do input, mas abaixo do botão de limpar */
-    }
-
-    /* 3. Oculta o placeholder customizado quando uma data é selecionada. */
-    .date-filter:valid + .date-filter-container::before,
-    .date-filter:focus + .date-filter-container::before {
-        content: '';
+    /* Oculta o placeholder "Calendário" quando uma data é selecionada. */
+    .date-filter:valid ~ .date-filter-placeholder {
+        display: none;
     }
 }
