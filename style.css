@@ -822,7 +822,8 @@ input[type="date"]::placeholder {
 
     #event-grid {
         /* Reduz o tamanho mínimo do card para permitir 2 colunas em telas menores */
-        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+        gap: 1rem; /* Reduz o espaçamento entre os cards */
     }
 
     .event-card__image {
