@@ -162,6 +162,9 @@ a {
     align-items: center; /* Alinha o ícone e o texto */
     gap: 0.5rem; /* Espaço entre o ícone e o texto */
 
+    /* Por padrão, o placeholder customizado fica oculto. Ele só é exibido via media query quando necessário. */
+    opacity: 0;
+    visibility: hidden;
 }
 
 .date-filter:not(:valid) {
@@ -984,16 +987,19 @@ input[type="date"]::placeholder {
 }
 
 /* Exibe o placeholder do calendário apenas em telas menores */
-/* E o esconde em telas maiores */
 @media (max-width: 600px) {
-    /* Mostra o placeholder "Calendário" apenas quando o campo está vazio. */
+    /* 2. Mostra o placeholder "dd/mm/aaaa" apenas quando o campo está vazio. */
+    /* Aumenta a especificidade para garantir que a regra seja aplicada */
     .date-filter-container .date-filter:not(:valid) ~ .date-filter-placeholder {
         opacity: 1;
         visibility: visible;
     }
 }
 
+/* Esconde o placeholder customizado "Calendário" em telas maiores (desktop) */
 @media (min-width: 601px) {
-    /* Esconde o placeholder "Calendário" em telas de desktop */
-    .date-filter-placeholder { display: none; }
+    .date-filter-placeholder {
+        opacity: 0;
+        visibility: hidden;
+    }
 }
