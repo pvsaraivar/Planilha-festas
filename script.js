@@ -42,7 +42,8 @@ const eventImageMap = {
     'cade o funk que tava aqui?': 'assets/funkbateu.PNG',
     'mare alta': 'assets/marealta.PNG',
     'psy club vs progressive psy': 'assets/psy.PNG',
-    'after da kolaje': 'assets/afterkolaje.jpg'
+    'after da kolaje': 'assets/afterkolaje.jpg',
+    'loren day party: candy edition': 'assets/lorenday.PNG'
 }
 
 /**
