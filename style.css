@@ -159,10 +159,12 @@ a {
     z-index: 1;
     transition: opacity 0.2s, visibility 0.2s;
 }
-
-/* Por padrão (desktop), o placeholder "Calendário" fica oculto. */
+ 
+/* Por padrão, o placeholder customizado fica oculto. */
 .date-filter-placeholder {
-    display: none;
+    opacity: 0;
+    visibility: hidden;
+    display: block; /* Garante que ele ocupe espaço para a transição funcionar */
 }
 
 .date-filter {
@@ -981,6 +983,8 @@ input[type="date"]::placeholder {
 
     /* 2. Mostra o placeholder "dd/mm/aaaa" apenas quando o campo está vazio. */
     .date-filter:not(:valid) ~ .date-filter-placeholder {
-        display: block;
+        /* display: block; */
+        opacity: 1;
+        visibility: visible;
     }
 }
