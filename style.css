@@ -159,15 +159,16 @@ a {
     z-index: 1;
     transition: opacity 0.2s, visibility 0.2s;
     display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-}
- 
-/* Por padrão, o placeholder customizado fica oculto. */
-.date-filter-placeholder {
+    align-items: center; /* Alinha o ícone e o texto */
+    gap: 0.5rem; /* Espaço entre o ícone e o texto */
+
+    /* Por padrão (desktop), o placeholder customizado fica oculto. */
     opacity: 0;
     visibility: hidden;
-    display: block; /* Garante que ele ocupe espaço para a transição funcionar */
+}
+
+.date-filter:not(:valid) {
+    color: transparent; /* Oculta o texto nativo (dd/mm/aaaa) quando o campo está vazio */
 }
 
 .date-filter {
@@ -181,6 +182,14 @@ a {
     color: var(--text-color); /* Garante que a data selecionada seja visível */
     height: 50px;
     background-color: transparent;
+}
+
+/* Esconde o placeholder nativo (dd/mm/aaaa) em navegadores WebKit */
+.date-filter:not(:valid)::-webkit-datetime-edit-text,
+.date-filter:not(:valid)::-webkit-datetime-edit-month-field,
+.date-filter:not(:valid)::-webkit-datetime-edit-day-field,
+.date-filter:not(:valid)::-webkit-datetime-edit-year-field {
+    color: transparent !important;
 }
 
 .date-filter:focus {
@@ -979,14 +988,9 @@ input[type="date"]::placeholder {
 
 /* Exibe o placeholder do calendário apenas em telas menores */
 @media (max-width: 600px) {
-    /* 1. Oculta o texto nativo "dd/mm/aaaa" do Android para dar espaço ao nosso placeholder. */
-    .date-filter:not(:valid) {
-        color: transparent; /* Oculta o placeholder nativo para exibir o nosso. */
-    }
-
     /* 2. Mostra o placeholder "dd/mm/aaaa" apenas quando o campo está vazio. */
-    .date-filter:not(:valid) ~ .date-filter-placeholder {
-        /* display: block; */
+    /* Aumenta a especificidade para garantir que a regra seja aplicada */
+    .date-filter-container .date-filter:not(:valid) ~ .date-filter-placeholder {
         opacity: 1;
         visibility: visible;
     }
