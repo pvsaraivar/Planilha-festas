@@ -162,9 +162,6 @@ a {
     align-items: center; /* Alinha o ícone e o texto */
     gap: 0.5rem; /* Espaço entre o ícone e o texto */
 
-    /* Por padrão, o placeholder customizado fica oculto. Ele só é exibido via media query quando necessário. */
-    opacity: 0;
-    visibility: hidden;
 }
 
 .date-filter:not(:valid) {
