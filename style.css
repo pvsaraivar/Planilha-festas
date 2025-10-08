@@ -873,12 +873,22 @@ input[type="date"]::placeholder {
         gap: 0.5rem;
     }
 
+    .date-filter-container {
+        flex-direction: column;
+        gap: 0.25rem;
+    }
+
     .search-container {
         /* A regra de flex-basis não é mais necessária com flex-direction: column */
     }
 
     .date-filter {
         padding-right: 3rem; /* Aumenta o espaço para o botão X no mobile */
+        height: 38px; /* Altura reduzida pois o label está separado */
+    }
+
+    .date-filter-placeholder {
+        position: static; /* Remove o posicionamento absoluto */
     }
 
     #search-input,
