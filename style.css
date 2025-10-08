@@ -158,6 +158,9 @@ a {
     pointer-events: none;
     z-index: 1;
     transition: opacity 0.2s, visibility 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
 }
  
 /* Por padrão, o placeholder customizado fica oculto. */
@@ -978,7 +981,7 @@ input[type="date"]::placeholder {
 @media (max-width: 600px) {
     /* 1. Oculta o texto nativo "dd/mm/aaaa" do Android para dar espaço ao nosso placeholder. */
     .date-filter:not(:valid) {
-        color: var(--subtle-text); /* Garante que o placeholder nativo seja visível */
+        color: transparent; /* Oculta o placeholder nativo para exibir o nosso. */
     }
 
     /* 2. Mostra o placeholder "dd/mm/aaaa" apenas quando o campo está vazio. */
