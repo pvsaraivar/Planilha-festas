@@ -14,6 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
     setupModal();
     setupContactModal();
     setupBackToTopButton();
+    setupThemeToggle();
 });
 
 /**
@@ -425,6 +426,44 @@ function setupFilters() {
             console.error('Falha ao copiar o link do filtro: ', err);
             alert('Não foi possível copiar o link.');
         });
+    });
+}
+
+/**
+ * Configura o botão para alternar entre tema claro e escuro.
+ */
+function setupThemeToggle() {
+    const themeToggleBtn = document.getElementById('theme-toggle-btn');
+    const body = document.body;
+    const sunIcon = themeToggleBtn.querySelector('.sun-icon');
+    const moonIcon = themeToggleBtn.querySelector('.moon-icon');
+
+    // Função para aplicar o tema e atualizar o ícone
+    const applyTheme = (theme) => {
+        if (theme === 'light') {
+            body.classList.add('light-theme');
+            sunIcon.style.display = 'none';
+            moonIcon.style.display = 'block';
+        } else {
+            body.classList.remove('light-theme');
+            sunIcon.style.display = 'block';
+            moonIcon.style.display = 'none';
+        }
+    };
+
+    // Verifica o tema salvo no localStorage ao carregar a página
+    const savedTheme = localStorage.getItem('theme') || 'dark';
+    applyTheme(savedTheme);
+
+    // Adiciona o listener de clique para o botão
+    themeToggleBtn.addEventListener('click', () => {
+        const isLight = body.classList.contains('light-theme');
+        const newTheme = isLight ? 'dark' : 'light';
+        
+        applyTheme(newTheme);
+        
+        // Salva a preferência do usuário
+        localStorage.setItem('theme', newTheme);
     });
 }
 
