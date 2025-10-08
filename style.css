@@ -162,6 +162,9 @@ a {
     align-items: center; /* Alinha o ícone e o texto */
     gap: 0.5rem; /* Espaço entre o ícone e o texto */
 
+    /* Por padrão, o placeholder customizado fica oculto. Ele só é exibido via media query quando necessário. */
+    opacity: 0;
+    visibility: hidden;
 }
 
 .date-filter:not(:valid) {
@@ -995,6 +998,8 @@ input[type="date"]::placeholder {
 
 /* Esconde o placeholder customizado "Calendário" em telas maiores (desktop) */
 @media (min-width: 601px) {
-    /* Garante que o placeholder customizado não apareça no desktop */
-    .date-filter-placeholder { display: none; }
+    .date-filter-placeholder {
+        opacity: 0;
+        visibility: hidden;
+    }
 }
