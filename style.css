@@ -998,8 +998,6 @@ input[type="date"]::placeholder {
 
 /* Esconde o placeholder customizado "Calendário" em telas maiores (desktop) */
 @media (min-width: 601px) {
-    .date-filter-placeholder {
-        opacity: 0;
-        visibility: hidden;
-    }
+    /* Garante que o placeholder customizado não apareça no desktop */
+    .date-filter-placeholder { display: none; }
 }
