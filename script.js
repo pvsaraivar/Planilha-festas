@@ -396,6 +396,7 @@ function setupFilters() {
     clearDateBtn.addEventListener('click', () => {
         dateInput.value = '';
         applyFilters();
+        dateInput.classList.remove('is-active'); // Garante que o placeholder customizado reapareça
     });
 
     clearAllBtn.addEventListener('click', () => {

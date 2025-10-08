@@ -31,7 +31,7 @@ body {
     -webkit-font-smoothing: antialiased; /* Melhora a renderização da fonte */
     -moz-osx-font-smoothing: grayscale;
     color-scheme: dark; /* Garante que componentes nativos (como o calendário) usem o tema escuro */
-
+ 
     /* Aplica o mapa e a cor de fundo em camadas para garantir a visibilidade */
     background: 
         linear-gradient(rgba(18, 18, 18, 0.96), rgba(18, 18, 18, 0.96)), /* Camada de cor com opacidade */
@@ -891,4 +891,18 @@ input[type="date"]::placeholder {
     .modal-separator {
         margin: 1rem 0; /* Espaçamento do separador reduzido */
     }
+}
+
+/* Exibe o placeholder do calendário apenas em telas menores */
+@media (max-width: 600px) {
+    /* 1. Oculta o texto nativo "dd/mm/aaaa" do Android para dar espaço ao nosso placeholder. */
+    .date-filter:not(:valid) {
+        color: transparent;
+    }
+
+    /* 2. Mostra o placeholder "dd/mm/aaaa" apenas quando o campo está vazio. */
+    .date-filter:not(:valid) ~ .date-filter-placeholder {
+        display: block;
+    }
+}
 }
