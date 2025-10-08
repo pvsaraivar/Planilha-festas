@@ -874,21 +874,11 @@ input[type="date"]::placeholder {
     }
 
     .date-filter-container {
-        flex-direction: column;
-        gap: 0.25rem;
+        /* Reverte para o comportamento padrão, permitindo a sobreposição do placeholder */
     }
 
     .search-container {
         /* A regra de flex-basis não é mais necessária com flex-direction: column */
-    }
-
-    .date-filter {
-        padding-right: 3rem; /* Aumenta o espaço para o botão X no mobile */
-        height: 38px; /* Altura reduzida pois o label está separado */
-    }
-
-    .date-filter-placeholder {
-        position: static; /* Remove o posicionamento absoluto */
     }
 
     #search-input,
