@@ -47,7 +47,8 @@ const eventImageMap = {
     'loren day party: candy edition': 'assets/lorenday.PNG',
     'addams halloween': 'assets/adams.PNG',
     'puro extase': 'assets/extase.PNG',
-    'elas na areia': 'assets/elasnaareia.PNG'
+    'elas na areia': 'assets/elasnaareia.PNG',
+    'lobotomia': 'assets/lobotomia.PNG'
 }
 
 /**
