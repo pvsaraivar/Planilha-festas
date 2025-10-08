@@ -159,6 +159,10 @@ a {
     z-index: 1;
     transition: opacity 0.2s, visibility 0.2s;
     /* display: inline-flex; */
+
+    /* Por padrão, o placeholder customizado fica oculto. Ele só é exibido via media query quando necessário. */
+    opacity: 0;
+    visibility: hidden;
 }
 
 .date-filter:not(:valid) {
