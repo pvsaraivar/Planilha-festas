@@ -44,7 +44,9 @@ const eventImageMap = {
     'mare alta': 'assets/marealta.PNG',
     'psy club vs progressive psy': 'assets/psy.PNG',
     'after da kolaje': 'assets/afterkolaje.jpg',
-    'loren day party: candy edition': 'assets/lorenday.PNG'
+    'loren day party: candy edition': 'assets/lorenday.PNG',
+    'addams halloween': 'assets/adams.PNG',
+    'puro extase': 'assets/extase.PNG'
 }
 
 /**
