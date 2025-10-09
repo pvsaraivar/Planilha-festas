@@ -300,6 +300,7 @@ function setupFilters() {
     const clearDateBtn = document.getElementById('clear-date-btn');
     const clearAllBtn = document.getElementById('clear-all-filters-btn');
     const datePickerTrigger = document.querySelector('.date-picker-trigger');
+    const dateValueDisplay = document.getElementById('date-filter-value');
     const shareFiltersBtn = document.getElementById('share-filters-btn');
     const searchLoader = document.getElementById('search-loader');
     const grid = document.getElementById('event-grid');
@@ -320,6 +321,16 @@ function setupFilters() {
         const anyFilterActive = !!searchTerm || !!selectedDate || (!!selectedGenre && selectedGenre !== '');
         clearAllBtn.hidden = !anyFilterActive;
         shareFiltersBtn.hidden = !anyFilterActive;
+
+        // Atualiza o display do filtro de data com o novo estilo
+        if (selectedDate) {
+            const [year, month, day] = selectedDate.split('-');
+            dateValueDisplay.textContent = `${day}/${month}/${year}`;
+            dateValueDisplay.classList.add('has-value');
+        } else {
+            dateValueDisplay.textContent = 'Calendário';
+            dateValueDisplay.classList.remove('has-value');
+        }
 
         // Atualiza a URL com os parâmetros de filtro
         const params = new URLSearchParams();
