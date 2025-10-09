@@ -817,12 +817,12 @@ function openModal(event) {
     `;
 
     overlay.classList.add('is-visible');
-    document.body.style.overflow = 'hidden'; // Impede o scroll da página ao fundo
+    document.body.style.overflow = 'hidden';
 
-    // Adiciona a funcionalidade de compartilhamento
+    /* Copiar link */
     const copyLinkBtn = modalContent.querySelector('.copy-link-btn');
     if (copyLinkBtn) {
-        // A URL na barra de endereço já contém todos os filtros e o slug do evento.
+       
         const shareUrl = window.location.href;
 
         copyLinkBtn.addEventListener('click', () => {
@@ -841,11 +841,10 @@ function openModal(event) {
         });
     }
 
-    // Adiciona a funcionalidade de compartilhar no WhatsApp
+    /* Compartilhar no Whats */
     const whatsappBtn = modalContent.querySelector('.whatsapp-btn');
     if (whatsappBtn) {
         whatsappBtn.addEventListener('click', () => {
-            // A URL na barra de endereço já contém todos os filtros e o slug do evento.
             const shareUrl = window.location.href;
             const shareText = `Confira este evento: *${name}* em ${date}! Saiba mais aqui: ${shareUrl}`;
             const whatsappUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareText)}`;            
