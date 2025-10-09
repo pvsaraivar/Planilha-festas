@@ -173,7 +173,7 @@ a {
     border: 1px solid var(--border-color);
     transition: border-color 0.2s, box-shadow 0.2s;
     font-family: inherit;
-    color: #FFFFFF; /* Garante que a data selecionada seja visível */
+    color: var(--text-color); /* Garante que a data selecionada seja visível */
     height: 50px;
     background-color: transparent;
 }
@@ -273,9 +273,14 @@ a {
     color: var(--text-color);
 }
 
-/* Garante que o placeholder nativo (dd/mm/aaaa) tenha a cor sutil */
-input[type="date"]::placeholder {
-    color: #FFFFFF;
+/* Garante que o placeholder nativo (dd/mm/aaaa) tenha a cor sutil.
+   Isso afeta os navegadores baseados em WebKit (Chrome, Safari, etc.) */
+input[type="date"]::-webkit-input-placeholder,
+input[type="date"]::-webkit-datetime-edit-text,
+input[type="date"]::-webkit-datetime-edit-month-field,
+input[type="date"]::-webkit-datetime-edit-day-field,
+input[type="date"]::-webkit-datetime-edit-year-field {
+    color: var(--subtle-text);
     opacity: 1; /* Necessário para o Firefox */
 }
 
