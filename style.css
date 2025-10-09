@@ -571,6 +571,19 @@ a {
     transform: none;
 }
 
+/* --- Estilos para o Modo Claro --- */
+
+.light-theme .event-card__tickets-btn {
+    background-color: var(--text-color); /* Fundo escuro (cor do texto do tema claro) */
+    color: var(--primary-color); /* Texto creme */
+    border-color: transparent;
+}
+
+.light-theme .event-card__tickets-btn:hover {
+    background-color: #333; /* Escurece um pouco o fundo no hover */
+    color: var(--primary-color); /* Mantém a cor do texto creme */
+}
+
 .site-footer {
     text-align: center;
     padding: 1.5rem 0; /* Padding reduzido */
