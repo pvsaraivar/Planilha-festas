@@ -587,6 +587,27 @@ function createEventCardElement(event) {
     const eventDate = parseDate(date);
     const isPastEvent = eventDate && eventDate < today;
 
+    // Adiciona uma classe especial se o evento ocorrer no fim de semana da semana atual (Sexta, Sábado, Domingo).
+    if (eventDate) {
+        const now = new Date();
+        now.setHours(0, 0, 0, 0);
+        const currentDay = now.getDay(); // 0=Dom, 1=Seg, ..., 6=Sáb
+
+        // Calcula o início do fim de semana relevante (a próxima sexta-feira)
+        const weekendStart = new Date(now);
+        // Dias até a próxima sexta-feira (dia 5)
+        const daysUntilFriday = (5 - currentDay + 7) % 7;
+        weekendStart.setDate(now.getDate() + daysUntilFriday);
+
+        // Calcula o fim do fim de semana (domingo)
+        const weekendEnd = new Date(weekendStart);
+        weekendEnd.setDate(weekendStart.getDate() + 2);
+
+        // Verifica se a data do evento está dentro do fim de semana da semana atual
+        if (eventDate >= weekendStart && eventDate <= weekendEnd) {
+            card.classList.add('event-card--weekend');
+        }
+    }
     let ticketHtml = '';
     if (isPastEvent) {
         ticketHtml = `<div class="event-card__footer"><span class="event-card__tickets-btn event-card__tickets-btn--free">Evento já realizado</span></div>`;

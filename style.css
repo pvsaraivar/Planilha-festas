@@ -1,7 +1,7 @@
 /* style.css */
 :root {
     /* Tema Escuro (Padrão) */
-    --primary-color: #8A2BE2; /* Roxo vibrante como nova cor de destaque */
+    --primary-color: #FDF5E6; /* Tom de branco creme (Old Lace) para um visual mais quente */
     --background-start: #121212; /* Fundo escuro principal */
     --background-end: #181818;
     --card-background: #3f3d3d; /* Fundo dos cards, um pouco mais claro */
@@ -444,6 +444,17 @@ a {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
 }
 
+/* Adiciona uma borda verde sutil para eventos de fim de semana */
+.event-card--weekend {
+    border-color: #2E8B57; /* Verde mar (SeaGreen), um tom sóbrio */
+}
+
+/* No hover, a borda do evento de fim de semana fica mais brilhante */
+.event-card--weekend:hover {
+    border-color: #32CD32; /* Verde lima (LimeGreen) */
+}
+
+
 .event-card__image {
     width: 100%;
     height: 220px;
@@ -531,25 +542,33 @@ a {
     display: block;
     width: 100%;
     padding: 0.65rem; /* Leve ajuste no padding */
-    background-color: var(--card-background);
-    color: var(--text-color);
+    background-color: var(--primary-color);
+    color: var(--background-start); /* Texto escuro para contrastar com o fundo branco */
     text-align: center;
     text-decoration: none;
     font-weight: 700; /* Peso "Bold" para o botão */
     border-radius: 8px;
-    border: 1px solid var(--border-color); /* Adiciona uma borda sutil */
-    transition: background-color 0.2s, border-color 0.2s;
+    border: 1px solid transparent; /* Borda transparente para manter o tamanho no hover */
+    transition: background-color 0.2s, transform 0.2s;
 }
 
 .event-card__tickets-btn:hover {
-    background-color: #1f1f1f; /* Escurece sutilmente o fundo */
-    border-color: var(--text-color); /* Destaca a borda em branco */
+    background-color: #F5EFE0; /* Escurece sutilmente o tom creme no hover */
+    transform: scale(1.02); /* Efeito de zoom sutil */
 }
 
 .event-card__tickets-btn--free {
     color: var(--subtle-text);
     cursor: default;
     /* Herda o background e a borda do botão padrão */
+    background-color: var(--card-background);
+    border: 1px solid var(--border-color);
+}
+
+/* Impede que os botões não-clicáveis tenham o efeito de hover do botão principal */
+.event-card__tickets-btn--free:hover {
+    background-color: var(--card-background);
+    transform: none;
 }
 
 .site-footer {
@@ -714,18 +733,15 @@ a {
 .modal-detail-value a {
     display: inline-flex;
     align-items: center;
-    gap: 0.5rem;    
-    color: var(--subtle-text);    
-    padding: 0.25rem 0.5rem; /* Adiciona um respiro para o fundo no hover */
-    margin: -0.25rem -0.5rem; /* Compensa o padding para não quebrar o layout */
-    border-radius: 6px; /* Bordas arredondadas para o fundo no hover */
-    background-color: #2e2e2e; /* Fundo bem leve para destacar a área clicável */
-    transition: color 0.2s, background-color 0.2s;
+    gap: 0.5rem;
+    color: var(--primary-color); /* Usa a cor de destaque creme */
+    font-weight: 500; /* Deixa o texto um pouco mais forte */
+    transition: color 0.2s, text-decoration 0.2s;
 }
 
 .modal-detail-value a:hover {
-    color: var(--text-color);
-    background-color: var(--card-background); /* Fundo sutil no hover */
+    color: var(--text-color); /* Fica branco no hover para mais destaque */
+    text-decoration: underline; /* Adiciona sublinhado para indicar que é um link */
 }
 
 .location-container {
@@ -784,9 +800,16 @@ a {
 }
 
 .tickets-btn {
-    background-color: var(--card-background);
-    color: var(--text-color);
-    border-color: var(--border-color);
+    /* Aplica o estilo principal de "call-to-action" */
+    background-color: var(--primary-color);
+    color: var(--background-start);
+    border-color: transparent;
+    font-weight: 700;
+}
+
+.tickets-btn:hover {
+    background-color: #F5EFE0; /* Escurece sutilmente o tom creme no hover */
+    color: var(--background-start); /* Mantém a cor do texto no hover */
 }
 
 .share-btn.tickets-btn--free {
@@ -844,7 +867,7 @@ a {
     position: fixed;
     bottom: 20px;
     right: 20px;
-    background-color: var(--primary-color);
+    background-color: var(--card-background);
     color: white;
     width: 45px;
     height: 45px;
@@ -859,6 +882,7 @@ a {
     opacity: 0;
     visibility: hidden;
     transition: opacity 0.3s, visibility 0.3s, transform 0.3s, background-color 0.2s;
+    border: 1px solid var(--border-color);
     z-index: 999;
     transform: translateY(20px);
 }
@@ -870,7 +894,8 @@ a {
 }
 
 .back-to-top-btn:hover {
-    background-color: #7B1FA2; /* Tom mais escuro do roxo */
+    border-color: var(--primary-color);
+    color: var(--primary-color);
 }
 
 .light-theme .back-to-top-btn {
