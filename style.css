@@ -188,6 +188,7 @@ a {
     background-position: center;
     background-size: contain;
     z-index: 2;
+    touch-action: manipulation; /* Impede o zoom de toque duplo no mobile */
 }
 
 /* Aplica o estilo de foco no label quando o input invisível é focado */
