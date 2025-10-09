@@ -399,6 +399,13 @@ a {
     gap: 1.5rem;
     padding-top: 2rem;
     padding-bottom: 2rem;
+    /* 
+      Correção para o bug de desaparecimento do background no iOS.
+      A propriedade 'isolation' cria um novo contexto de empilhamento, garantindo que
+      os cards (que usam 'transform' e 'opacity') não sejam renderizados em uma camada
+      separada que cobriria o pseudo-elemento ::before do body.
+    */
+    isolation: isolate;
     transition: opacity 0.2s ease-in-out;
 }
 
