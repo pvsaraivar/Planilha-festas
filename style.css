@@ -150,7 +150,7 @@ a {
 }
 
 .date-filter-placeholder {
-    color: var(--subtle-text); /* Cor do texto "Calendário" */
+    color: #FFFFFF; /* Cor do texto "Calendário" */
     position: absolute;
     left: 1rem;
     top: 50%;
@@ -165,11 +165,6 @@ a {
     visibility: hidden;
 }
 
-/* Quando o campo de data está vazio, o texto nativo (dd/mm/aaaa) fica transparente para não sobrepor nosso placeholder. */
-.date-filter:not(:valid) {
-    color: transparent;
-}
-
 .date-filter {
     width: 100%;
     padding: 0.75rem 2.5rem 0.75rem 1rem; /* Espaço para o botão de limpar */
@@ -180,8 +175,8 @@ a {
     font-family: inherit;
     height: 50px;
     background-color: transparent;
+    color: #FFFFFF;
 }
-
 
 .date-filter:focus {
     outline: 2px solid transparent;
@@ -865,9 +860,6 @@ a {
         /* A regra de flex-basis não é mais necessária com flex-direction: column */
     }
 
-    .date-filter {
-        padding-right: 3rem; /* Aumenta o espaço para o botão X no mobile */
-    }
 
     #search-input,
     .date-filter,
