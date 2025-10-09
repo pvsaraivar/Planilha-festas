@@ -178,13 +178,6 @@ a {
     background-color: transparent;
 }
 
-/* Esconde o placeholder nativo (dd/mm/aaaa) em navegadores WebKit */
-.date-filter:not(:valid)::-webkit-datetime-edit-text,
-.date-filter:not(:valid)::-webkit-datetime-edit-month-field,
-.date-filter:not(:valid)::-webkit-datetime-edit-day-field,
-.date-filter:not(:valid)::-webkit-datetime-edit-year-field {
-    color: transparent !important;
-}
 
 .date-filter:focus {
     outline: 2px solid transparent;
