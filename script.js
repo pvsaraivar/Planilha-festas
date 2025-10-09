@@ -384,6 +384,7 @@ function setupFilters() {
             searchLoader.hidden = true;
         }, 300); // Atraso de 300ms
     });
+
     dateInput.addEventListener('change', applyFilters);
     // Impede a digitação manual no campo de data, forçando o uso do calendário.
     dateInput.addEventListener('keydown', (e) => {

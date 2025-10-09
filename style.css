@@ -150,7 +150,7 @@ a {
 }
 
 .date-filter-placeholder {
-    color: #FFFFFF; /* Cor do texto "Calendário" */
+    color: var(--subtle-text); /* Cor do texto "Calendário" */
     position: absolute;
     left: 1rem;
     top: 50%;
@@ -158,11 +158,14 @@ a {
     pointer-events: none;
     z-index: 1;
     transition: opacity 0.2s, visibility 0.2s;
-    /* display: inline-flex; */
-
     /* Por padrão, o placeholder customizado fica oculto. Ele só é exibido via media query quando necessário. */
     opacity: 0;
     visibility: hidden;
+}
+
+/* Quando o campo de data está vazio, o texto nativo (dd/mm/aaaa) fica transparente para não sobrepor nosso placeholder. */
+.date-filter:not(:valid) {
+    color: transparent;
 }
 
 .date-filter {
@@ -175,7 +178,6 @@ a {
     font-family: inherit;
     height: 50px;
     background-color: transparent;
-    color: #FFFFFF;
 }
 
 .date-filter:focus {
@@ -229,8 +231,7 @@ a {
 }
 
 /* Muda a cor do texto quando uma data é selecionada */
-.date-filter:not(:placeholder-shown),
-.genre-filter option:checked:not([value='']) {
+.date-filter:not(:placeholder-shown), .genre-filter option:checked:not([value='']) {
     color: var(--text-color);
 }
 
@@ -272,8 +273,7 @@ a {
     color: var(--text-color);
 }
 
-.date-filter.is-active,
-.genre-filter.is-active,
+.date-filter.is-active, .genre-filter.is-active,
 #search-input.is-active {
     border-color: var(--primary-color);
     box-shadow: 0 0 0 1px var(--primary-color); /* Adiciona um brilho sutil para indicar atividade */
@@ -297,25 +297,6 @@ a {
 
 .clear-date-btn:hover {
     color: var(--text-color);
-}
-
-.search-loader {
-    position: absolute;
-    top: 50%;
-    right: 0.75rem;
-    transform: translateY(-50%);
-    width: 16px;
-    height: 16px;
-    border: 2px solid var(--primary-color);
-    border-top-color: transparent;
-    border-radius: 50%;
-    animation: spin 0.8s linear infinite;
-}
-
-@keyframes spin {
-    to {
-        transform: translateY(-50%) rotate(360deg);
-    }
 }
 
 .clear-all-filters-btn {
