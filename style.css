@@ -980,8 +980,4 @@ input[type="date"]::-webkit-datetime-edit-year-field {
 /* Esconde o placeholder customizado "Calendário" em telas maiores (desktop) */
 @media (min-width: 601px) {
     .date-filter-placeholder { display: none; } /* Esconde o placeholder customizado (agora vazio) */
-    /* Oculta o texto nativo do placeholder (dd/mm/aaaa) quando o campo está vazio, apenas no desktop */
-    .date-filter:not(:valid) {
-        color: transparent;
-    }
 }
