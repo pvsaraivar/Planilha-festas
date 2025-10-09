@@ -173,7 +173,6 @@ a {
     border: 1px solid var(--border-color);
     transition: border-color 0.2s, box-shadow 0.2s;
     font-family: inherit;
-    color: var(--text-color); /* Garante que a data selecionada seja visível */
     height: 50px;
     background-color: transparent;
 }
@@ -232,7 +231,7 @@ a {
 /* Muda a cor do texto quando uma data é selecionada */
 .date-filter:valid,
 .genre-filter option:checked:not([value='']) {
-    color: #FFFFFF;
+    color: var(--text-color);
 }
 
 #search-input {
