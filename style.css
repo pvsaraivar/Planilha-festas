@@ -150,7 +150,7 @@ a {
 }
 
 .date-filter-placeholder {
-    color: #FFFFFF;
+    color: var(--subtle-text); /* Cor do texto "Calendário" */
     position: absolute;
     left: 1rem;
     top: 50%;
@@ -163,6 +163,11 @@ a {
     /* Por padrão, o placeholder customizado fica oculto. Ele só é exibido via media query quando necessário. */
     opacity: 0;
     visibility: hidden;
+}
+
+/* Quando o campo de data está vazio, o texto nativo (dd/mm/aaaa) fica transparente para não sobrepor nosso placeholder. */
+.date-filter:not(:valid) {
+    color: transparent;
 }
 
 .date-filter {
@@ -270,17 +275,6 @@ a {
 
 .clear-search-btn:hover {
     color: var(--text-color);
-}
-
-/* Garante que o placeholder nativo (dd/mm/aaaa) tenha a cor sutil.
-   Isso afeta os navegadores baseados em WebKit (Chrome, Safari, etc.) */
-input[type="date"]::-webkit-input-placeholder,
-input[type="date"]::-webkit-datetime-edit-text,
-input[type="date"]::-webkit-datetime-edit-month-field,
-input[type="date"]::-webkit-datetime-edit-day-field,
-input[type="date"]::-webkit-datetime-edit-year-field {
-    color: var(--subtle-text);
-    opacity: 1; /* Necessário para o Firefox */
 }
 
 .date-filter.is-active,
@@ -976,8 +970,18 @@ input[type="date"]::-webkit-datetime-edit-year-field {
         margin: 1rem 0; /* Espaçamento do separador reduzido */
     }
 }
+
+/* Exibe o placeholder customizado "Calendário" apenas em telas menores */
+@media (max-width: 600px) {
+    /* Mostra o placeholder "Calendário" quando o campo está vazio. */
+    .date-filter:not(:valid) ~ .date-filter-placeholder {
+        opacity: 1;
+        visibility: visible;
+    }
+}
  
 /* Esconde o placeholder customizado "Calendário" em telas maiores (desktop) */
 @media (min-width: 601px) {
-    .date-filter-placeholder { display: none; } /* Esconde o placeholder customizado (agora vazio) */
+    .date-filter-placeholder { display: none; } /* Esconde o placeholder customizado no desktop */
+    .date-filter:not(:valid) { color: inherit; } /* No desktop, mostra o placeholder nativo (dd/mm/aaaa) */
 }
