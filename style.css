@@ -150,7 +150,7 @@ a {
 }
 
 .date-filter-placeholder {
-    color: var(--subtle-text);
+    color: #FFFFFF;
     position: absolute;
     left: 1rem;
     top: 50%;
@@ -173,7 +173,7 @@ a {
     border: 1px solid var(--border-color);
     transition: border-color 0.2s, box-shadow 0.2s;
     font-family: inherit;
-    color: var(--text-color); /* Garante que a data selecionada seja visível */
+    color: #FFFFFF; /* Garante que a data selecionada seja visível */
     height: 50px;
     background-color: transparent;
 }
@@ -239,7 +239,7 @@ a {
 /* Muda a cor do texto quando uma data é selecionada */
 .date-filter:valid,
 .genre-filter option:checked:not([value='']) {
-    color: var(--text-color);
+    color: #FFFFFF;
 }
 
 #search-input {
@@ -282,7 +282,7 @@ a {
 
 /* Garante que o placeholder nativo (dd/mm/aaaa) tenha a cor sutil */
 input[type="date"]::placeholder {
-    color: var(--subtle-text);
+    color: #FFFFFF;
     opacity: 1; /* Necessário para o Firefox */
 }
 
