@@ -420,14 +420,6 @@ function setupFilters() {
         e.preventDefault();
     });
 
-    // Adiciona o listener para o novo botão de ícone
-    if (datePickerTrigger) {
-        datePickerTrigger.addEventListener('click', (e) => {
-            e.preventDefault(); // Impede o comportamento padrão do navegador (como o zoom no mobile)
-            dateInput.showPicker(); // API padrão para abrir o seletor de data
-        });
-    }
-
     genreFilter.addEventListener('change', applyFilters);
 
     clearSearchBtn.addEventListener('click', () => {

@@ -160,16 +160,17 @@ a {
 }
 
 /* Esconde o input de data real, mas o mantém funcional e acessível para o navegador */
+/* Agora ele é uma pequena área transparente posicionada sobre o ícone */
 .date-filter {
     position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    margin: -1px;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    white-space: nowrap;
-    border: 0;
+    right: 2.75rem; /* Alinha com o gatilho do ícone */
+    top: 50%;
+    transform: translateY(-50%);
+    width: 24px; /* Tamanho da área de clique */
+    height: 24px;
+    opacity: 0; /* Totalmente transparente */
+    cursor: pointer;
+    z-index: 3; /* Garante que ele fique acima do ícone */
 }
 
 .date-picker-trigger {
@@ -187,7 +188,7 @@ a {
     background-repeat: no-repeat;
     background-position: center;
     background-size: contain;
-    z-index: 2;
+    z-index: 1; /* Fica abaixo da área de clique do input */
     touch-action: manipulation; /* Impede o zoom de toque duplo no mobile */
 }
 
