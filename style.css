@@ -229,7 +229,7 @@ a {
 }
 
 /* Muda a cor do texto quando uma data é selecionada */
-.date-filter:valid,
+.date-filter:not(:placeholder-shown),
 .genre-filter option:checked:not([value='']) {
     color: var(--text-color);
 }
