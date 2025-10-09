@@ -165,10 +165,6 @@ a {
     visibility: hidden;
 }
 
-.date-filter:not(:valid) {
-    color: transparent; /* Oculta o texto nativo (dd/mm/aaaa) quando o campo está vazio */
-}
-
 .date-filter {
     width: 100%;
     padding: 0.75rem 2.5rem 0.75rem 1rem; /* Espaço para o botão de limpar */
@@ -786,25 +782,6 @@ input[type="date"]::placeholder {
     margin: 2rem 0;
 }
 
-/* Separador de data para mobile, escondido por padrão */
-.mobile-date-separator {
-    display: none;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    color: var(--subtle-text);    
-    font-size: 0.7rem; /* Fonte menor */
-    font-weight: 500;
-    margin: 0; /* Remove o espaço vertical */
-    pointer-events: none; /* Não interfere com cliques */
-}
-
-/* Ajusta o tamanho do ícone da seta para corresponder ao texto */
-.mobile-date-separator svg {
-    width: 1em;
-    height: 1em;
-}
-
 /* --- Estilos para o Modal de Contato --- */
 .contact-options {
     display: grid;
@@ -1001,24 +978,13 @@ input[type="date"]::placeholder {
     .modal-separator {
         margin: 1rem 0; /* Espaçamento do separador reduzido */
     }
- 
-    /* Mostra o separador de data no mobile */
-    .mobile-date-separator {
-        display: flex;
-    }
 }
  
-/* Exibe o placeholder do calendário apenas em telas menores */
-@media (max-width: 600px) {
-    /* 2. Mostra o placeholder "dd/mm/aaaa" apenas quando o campo está vazio. */
-    /* Aumenta a especificidade para garantir que a regra seja aplicada */
-    .date-filter-container .date-filter:not(:valid) ~ .date-filter-placeholder {
-        opacity: 1;
-        visibility: visible;
-    }
-}
-
 /* Esconde o placeholder customizado "Calendário" em telas maiores (desktop) */
 @media (min-width: 601px) {
     .date-filter-placeholder { display: none; }
+    /* Oculta o texto nativo (dd/mm/aaaa) quando o campo está vazio, apenas no desktop */
+    .date-filter:not(:valid) {
+        color: transparent;
+    }
 }
