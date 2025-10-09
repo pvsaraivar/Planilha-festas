@@ -892,6 +892,12 @@ a {
         height: 40px; /* Altura dos filtros reduzida */
     }
 
+    /* Garante que a área de clique invisível do input de data
+       permaneça alinhada com o ícone na altura reduzida do mobile. */
+    .date-filter {
+        right: 2.5rem; /* Ajuste fino para o alinhamento */
+    }
+
     .genre-filter {
         padding-top: 0; /* Remove o padding vertical padrão do select */
         padding-bottom: 0; /* Remove o padding vertical padrão do select */
