@@ -143,6 +143,11 @@ function applyFiltersFromURL() {
         filtersApplied = true;
     }
 
+    // Se algum filtro foi aplicado pela URL, chamamos applyFilters para atualizar a UI (ex: texto do campo de data)
+    // Isso será chamado novamente em setupFilters, mas a primeira chamada garante a UI inicial correta.
+    // if (filtersApplied) applyFilters();
+    // A chamada foi movida para o final de setupFilters() para evitar chamadas duplas e garantir que todos os elementos
+    // da UI (como o texto do campo de data) sejam atualizados após a configuração dos listeners.
 }
 /**
  * Analisa uma string de texto CSV em um array de objetos de produto.
@@ -294,6 +299,7 @@ function setupFilters() {
     const clearSearchBtn = document.getElementById('clear-search-btn');
     const clearDateBtn = document.getElementById('clear-date-btn');
     const clearAllBtn = document.getElementById('clear-all-filters-btn');
+    const datePickerTrigger = document.querySelector('.date-picker-trigger');
     const shareFiltersBtn = document.getElementById('share-filters-btn');
     const searchLoader = document.getElementById('search-loader');
     const grid = document.getElementById('event-grid');
@@ -304,7 +310,7 @@ function setupFilters() {
         const selectedGenre = genreFilter.value;
 
         // Adiciona/remove a classe 'is-active' para feedback visual
-        searchInput.classList.toggle('is-active', !!searchTerm);
+        searchInput.classList.toggle('is-active', !!searchTerm);        
         dateInput.classList.toggle('is-active', !!selectedDate);
         genreFilter.classList.toggle('is-active', !!selectedGenre);
 
@@ -329,9 +335,35 @@ function setupFilters() {
         // Usa replaceState para não poluir o histórico do navegador a cada tecla
         window.history.replaceState({ path: newUrl }, '', newUrl);
 
-        let filteredEvents = allEvents;
+        let filteredEvents;
 
-        // 1. Filtra por texto
+        // 1. Filtra por data PRIMEIRO, pois ele define a base de eventos.
+        if (selectedDate) {
+            // Se uma data for selecionada, a busca é feita em TODOS os eventos.
+            const [year, month, day] = selectedDate.split('-');
+            const formattedDate = `${day}/${month}/${year}`;
+            
+            filteredEvents = allEvents.filter(event => {
+                const eventDate = getProp(event, 'Data') || getProp(event, 'Date');
+                return eventDate === formattedDate;
+            });
+        } else {
+            // Se NENHUMA data for selecionada, a base para os outros filtros são os eventos futuros.
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const parseDateForFilter = (dateString) => {
+                if (!dateString || typeof dateString !== 'string') return null;
+                const parts = dateString.split('/');
+                if (parts.length !== 3) return null;
+                return new Date(parts[2], parts[1] - 1, parts[0]);
+            };
+            filteredEvents = allEvents.filter(event => {
+                const eventDate = parseDateForFilter(getProp(event, 'Data') || getProp(event, 'Date'));
+                return eventDate && eventDate >= today;
+            });
+        }
+
+        // 2. Filtra por texto (sobre o resultado do filtro de data/futuros)
         if (searchTerm) {
             filteredEvents = filteredEvents.filter(event => {
                 const name = (getProp(event, 'Evento') || getProp(event, 'Nome') || '').toLowerCase();
@@ -340,24 +372,10 @@ function setupFilters() {
             });
         }
 
-        // 2. Filtra por data
-        if (selectedDate) {
-            // Converte YYYY-MM-DD para DD/MM/YYYY para comparar com o formato da planilha
-            const [year, month, day] = selectedDate.split('-');
-            const formattedDate = `${day}/${month}/${year}`;
-            
-            filteredEvents = filteredEvents.filter(event => {
-                const eventDate = getProp(event, 'Data') || getProp(event, 'Date');
-                return eventDate === formattedDate;
-            });
-        }
-
-        // 3. Filtra por gênero
+        // 3. Filtra por gênero (sobre o resultado dos filtros anteriores)
         if (selectedGenre) {
             filteredEvents = filteredEvents.filter(event => {
                 const eventGenres = (getProp(event, 'Gênero') || '').toLowerCase();
-                // Verifica se a string de gêneros do evento inclui o gênero selecionado
-                // Isso funciona para "Techno, House" contendo "techno"
                 return eventGenres.split(',').map(g => g.trim()).includes(selectedGenre);
             });
         }
@@ -390,6 +408,13 @@ function setupFilters() {
     dateInput.addEventListener('keydown', (e) => {
         e.preventDefault();
     });
+
+    // Adiciona o listener para o novo botão de ícone
+    if (datePickerTrigger) {
+        datePickerTrigger.addEventListener('click', () => {
+            dateInput.showPicker(); // API padrão para abrir o seletor de data
+        });
+    }
 
     genreFilter.addEventListener('change', applyFilters);
 

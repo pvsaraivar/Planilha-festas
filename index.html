@@ -14,7 +14,7 @@
     
     <link rel="stylesheet" href="style.css">
 </head>
-<body>
+<body> 
     <header class="site-header">
         <div class="container">
             <div class="header-content">
@@ -33,11 +33,15 @@
                 <div class="search-container">
                     <input type="text" id="search-input" placeholder="Buscar por festa ou local"><span id="search-loader" class="search-loader" hidden></span><button id="clear-search-btn" class="clear-search-btn" hidden>&times;</button>
                 </div>
+
                 <div class="date-filter-container">
-                    <input type="date" id="date-filter" class="date-filter">
-                    <span class="date-filter-placeholder">Calendário</span>
+                    <span id="date-filter-value" class="date-filter-value">Calendário</span>
+                    <input type="date" id="date-filter" class="date-filter"> <!-- Este input permanece escondido -->
+                    <button class="date-picker-trigger" aria-label="Abrir calendário"></button>
                     <button id="clear-date-btn" class="clear-date-btn" hidden>&times;</button>
                 </div>
+
+
                 <div class="genre-filter-container">
                     <select id="genre-filter" class="genre-filter">
                         <option value="">Todos os gêneros</option>
