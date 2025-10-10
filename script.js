@@ -1008,7 +1008,6 @@ async function createStorySticker(event) {
             <img src="${imageAsDataUrl}" class="story-sticker__image" />
             <h1 class="story-sticker__title">${name}</h1>
             <p class="story-sticker__details">${detailsText}</p>
-            <div class="story-sticker__footer"></div>
         `;
 
         // Etapa 3: Gera o canvas. Agora, este passo será muito mais rápido.
