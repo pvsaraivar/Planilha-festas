@@ -928,7 +928,7 @@ function openModal(event) {
 
                 // Verifica se o navegador pode compartilhar o arquivo gerado.
                 if (!navigator.canShare || !navigator.canShare({ files: [stickerFile] })) {
-                    throw new Error("Seu navegador não suporta o compartilhamento de arquivos.");
+                    throw new Error("Seu navegador não suporta o compartilhamento de arquivos. Tente usar o Safari no iPhone.");
                 }
                 
                 // Usa a API de compartilhamento nativo para enviar o arquivo.
@@ -938,8 +938,10 @@ function openModal(event) {
 
             } catch (err) {
                 console.error('Erro ao compartilhar no Story:', err);
-                alert('Não foi possível compartilhar a imagem. Esta função é melhor suportada no Safari em iPhones.');
+                // Fornece uma mensagem de erro mais clara e útil
+                alert(err.message || 'Não foi possível compartilhar a imagem. Esta função é melhor suportada no Safari em iPhones.');
             } finally {
+                // Retorna o botão ao estado original imediatamente após a tentativa de compartilhamento
                 storyBtn.innerHTML = originalText;
                 storyBtn.disabled = false;
             }
