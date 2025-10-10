@@ -825,6 +825,7 @@ function openModal(event) {
 
     const copyLinkIconSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.72"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.72-1.72"></path></svg>`;
     const whatsappIconSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.894 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.886-.001 2.269.655 4.357 1.849 6.081l-1.214 4.425 4.56-1.195z"/></svg>`;
+    const instagramIconSvgModal = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>`;
 
     let ticketActionHtml = '';
     if (ticketUrl) {
@@ -864,6 +865,7 @@ function openModal(event) {
         <div class="modal-actions">
             ${ticketActionHtml}
             <button class="share-btn whatsapp-btn">${whatsappIconSvg} Compartilhar no WhatsApp</button>
+            <button class="share-btn instagram-story-btn">${instagramIconSvgModal} Compartilhar nos stories</button>
             <button class="share-btn copy-link-btn">${copyLinkIconSvg} Copiar link</button>
         </div>
     `;
@@ -902,6 +904,73 @@ function openModal(event) {
             const whatsappUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareText)}`;            
             window.open(whatsappUrl, '_blank');
         });
+    }
+
+    /* Compartilhar nos Stories */
+    const storyBtn = modalContent.querySelector('.instagram-story-btn');
+    if (storyBtn) {
+        if (!navigator.canShare || !navigator.share) {
+            storyBtn.hidden = true;
+        }
+
+        storyBtn.addEventListener('click', async () => {
+            const originalText = storyBtn.innerHTML;
+            storyBtn.innerHTML = 'Gerando imagem...';
+            storyBtn.disabled = true;
+
+            try {
+                const stickerBlob = await createStorySticker(event);
+                const stickerFile = new File([stickerBlob], 'logistica-clubber-story.png', { type: 'image/png' });
+
+                if (navigator.canShare && navigator.canShare({ files: [stickerFile] })) {
+                    await navigator.share({
+                        files: [stickerFile],
+                        title: `Evento: ${name}`,
+                        text: `Confira o evento ${name} que vai rolar em ${date}!`,
+                    });
+                } else {
+                    throw new Error("Não é possível compartilhar arquivos neste navegador.");
+                }
+            } catch (err) {
+                console.error('Erro ao compartilhar no Story:', err);
+                alert('Não foi possível compartilhar a imagem. Tente novamente ou use outro navegador.');
+            } finally {
+                storyBtn.innerHTML = originalText;
+                storyBtn.disabled = false;
+            }
+        });
+    }
+}
+
+/**
+ * Gera uma imagem (Blob) de um sticker de story para o evento.
+ * @param {Object} event O objeto do evento.
+ * @returns {Promise<Blob>} Uma promessa que resolve com o Blob da imagem.
+ */
+async function createStorySticker(event) {
+    const name = getProp(event, 'Evento') || getProp(event, 'Nome') || 'Evento';
+    const date = getProp(event, 'Data') || getProp(event, 'Date') || 'Em breve';
+    const location = getProp(event, 'Local') || 'Local a confirmar';
+    const imageUrl = eventImageMap[name.toLowerCase()] || getProp(event, 'Imagem (URL)') || '';
+
+    // Cria um container temporário para o sticker
+    const stickerContainer = document.createElement('div');
+    stickerContainer.className = 'story-sticker-container';
+    stickerContainer.innerHTML = `
+        <img src="${imageUrl}" class="story-sticker__image" crossorigin="anonymous" />
+        <h1 class="story-sticker__title">${name}</h1>
+        <p class="story-sticker__details">${date} &bull; ${location}</p>
+        <p class="story-sticker__footer">Veja mais em <strong>logistica.club</strong></p>
+    `;
+
+    document.body.appendChild(stickerContainer);
+
+    try {
+        const canvas = await html2canvas(stickerContainer, { useCORS: true, backgroundColor: null });
+        return new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+    } finally {
+        // Remove o container temporário do DOM após a captura
+        document.body.removeChild(stickerContainer);
     }
 }
 
