@@ -983,18 +983,27 @@ async function createStorySticker(event) {
     document.body.appendChild(stickerContainer);
 
     try {
-        // Etapa 1: Busca a imagem e a converte para um Data URL.
-        // Isso embute a imagem no HTML, eliminando requisições externas durante a renderização do canvas,
-        // o que é a principal causa de falhas e lentidão no iOS.
-        const response = await fetch(imageUrl);
-        if (!response.ok) throw new Error('Falha ao buscar a imagem do evento.');
-        const imageBlob = await response.blob();
-        const imageAsDataUrl = await new Promise((resolve, reject) => {
+        // Otimização de Performance para iOS: Pré-carrega TODAS as imagens (evento e fundo)
+        // e as converte para Data URL antes de passar para o html2canvas.
+        const [eventImageBlob, mapImageBlob] = await Promise.all([
+            fetch(imageUrl).then(res => res.blob()),
+            fetch('assets/mapa.jpg').then(res => res.blob())
+        ]);
+
+        const readBlobAsDataURL = (blob) => new Promise((resolve, reject) => {
             const reader = new FileReader();
             reader.onloadend = () => resolve(reader.result);
             reader.onerror = reject;
-            reader.readAsDataURL(imageBlob);
+            reader.readAsDataURL(blob);
         });
+
+        const [eventImageAsDataUrl, mapImageAsDataUrl] = await Promise.all([
+            readBlobAsDataURL(eventImageBlob),
+            readBlobAsDataURL(mapImageBlob)
+        ]);
+
+        // Aplica o fundo do mapa diretamente no estilo do container via JavaScript
+        stickerContainer.style.backgroundImage = `linear-gradient(rgba(18, 18, 18, 0.85), rgba(18, 18, 18, 0.95)), url(${mapImageAsDataUrl})`;
 
         // Formata a string de horário para incluir no sticker
         const timeString = formatTimeString(startTime, endTime);
@@ -1005,7 +1014,7 @@ async function createStorySticker(event) {
 
         // Etapa 2: Monta o HTML do sticker com a imagem já embutida.
         stickerContainer.innerHTML = `
-            <img src="${imageAsDataUrl}" class="story-sticker__image" />
+            <img src="${eventImageAsDataUrl}" class="story-sticker__image" />
             <h1 class="story-sticker__title">${name}</h1>
             <p class="story-sticker__details">${detailsText}</p>
         `;
