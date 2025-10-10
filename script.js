@@ -919,28 +919,35 @@ function openModal(event) {
             storyBtn.disabled = true;
 
             try {
-                // Garante que todas as fontes (como 'Satoshi') estejam carregadas antes de gerar a imagem.
-                // Isso é crucial para a performance e estabilidade no iOS.
                 await document.fonts.ready;
 
                 const stickerBlob = await createStorySticker(event);
                 
-                const stickerFile = new File([stickerBlob], 'logistica-clubber-story.png', { type: 'image/png' });
+                // Cria um link temporário para o download da imagem
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(stickerBlob);
+                link.download = `story-${createEventSlug(name)}.png`; // Nome do arquivo para download
+                
+                // Simula o clique no link para iniciar o download
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
 
-                // Verifica se o navegador pode compartilhar esses arquivos.
-                if (!navigator.canShare({ files: [stickerFile] })) {
-                    throw new Error("Seu navegador não suporta o compartilhamento deste tipo de arquivo.");
-                }
+                // Limpa o Object URL para liberar memória
+                URL.revokeObjectURL(link.href);
                 
-                // Compartilha o arquivo.
-                await navigator.share({ files: [stickerFile] });
-                
+                // Atualiza o botão para indicar sucesso
+                storyBtn.innerHTML = 'Imagem salva! Poste no seu story';
+
             } catch (err) {
                 console.error('Erro ao compartilhar no Story:', err);
                 alert('Não foi possível compartilhar a imagem. Tente novamente ou use outro navegador.');
             } finally {
-                storyBtn.innerHTML = originalText;
-                storyBtn.disabled = false;
+                // Volta ao estado original após 2.5 segundos
+                setTimeout(() => {
+                    storyBtn.innerHTML = originalText;
+                    storyBtn.disabled = false;
+                }, 2500);
             }
         });
     }
