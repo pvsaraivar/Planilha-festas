@@ -51,7 +51,7 @@ const eventImageMap = {
     'puro êxtase': 'assets/extase.jpg',
     'mysterious': 'assets/vintage.PNG',
     'vulgaris': 'assets/vulgaris.PNG',
-    'preliminar':  'assets/preliminar.PNG'
+    'esquenta da ignis erótica: preliminar':  'assets/preliminar.PNG'
 }
 
 /**
