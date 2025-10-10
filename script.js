@@ -992,7 +992,15 @@ async function createStorySticker(event) {
         `;
 
         // Gera o canvas a partir do container
-        const canvas = await html2canvas(stickerContainer, { useCORS: true, backgroundColor: null, allowTaint: true });
+        const canvas = await html2canvas(stickerContainer, { 
+            useCORS: true, 
+            backgroundColor: null, 
+            allowTaint: true,
+            // Otimização de performance: Força a escala para 1.
+            // Evita que o html2canvas use o devicePixelRatio (2x ou 3x em iPhones),
+            // o que torna a geração da imagem muito mais rápida.
+            scale: 1 
+        });
         return new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
     } catch (error) {
         console.error("Falha ao criar o sticker:", error);
