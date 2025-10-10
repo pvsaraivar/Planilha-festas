@@ -924,26 +924,32 @@ function openModal(event) {
 
                 const stickerBlob = await createStorySticker(event);
                 
-                const stickerFile = new File([stickerBlob], `story-${createEventSlug(name)}.png`, { type: 'image/png' });
+                // Etapa 1: Copia o link do evento para a área de transferência.
+                const shareUrl = window.location.href;
+                await navigator.clipboard.writeText(shareUrl);
 
-                // Verifica se o navegador pode compartilhar o arquivo gerado.
-                if (!navigator.canShare || !navigator.canShare({ files: [stickerFile] })) {
-                    throw new Error("Seu navegador não suporta o compartilhamento de arquivos. Tente usar o Safari no iPhone.");
-                }
+                // Etapa 2: Inicia o download da imagem do sticker.
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(stickerBlob);
+                link.download = `story-${createEventSlug(name)}.png`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(link.href);
                 
-                // Usa a API de compartilhamento nativo para enviar o arquivo.
-                await navigator.share({
-                    files: [stickerFile],
-                });
+                // Etapa 3: Atualiza o botão com instruções para o usuário.
+                storyBtn.innerHTML = 'Link copiado! Cole no sticker de link dos seus stories';
 
             } catch (err) {
                 console.error('Erro ao compartilhar no Story:', err);
                 // Fornece uma mensagem de erro mais clara e útil
                 alert(err.message || 'Não foi possível compartilhar a imagem. Esta função é melhor suportada no Safari em iPhones.');
             } finally {
-                // Retorna o botão ao estado original imediatamente após a tentativa de compartilhamento
-                storyBtn.innerHTML = originalText;
-                storyBtn.disabled = false;
+                // Retorna o botão ao estado original após 3.5 segundos
+                setTimeout(() => {
+                    storyBtn.innerHTML = originalText;
+                    storyBtn.disabled = false;
+                }, 3500);
             }
         });
     }
