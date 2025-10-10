@@ -746,15 +746,18 @@ a {
 .modal-detail-value a {
     display: inline-flex;
     align-items: center;
-    gap: 0.5rem;
-    color: var(--primary-color); /* Usa a cor de destaque creme */
-    font-weight: 500; /* Deixa o texto um pouco mais forte */
-    transition: color 0.2s, text-decoration 0.2s;
+    gap: 0.5rem;    
+    color: var(--subtle-text);    
+    padding: 0.25rem 0.5rem; /* Adiciona um respiro para o fundo no hover */
+    margin: -0.25rem -0.5rem; /* Compensa o padding para não quebrar o layout */
+    border-radius: 6px; /* Bordas arredondadas para o fundo no hover */
+    background-color: transparent; /* Começa transparente */
+    transition: color 0.2s, background-color 0.2s;
 }
 
 .modal-detail-value a:hover {
-    color: var(--text-color); /* Fica branco no hover para mais destaque */
-    text-decoration: underline; /* Adiciona sublinhado para indicar que é um link */
+    color: var(--text-color);
+    background-color: var(--card-background); /* Fundo sutil no hover */
 }
 
 .location-container {
