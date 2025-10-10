@@ -879,54 +879,28 @@ a {
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: flex-start;
-    background: #1a1a1a; /* Cor de fundo sólida como fallback */
+    justify-content: flex-start; /* Alinha o conteúdo ao topo */
+    /* Otimização de performance: Usa um gradiente simples em vez de uma imagem de fundo.
+       Isso acelera drasticamente a renderização do canvas no iOS. */
+    background-image: linear-gradient(rgba(18, 18, 18, 0.85), rgba(18, 18, 18, 0.95)), url('assets/mapa.jpg');
+    background-size: cover;
+    background-position: center;
     color: #fff;
     font-family: 'Satoshi', sans-serif;
     overflow: hidden; /* Garante que nada vaze */
-}
-
-.story-sticker__background {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-size: cover;
-    background-position: center;
-    z-index: 0; /* Fica na camada de baixo */
-}
-
-/* Adiciona o gradiente de overlay sobre o fundo */
-.story-sticker__background::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(rgba(18, 18, 18, 0.85), rgba(18, 18, 18, 0.95));
-}
-
-.story-sticker__content {
-    position: relative;
-    z-index: 1; /* Garante que todo o conteúdo fique acima do fundo */
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 5rem 3rem 3rem 3rem;
+    padding-top: 5rem; /* Adiciona um espaço no topo */
 }
 
 .story-sticker__image {
     width: 100%;
-    height: 320px;
+    height: 320px; /* Reduz a altura da imagem */
     /* Usar background-image é mais robusto para evitar distorção */
     background-size: cover;
     background-position: center;
     border-radius: 12px;
     border: 2px solid #fff;
     box-shadow: 0 15px 40px rgba(0,0,0,0.6);
+    z-index: 1; /* Garante que a imagem fique acima do gradiente de fundo do container */
     /* Efeito de "foto colada" */
 }
 
