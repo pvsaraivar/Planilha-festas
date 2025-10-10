@@ -919,35 +919,29 @@ function openModal(event) {
             storyBtn.disabled = true;
 
             try {
+                // Garante que as fontes customizadas estejam prontas, crucial para a estabilidade no iOS.
                 await document.fonts.ready;
 
                 const stickerBlob = await createStorySticker(event);
                 
-                // Cria um link temporário para o download da imagem
-                const link = document.createElement('a');
-                link.href = URL.createObjectURL(stickerBlob);
-                link.download = `story-${createEventSlug(name)}.png`; // Nome do arquivo para download
-                
-                // Simula o clique no link para iniciar o download
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
+                const stickerFile = new File([stickerBlob], `story-${createEventSlug(name)}.png`, { type: 'image/png' });
 
-                // Limpa o Object URL para liberar memória
-                URL.revokeObjectURL(link.href);
+                // Verifica se o navegador pode compartilhar o arquivo gerado.
+                if (!navigator.canShare || !navigator.canShare({ files: [stickerFile] })) {
+                    throw new Error("Seu navegador não suporta o compartilhamento de arquivos.");
+                }
                 
-                // Atualiza o botão para indicar sucesso
-                storyBtn.innerHTML = 'Imagem salva! Poste no seu story';
+                // Usa a API de compartilhamento nativo para enviar o arquivo.
+                await navigator.share({
+                    files: [stickerFile],
+                });
 
             } catch (err) {
                 console.error('Erro ao compartilhar no Story:', err);
-                alert('Não foi possível compartilhar a imagem. Tente novamente ou use outro navegador.');
+                alert('Não foi possível compartilhar a imagem. Esta função é melhor suportada no Safari em iPhones.');
             } finally {
-                // Volta ao estado original após 2.5 segundos
-                setTimeout(() => {
-                    storyBtn.innerHTML = originalText;
-                    storyBtn.disabled = false;
-                }, 2500);
+                storyBtn.innerHTML = originalText;
+                storyBtn.disabled = false;
             }
         });
     }
@@ -962,6 +956,8 @@ async function createStorySticker(event) {
     const name = getProp(event, 'Evento') || getProp(event, 'Nome') || 'Evento';
     const date = getProp(event, 'Data') || getProp(event, 'Date') || 'Em breve';
     const location = getProp(event, 'Local') || 'Local a confirmar';
+    const startTime = getProp(event, 'Início');
+    const endTime = getProp(event, 'Fim');
     let imageUrl = eventImageMap[name.toLowerCase()] || getProp(event, 'Imagem (URL)') || '';
 
     // Se a imagem for uma URL externa (começa com http), usa um proxy de imagem para evitar problemas de CORS.
@@ -991,11 +987,18 @@ async function createStorySticker(event) {
             reader.readAsDataURL(imageBlob);
         });
 
+        // Formata a string de horário para incluir no sticker
+        const timeString = formatTimeString(startTime, endTime);
+        const detailsParts = [date];
+        if (timeString) detailsParts.push(timeString);
+        detailsParts.push(location);
+        const detailsText = detailsParts.join(' &bull; ');
+
         // Etapa 2: Monta o HTML do sticker com a imagem já embutida.
         stickerContainer.innerHTML = `
             <img src="${imageAsDataUrl}" class="story-sticker__image" />
             <h1 class="story-sticker__title">${name}</h1>
-            <p class="story-sticker__details">${date} &bull; ${location}</p>
+            <p class="story-sticker__details">${detailsText}</p>
             <p class="story-sticker__footer">Veja mais em <strong>logistica.club</strong></p>
         `;
 
