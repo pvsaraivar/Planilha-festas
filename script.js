@@ -919,15 +919,16 @@ function openModal(event) {
             storyBtn.disabled = true;
 
             try {
+                // Etapa 1: Copia o link do evento para a área de transferência IMEDIATAMENTE.
+                // Esta é a ação mais sensível a permissões no iOS e precisa acontecer primeiro.
+                const shareUrl = window.location.href;
+                await navigator.clipboard.writeText(shareUrl);
+
                 // Garante que as fontes customizadas estejam prontas, crucial para a estabilidade no iOS.
                 await document.fonts.ready;
 
                 const stickerBlob = await createStorySticker(event);
                 
-                // Etapa 1: Copia o link do evento para a área de transferência.
-                const shareUrl = window.location.href;
-                await navigator.clipboard.writeText(shareUrl);
-
                 // Etapa 2: Inicia o download da imagem do sticker.
                 const link = document.createElement('a');
                 link.href = URL.createObjectURL(stickerBlob);
