@@ -900,6 +900,7 @@ a {
     border-radius: 12px;
     border: 2px solid #fff;
     box-shadow: 0 15px 40px rgba(0,0,0,0.6);
+    z-index: 1; /* Garante que a imagem fique acima do gradiente de fundo do container */
     /* Efeito de "foto colada" */
 }
 
