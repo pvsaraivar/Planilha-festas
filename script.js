@@ -48,7 +48,8 @@ const eventImageMap = {
     'addams halloween': 'assets/adams.PNG',
     'elas na areia': 'assets/elasnaareia.PNG',
     'lobbotomia': 'assets/lobotomia.PNG',
-    'puro êxtase': 'assets/extase.jpg'
+    'puro êxtase': 'assets/extase.jpg',
+    'vintage': 'assets/vintage.PNG'
 }
 
 /**
