@@ -951,23 +951,47 @@ async function createStorySticker(event) {
     const name = getProp(event, 'Evento') || getProp(event, 'Nome') || 'Evento';
     const date = getProp(event, 'Data') || getProp(event, 'Date') || 'Em breve';
     const location = getProp(event, 'Local') || 'Local a confirmar';
-    const imageUrl = eventImageMap[name.toLowerCase()] || getProp(event, 'Imagem (URL)') || '';
+    let imageUrl = eventImageMap[name.toLowerCase()] || getProp(event, 'Imagem (URL)') || '';
+
+    // Se a imagem for uma URL externa (começa com http), usa um proxy de imagem para evitar problemas de CORS.
+    // Isso garante que o html2canvas consiga renderizar a imagem.
+    if (imageUrl.startsWith('http')) {
+        // Remove o 'https://' ou 'http://' para passar a URL limpa para o proxy.
+        const cleanUrl = imageUrl.replace(/^(https?:\/\/)/, '');
+        imageUrl = `https://images.weserv.nl/?url=${encodeURIComponent(cleanUrl)}`;
+    }
 
     // Cria um container temporário para o sticker
     const stickerContainer = document.createElement('div');
     stickerContainer.className = 'story-sticker-container';
-    stickerContainer.innerHTML = `
-        <img src="${imageUrl}" class="story-sticker__image" crossorigin="anonymous" />
-        <h1 class="story-sticker__title">${name}</h1>
-        <p class="story-sticker__details">${date} &bull; ${location}</p>
-        <p class="story-sticker__footer">Veja mais em <strong>logistica.club</strong></p>
-    `;
-
     document.body.appendChild(stickerContainer);
 
     try {
+        // Pré-carrega a imagem para garantir que ela esteja disponível para o html2canvas
+        const img = new Image();
+        img.crossOrigin = 'anonymous'; // Essencial para carregar imagens de outras origens (proxy)
+        
+        // Aguarda a imagem ser totalmente carregada
+        await new Promise((resolve, reject) => {
+            img.onload = resolve;
+            img.onerror = reject;
+            img.src = imageUrl;
+        });
+
+        // Somente após a imagem carregar, montamos o HTML do sticker
+        stickerContainer.innerHTML = `
+            <img src="${img.src}" class="story-sticker__image" />
+            <h1 class="story-sticker__title">${name}</h1>
+            <p class="story-sticker__details">${date} &bull; ${location}</p>
+            <p class="story-sticker__footer">Veja mais em <strong>logistica.club</strong></p>
+        `;
+
+        // Gera o canvas a partir do container
         const canvas = await html2canvas(stickerContainer, { useCORS: true, backgroundColor: null });
         return new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+    } catch (error) {
+        console.error("Falha ao criar o sticker:", error);
+        throw new Error("Não foi possível carregar a imagem do evento para o sticker.");
     } finally {
         // Remove o container temporário do DOM após a captura
         document.body.removeChild(stickerContainer);
