@@ -919,23 +919,22 @@ function openModal(event) {
             storyBtn.disabled = true;
 
             try {
+                // Garante que todas as fontes (como 'Satoshi') estejam carregadas antes de gerar a imagem.
+                // Isso é crucial para a performance e estabilidade no iOS.
+                await document.fonts.ready;
+
                 const stickerBlob = await createStorySticker(event);
                 
-                // Prepara os dados para a API de compartilhamento.
-                // Criar um objeto File é mais robusto para compatibilidade.
-                const filesArray = [
-                    new File([stickerBlob], 'logistica-clubber-story.png', {
-                        type: 'image/png',
-                        lastModified: new Date().getTime()
-                    })
-                ];
+                const stickerFile = new File([stickerBlob], 'logistica-clubber-story.png', { type: 'image/png' });
 
                 // Verifica se o navegador pode compartilhar esses arquivos.
-                if (!navigator.canShare({ files: filesArray })) {
+                if (!navigator.canShare({ files: [stickerFile] })) {
                     throw new Error("Seu navegador não suporta o compartilhamento deste tipo de arquivo.");
                 }
-                await navigator.share({ files: filesArray });
-
+                
+                // Compartilha o arquivo.
+                await navigator.share({ files: [stickerFile] });
+                
             } catch (err) {
                 console.error('Erro ao compartilhar no Story:', err);
                 alert('Não foi possível compartilhar a imagem. Tente novamente ou use outro navegador.');
