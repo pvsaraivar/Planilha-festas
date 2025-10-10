@@ -49,7 +49,9 @@ const eventImageMap = {
     'elas na areia': 'assets/elasnaareia.PNG',
     'lobbotomia': 'assets/lobotomia.PNG',
     'puro êxtase': 'assets/extase.jpg',
-    'mysterious': 'assets/vintage.PNG'
+    'mysterious': 'assets/vintage.PNG',
+    'vulgaris': 'assets/vulgaris.PNG',
+    'preliminar':  'assets/preliminar.PNG'
 }
 
 /**
