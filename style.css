@@ -897,7 +897,6 @@ a {
     border: 2px solid #fff;
     box-shadow: 0 15px 40px rgba(0,0,0,0.6);
     /* Efeito de "foto colada" */
-    transform: rotate(-2deg);
 }
 
 .story-sticker__title {
@@ -906,11 +905,8 @@ a {
     text-align: center;
     margin: 1.5rem 0 0.5rem 0;
     line-height: 1.2;
-    /* Gradiente sutil usando a cor primária */
-    background: linear-gradient(180deg, #fff, var(--primary-color));
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
+    /* Usa a cor primária sólida para melhor legibilidade e renderização */
+    color: var(--primary-color);
     z-index: 1;
 }
 
