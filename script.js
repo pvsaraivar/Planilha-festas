@@ -920,17 +920,22 @@ function openModal(event) {
 
             try {
                 const stickerBlob = await createStorySticker(event);
-                const stickerFile = new File([stickerBlob], 'logistica-clubber-story.png', { type: 'image/png' });
+                
+                // Prepara os dados para a API de compartilhamento.
+                // Criar um objeto File é mais robusto para compatibilidade.
+                const filesArray = [
+                    new File([stickerBlob], 'logistica-clubber-story.png', {
+                        type: 'image/png',
+                        lastModified: new Date().getTime()
+                    })
+                ];
 
-                if (navigator.canShare && navigator.canShare({ files: [stickerFile] })) {
-                    await navigator.share({
-                        files: [stickerFile],
-                        title: `Evento: ${name}`,
-                        text: `Confira o evento ${name} que vai rolar em ${date}!`,
-                    });
-                } else {
-                    throw new Error("Não é possível compartilhar arquivos neste navegador.");
+                // Verifica se o navegador pode compartilhar esses arquivos.
+                if (!navigator.canShare({ files: filesArray })) {
+                    throw new Error("Seu navegador não suporta o compartilhamento deste tipo de arquivo.");
                 }
+                await navigator.share({ files: filesArray });
+
             } catch (err) {
                 console.error('Erro ao compartilhar no Story:', err);
                 alert('Não foi possível compartilhar a imagem. Tente novamente ou use outro navegador.');
@@ -987,7 +992,7 @@ async function createStorySticker(event) {
         `;
 
         // Gera o canvas a partir do container
-        const canvas = await html2canvas(stickerContainer, { useCORS: true, backgroundColor: null });
+        const canvas = await html2canvas(stickerContainer, { useCORS: true, backgroundColor: null, allowTaint: true });
         return new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
     } catch (error) {
         console.error("Falha ao criar o sticker:", error);
