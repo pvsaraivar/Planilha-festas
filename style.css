@@ -882,7 +882,9 @@ a {
     justify-content: flex-start; /* Alinha o conteúdo ao topo */
     /* Otimização de performance: Usa um gradiente simples em vez de uma imagem de fundo.
        Isso acelera drasticamente a renderização do canvas no iOS. */
-    background: linear-gradient(160deg, #3a3a3a, #1a1a1a);
+    background-image: linear-gradient(rgba(18, 18, 18, 0.85), rgba(18, 18, 18, 0.95)), url('assets/mapa.jpg');
+    background-size: cover;
+    background-position: center;
     color: #fff;
     font-family: 'Satoshi', sans-serif;
     overflow: hidden; /* Garante que nada vaze */
