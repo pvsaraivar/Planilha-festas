@@ -971,26 +971,28 @@ async function createStorySticker(event) {
     document.body.appendChild(stickerContainer);
 
     try {
-        // Pré-carrega a imagem para garantir que ela esteja disponível para o html2canvas
-        const img = new Image();
-        img.crossOrigin = 'anonymous'; // Essencial para carregar imagens de outras origens (proxy)
-        
-        // Aguarda a imagem ser totalmente carregada
-        await new Promise((resolve, reject) => {
-            img.onload = resolve;
-            img.onerror = reject;
-            img.src = imageUrl;
+        // Etapa 1: Busca a imagem e a converte para um Data URL.
+        // Isso embute a imagem no HTML, eliminando requisições externas durante a renderização do canvas,
+        // o que é a principal causa de falhas e lentidão no iOS.
+        const response = await fetch(imageUrl);
+        if (!response.ok) throw new Error('Falha ao buscar a imagem do evento.');
+        const imageBlob = await response.blob();
+        const imageAsDataUrl = await new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onloadend = () => resolve(reader.result);
+            reader.onerror = reject;
+            reader.readAsDataURL(imageBlob);
         });
 
-        // Somente após a imagem carregar, montamos o HTML do sticker
+        // Etapa 2: Monta o HTML do sticker com a imagem já embutida.
         stickerContainer.innerHTML = `
-            <img src="${img.src}" class="story-sticker__image" />
+            <img src="${imageAsDataUrl}" class="story-sticker__image" />
             <h1 class="story-sticker__title">${name}</h1>
             <p class="story-sticker__details">${date} &bull; ${location}</p>
             <p class="story-sticker__footer">Veja mais em <strong>logistica.club</strong></p>
         `;
 
-        // Gera o canvas a partir do container
+        // Etapa 3: Gera o canvas. Agora, este passo será muito mais rápido.
         const canvas = await html2canvas(stickerContainer, { 
             useCORS: true, 
             backgroundColor: null, 
