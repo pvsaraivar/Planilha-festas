@@ -989,7 +989,10 @@ async function createStorySticker(event) {
     try {
         // Otimização de Performance para iOS: Pré-carrega TODAS as imagens (evento e fundo)
         // e as converte para Data URL antes de passar para o html2canvas.
-        const eventImageBlob = await fetch(imageUrl).then(res => res.blob());
+        const [eventImageBlob, mapImageBlob] = await Promise.all([
+            fetch(imageUrl).then(res => res.blob()),
+            fetch('assets/mapa.jpg').then(res => res.blob())
+        ]);
 
         const readBlobAsDataURL = (blob) => new Promise((resolve, reject) => {
             const reader = new FileReader();
@@ -998,7 +1001,10 @@ async function createStorySticker(event) {
             reader.readAsDataURL(blob);
         });
 
-        const eventImageAsDataUrl = await readBlobAsDataURL(eventImageBlob);
+        const [eventImageAsDataUrl, mapImageAsDataUrl] = await Promise.all([
+            readBlobAsDataURL(eventImageBlob),
+            readBlobAsDataURL(mapImageBlob)
+        ]);
 
         // Formata a string de horário para incluir no sticker
         const timeString = formatTimeString(startTime, endTime);
@@ -1006,6 +1012,9 @@ async function createStorySticker(event) {
         if (timeString) detailsParts.push(timeString);
         detailsParts.push(location);
         const detailsText = detailsParts.join(' &bull; ');
+
+        // Aplica o fundo do mapa diretamente no estilo do container via JavaScript
+        stickerContainer.style.backgroundImage = `linear-gradient(rgba(18, 18, 18, 0.85), rgba(18, 18, 18, 0.95)), url(${mapImageAsDataUrl})`;
 
         // Etapa 2: Monta o HTML do sticker com a imagem já embutida.
         stickerContainer.innerHTML = `
