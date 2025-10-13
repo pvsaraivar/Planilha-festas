@@ -844,8 +844,8 @@ a {
 }
 
 .story-sticker__image {
-    width: 100%;
-    height: 350px; /* Tamanho da imagem reduzido */
+    width: 250px;
+    height: 250px; /* Tamanho da imagem reduzido */
     object-fit: cover;
     border-radius: 12px;
     border: 2px solid #fff;
