@@ -989,7 +989,10 @@ async function createStorySticker(event) {
     try {
         // Otimização de Performance para iOS: Pré-carrega TODAS as imagens (evento e fundo)
         // e as converte para Data URL antes de passar para o html2canvas.
-        const eventImageBlob = await fetch(imageUrl).then(res => res.blob());
+        const [eventImageBlob, mapImageBlob] = await Promise.all([
+            fetch(imageUrl).then(res => res.blob()),
+            fetch('assets/mapa.jpg').then(res => res.blob())
+        ]);
 
         const readBlobAsDataURL = (blob) => new Promise((resolve, reject) => {
             const reader = new FileReader();
@@ -998,7 +1001,10 @@ async function createStorySticker(event) {
             reader.readAsDataURL(blob);
         });
 
-        const eventImageAsDataUrl = await readBlobAsDataURL(eventImageBlob);
+        const [eventImageAsDataUrl, mapImageAsDataUrl] = await Promise.all([
+            readBlobAsDataURL(eventImageBlob),
+            readBlobAsDataURL(mapImageBlob)
+        ]);
 
         // Formata a string de horário para incluir no sticker
         const timeString = formatTimeString(startTime, endTime);
@@ -1009,9 +1015,12 @@ async function createStorySticker(event) {
 
         // Etapa 2: Monta o HTML do sticker com a imagem já embutida.
         stickerContainer.innerHTML = `
-            <img src="${eventImageAsDataUrl}" class="story-sticker__image" />
-            <h1 class="story-sticker__title">${name}</h1>
-            <p class="story-sticker__details">${detailsText}</p>
+            <div class="story-sticker__background" style="background-image: url(${mapImageAsDataUrl});"></div>
+            <div class="story-sticker__content">
+                <div class="story-sticker__image" style="background-image: url(${eventImageAsDataUrl});"></div>
+                <h1 class="story-sticker__title">${name}</h1>
+                <p class="story-sticker__details">${detailsText}</p>
+            </div>
         `;
 
         // Etapa 3: Gera o canvas. Agora, este passo será muito mais rápido.
