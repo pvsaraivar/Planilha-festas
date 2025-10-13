@@ -866,11 +866,11 @@ a {
 
 .story-sticker__content {
     position: relative;
-    z-index: 2; /* Camada de cima, na frente do fundo e do gradiente */
     width: 100%;
     display: flex;
     flex-direction: column;
     align-items: center;
+    padding: 4rem 2rem;
 }
 
 .story-sticker__image {
