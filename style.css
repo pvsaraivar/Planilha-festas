@@ -832,7 +832,6 @@ a {
     left: -9999px;
     width: 450px;
     height: 800px;
-    padding: 3rem;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -851,7 +850,6 @@ a {
     height: 100%;
     background-size: cover;
     background-position: center;
-    z-index: 0; /* Fica na camada de baixo */
 }
 
 /* Adiciona o gradiente de overlay sobre o fundo */
@@ -872,7 +870,7 @@ a {
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 5rem 3rem 3rem;
+    padding: 5rem 3rem;
 }
 
 .story-sticker__image {
