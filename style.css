@@ -868,6 +868,14 @@ a {
     text-align: center;
 }
 
+.story-sticker__attractions {
+    font-size: 1rem;
+    font-weight: 400;
+    color: #A7A7A7;
+    text-align: center;
+    margin-top: 0.75rem;
+}
+
 .contact-options {
     display: grid;
     gap: 1rem;

@@ -971,6 +971,7 @@ async function createStorySticker(event) {
     const location = getProp(event, 'Local') || 'Local a confirmar';
     const startTime = getProp(event, 'Início');
     const endTime = getProp(event, 'Fim');
+    const attractions = getProp(event, 'Atrações') || '';
     let imageUrl = eventImageMap[name.toLowerCase()] || getProp(event, 'Imagem (URL)') || '';
 
     // Se a imagem for uma URL externa (começa com http), usa um proxy de imagem para evitar problemas de CORS.
@@ -1021,6 +1022,7 @@ async function createStorySticker(event) {
             <img src="${eventImageAsDataUrl}" class="story-sticker__image" />
             <h1 class="story-sticker__title">${name}</h1>
             <p class="story-sticker__details">${detailsText}</p>
+            ${attractions ? `<p class="story-sticker__attractions">${attractions}</p>` : ''}
         `;
 
         // Etapa 3: Gera o canvas. Agora, este passo será muito mais rápido.
