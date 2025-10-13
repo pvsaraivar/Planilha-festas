@@ -864,13 +864,21 @@ a {
     background: linear-gradient(rgba(18, 18, 18, 0.85), rgba(18, 18, 18, 0.95));
 }
 
-.story-sticker__content {
+.story-sticker__image-container,
+.story-sticker__text-content {
     position: relative;
     z-index: 2; /* Camada de cima, na frente do fundo e do gradiente */
     width: 100%;
     display: flex;
     flex-direction: column;
     align-items: center;
+}
+
+.story-sticker__image-container {
+    padding: 4rem 0 0; /* Padding apenas no topo */
+}
+
+.story-sticker__text-content {
     padding: 4rem 2rem;
 }
 
