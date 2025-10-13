@@ -1018,7 +1018,8 @@ async function createStorySticker(event) {
 
         // Etapa 2: Monta o HTML do sticker com a imagem já embutida.
         stickerContainer.innerHTML = `
-            <div class="story-sticker__background" style="background-image: url(${mapImageAsDataUrl});"></div>
+            <div class="story-sticker__background-image" style="background-image: url(${mapImageAsDataUrl});"></div>
+            <div class="story-sticker__background-gradient"></div>
             <div class="story-sticker__content">
                 <div class="story-sticker__image" style="background-image: url(${eventImageAsDataUrl})"></div>
                 <h1 class="story-sticker__title">${name}</h1>
