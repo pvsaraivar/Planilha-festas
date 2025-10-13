@@ -868,14 +868,14 @@ a {
     font-weight: 500;
     color: #ccc;
     text-align: center;
+    margin-top: 0.75rem;
 }
 
 .story-sticker__attractions {
-    font-size: 1rem;
-    font-weight: 400;
-    color: #A7A7A7;
+    font-size: 1.25rem; /* Tamanho da fonte igual ao dos detalhes */
+    font-weight: 500;
+    color: #ccc;
     text-align: center;
-    margin-top: 0.75rem;
 }
 
 .contact-options {
