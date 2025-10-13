@@ -1,13 +1,11 @@
-// script.js
-let eventSlugFromUrl = null; // Armazena o slug do evento da URL para uso posterior
+let eventSlugFromUrl = null;
 
-let allEvents = []; // Armazena todos os eventos para filtragem
+let allEvents = []; 
 
 document.addEventListener('DOMContentLoaded', () => {
     const sheetId = '1LAfG4Nt2g_P12HMCx-wEmWpXoX3yp1qAKdw89eLbeWU';
     const googleSheetUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/export?format=csv`;
-    
-    // Primeiro, lê os parâmetros da URL para saber se um evento específico deve ser aberto.
+
     applyFiltersFromURL();
     loadAndDisplayEvents(googleSheetUrl);
     setupFilters();
@@ -17,11 +15,6 @@ document.addEventListener('DOMContentLoaded', () => {
     setupThemeToggle();
 });
 
-/**
- * Mapeamento de nomes de eventos para imagens locais específicas.
- * Isso substitui a longa cadeia de if/else if, tornando o código mais limpo e fácil de manter.
- * As chaves devem estar em minúsculas para corresponder à verificação.
- */
 const eventImageMap = {
     'na pista': 'assets/napista.PNG',
     'beije': 'assets/beije.PNG',
@@ -57,7 +50,7 @@ const eventImageMap = {
 /**
  * Orquestra o carregamento, análise e exibição dos eventos.
  * @param {string} csvPath - O caminho para o arquivo CSV.
- */
+ 
 async function loadAndDisplayEvents(csvPath) {
     const grid = document.getElementById('event-grid');
     if (!grid) {

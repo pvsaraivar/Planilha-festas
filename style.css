@@ -1,16 +1,14 @@
-/* style.css */
 :root {
-    /* Tema Escuro (Padrão) */
-    --primary-color: #FDF5E6; /* Tom de branco creme (Old Lace) para um visual mais quente */
-    --background-start: #121212; /* Fundo escuro principal */
+    --primary-color: #FDF5E6; 
+    --background-start: #121212; 
     --background-end: #181818;
-    --card-background: #3f3d3d; /* Fundo dos cards, um pouco mais claro */
+    --card-background: #3f3d3d; 
     --text-color: #FFFFFF;
     --subtle-text: #A7A7A7;
-    --border-color: #404040; /* Cor da borda sutil */
-    --shadow: 0 4px 12px rgba(0, 0, 0, 0.2); /* Sombra para tema escuro */
+    --border-color: #404040; 
+    --shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
     --background-overlay: rgba(18, 18, 18, 0.96);
-    --border-radius: 8px; /* Bordas um pouco menos arredondadas para um look mais sharp */
+    --border-radius: 8px;
     --transition-speed: 0.3s;
 }
 
@@ -25,7 +23,6 @@
     --background-overlay: rgba(255, 255, 255, 0.9);
 }
 
-/* Reset básico e box-sizing */
 *,
 *::before,
 *::after {
@@ -35,25 +32,18 @@
 body {
     font-family: 'Satoshi', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     line-height: 1.6;
-    font-weight: 300; /* Define o peso da fonte padrão como "Light" */
+    font-weight: 300;
     color: var(--text-color);
     margin: 0;
     min-height: 100vh;
-    -webkit-font-smoothing: antialiased; /* Melhora a renderização da fonte */
+    -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    color-scheme: dark; /* Padrão é escuro */
- 
-    /* A cor de fundo principal é aplicada aqui */
+    color-scheme: dark;
     background-color: var(--background-start);
-    position: relative; /* Necessário para o z-index do pseudo-elemento funcionar */
-    z-index: 0; /* Garante que o body tenha um contexto de empilhamento */
+    position: relative;
+    z-index: 0;
 }
 
-/* 
-  Correção para o bug do background-attachment: fixed no iOS.
-  Um pseudo-elemento é usado para criar uma camada de fundo fixa que não é afetada
-  pela rolagem ou repintura da tela no mobile.
-*/
 body::before {
     content: '';
     position: fixed;
@@ -64,14 +54,12 @@ body::before {
     background: linear-gradient(var(--background-overlay), var(--background-overlay)), url('assets/mapa.jpg');
     background-position: center;
     background-size: cover;
-    z-index: -1; /* Coloca o pseudo-elemento atrás de todo o conteúdo do body */
+    z-index: -1;
 }
 .light-theme {
-    color-scheme: light; /* Garante que componentes nativos usem o tema claro */
+    color-scheme: light; 
 }
 
-
-/* Remove o sublinhado de todos os links por padrão */
 a {
     text-decoration: none;
 }
@@ -97,7 +85,7 @@ a {
 .site-header h1 {
     margin: 0 0 0.5rem 0;
     font-size: 2.5rem;
-    font-weight: 700; /* Peso "Bold" para o título */
+    font-weight: 700;
     color: var(--text-color);
 }
 
@@ -118,7 +106,7 @@ a {
     align-items: center;
     justify-content: center;
     padding: 0;
-    flex-shrink: 0; /* Impede que o botão encolha */
+    flex-shrink: 0;
     transition: background-color 0.2s, border-color 0.2s;
 }
 
@@ -137,7 +125,7 @@ a {
 }
 
 .moon-icon {
-    display: none; /* Começa escondido, pois o tema padrão é escuro */
+    display: none; 
 }
 
 .filters-wrapper {
@@ -145,11 +133,11 @@ a {
     flex-wrap: wrap;
     gap: 1rem;
     margin-top: 1.5rem;
-    margin-bottom: -1rem; /* Compensa o padding-top do event-grid */
+    margin-bottom: -1rem; 
 }
 
 .search-container {
-    position: relative; /* Para posicionar o botão de limpar */
+    position: relative; 
     flex-grow: 1;
     min-width: 250px;
 }
@@ -159,11 +147,10 @@ a {
 }
 
 .date-filter-container {
-    /* O container agora é o próprio campo visual */
     display: flex;
     align-items: center;
     position: relative;
-    min-width: 200px; /* Garante que os filtros fiquem na mesma linha */
+    min-width: 200px;
     height: 50px;
     padding: 0.75rem 1rem;
     border: 1px solid var(--border-color);
@@ -172,23 +159,21 @@ a {
     transition: border-color 0.2s, box-shadow 0.2s;
 }
 
-/* Esconde o input de data real, mas o mantém funcional e acessível para o navegador */
-/* Agora ele é uma pequena área transparente posicionada sobre o ícone */
 .date-filter {
     position: absolute;
-    right: 2.75rem; /* Alinha com o gatilho do ícone */
+    right: 2.75rem;
     top: 50%;
     transform: translateY(-50%);
-    width: 24px; /* Tamanho da área de clique */
+    width: 24px;
     height: 24px;
-    opacity: 0; /* Totalmente transparente */
+    opacity: 0;
     cursor: pointer;
-    z-index: 3; /* Garante que ele fique acima do ícone */
+    z-index: 3;
 }
 
 .date-picker-trigger {
     position: absolute;
-    right: 2.75rem; /* Posição à esquerda do botão de limpar */
+    right: 2.75rem;
     top: 50%;
     transform: translateY(-50%);
     width: 20px;
@@ -201,18 +186,17 @@ a {
     background-repeat: no-repeat;
     background-position: center;
     background-size: contain;
-    z-index: 1; /* Fica abaixo da área de clique do input */
-    touch-action: manipulation; /* Impede o zoom de toque duplo no mobile */
+    z-index: 1; 
+    touch-action: manipulation;
 }
 
-/* Aplica o estilo de foco no label quando o input invisível é focado */
 .date-filter-container:focus-within {
     border-color: var(--primary-color);
     box-shadow: 0 0 0 2px var(--primary-color);
 }
 
 .date-filter-value {
-    flex-grow: 1; /* Ocupa o espaço disponível */
+    flex-grow: 1;
     color: var(--subtle-text);
     font-size: 1rem;
     white-space: nowrap;
@@ -227,7 +211,7 @@ a {
 .genre-filter {
     width: 100%;
     padding: 0.75rem 1rem;
-    padding-right: 2.5rem; /* Espaço para a seta personalizada */
+    padding-right: 2.5rem; 
     font-size: 1rem;
     border-radius: 8px;
     border: 1px solid var(--border-color);
@@ -235,16 +219,13 @@ a {
     font-family: inherit;
     color: var(--subtle-text);
     height: 50px;
-    /* Remove a aparência padrão do navegador */
     -webkit-appearance: none;
     appearance: none;
-    /* Adiciona a seta personalizada */
     background-color: transparent;
     background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23A7A7A7'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e");
     background-repeat: no-repeat;
     background-position: right 1rem center;
     background-size: 1em;
-    /* Garante que o texto não sobreponha a seta */
     text-overflow: ellipsis;
     white-space: nowrap;
     overflow: hidden;
@@ -267,21 +248,21 @@ a {
     box-shadow: 0 0 0 2px var(--primary-color);
 }
 
-/* Muda a cor do texto quando uma data é selecionada */
+
 .date-filter:not(:placeholder-shown), .genre-filter option:checked:not([value='']) {
     color: var(--text-color);
 }
 
 #search-input {
     width: 100%;
-    padding: 0.75rem 2.5rem 0.75rem 1rem; /* Adiciona espaço à direita para o botão */
+    padding: 0.75rem 2.5rem 0.75rem 1rem;
     font-size: 1rem;
     border-radius: 8px;
     border: 1px solid var(--border-color);
     background-color: transparent;
     transition: border-color 0.2s, box-shadow 0.2s;
     height: 50px;
-    color: var(--text-color); /* Garante que o texto digitado seja branco */
+    color: var(--text-color); 
 }
 
 #search-input:focus {
@@ -314,7 +295,7 @@ a {
 .genre-filter.is-active,
 #search-input.is-active {
     border-color: var(--primary-color);
-    box-shadow: 0 0 0 1px var(--primary-color); /* Adiciona um brilho sutil para indicar atividade */
+    box-shadow: 0 0 0 1px var(--primary-color);
 }
 
 .clear-date-btn {
@@ -399,12 +380,6 @@ a {
     gap: 1.5rem;
     padding-top: 2rem;
     padding-bottom: 2rem;
-    /* 
-      Correção para o bug de desaparecimento do background no iOS.
-      A propriedade 'isolation' cria um novo contexto de empilhamento, garantindo que
-      os cards (que usam 'transform' e 'opacity') não sejam renderizados em uma camada
-      separada que cobriria o pseudo-elemento ::before do body.
-    */
     isolation: isolate;
     transition: opacity 0.2s ease-in-out;
 }
@@ -414,7 +389,7 @@ a {
 }
 
 .empty-grid-message {
-    grid-column: 1 / -1; /* Faz a mensagem ocupar a largura total da grade */
+    grid-column: 1 / -1;
     text-align: center;
     color: var(--subtle-text);
 }
@@ -429,62 +404,60 @@ a {
     transition: transform var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
     cursor: pointer;
     border-radius: var(--border-radius);
-    /* Animação de fade-in */
-    opacity: 0; /* Começa invisível */
+    opacity: 0;
     animation: fadeIn 0.5s ease-out forwards;
 }
 .event-card:hover {
     transform: translateY(-6px);
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
     border-color: var(--text-color);
-    background-color: rgba(255, 255, 255, 0.03); /* Adiciona um brilho sutil transparente no hover */
+    background-color: rgba(255, 255, 255, 0.03);
 }
 .event-card:active {
     transform: translateY(-2px) scale(0.98);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
 }
 
-/* Adiciona uma borda verde sutil para eventos de fim de semana */
 .event-card--weekend {
-    border-color: #2E8B57; /* Verde mar (SeaGreen), um tom sóbrio */
+    border-color: #2E8B57; 
 }
 
-/* No hover, a borda do evento de fim de semana fica mais brilhante */
+
 .event-card--weekend:hover {
-    border-color: #32CD32; /* Verde lima (LimeGreen) */
+    border-color: #32CD32;
 }
 
 
 .event-card__image {
     width: 100%;
     height: 220px;
-    object-fit: cover; /* Mantém o cover que é ótimo */
-    object-position: center; /* Garante o alinhamento central */
+    object-fit: cover;
+    object-position: center;
 }
 
 .event-card__info {
     padding: 1.25rem;
     display: flex;
     flex-direction: column;
-    flex-grow: 1; /* Garante que o rodapé do card se alinhe */
+    flex-grow: 1;
 }
 
 .event-card__details {
     font-size: 0.75rem;
-    font-weight: 500; /* Peso "Medium" para detalhes */
+    font-weight: 500;
     color: var(--subtle-text);
     margin-bottom: 0.5rem;
 }
 
 .event-card__name {    
     font-size: 1.2rem;
-    font-weight: 700; /* Peso "Bold" para o nome do evento */
-    margin: 0; /* Remove a margem para juntar com a data */
-    /* flex-grow: 1; foi removido para juntar o nome e a data */
+    font-weight: 700;
+    margin: 0; 
+    
 }
 
 .event-card__genres {
-    margin: 0.1rem 0 0 0; /* Margem pequena para aproximar do título */
+    margin: 0.1rem 0 0 0;
     font-size: 0.7rem;
     font-weight: 500;
     color: var(--subtle-text);
@@ -495,8 +468,7 @@ a {
 .event-card__attractions {
     font-size: 0.9rem;
     color: var(--subtle-text);
-    margin: 0.5rem 0 1rem 0; /* Aumenta o espaço acima das atrações */
-    font-style: italic;
+    margin: 0.5rem 0 1rem 0; 
 }
 
 .event-card__instagram {
@@ -511,15 +483,15 @@ a {
     gap: 0.5rem;
     color: var(--subtle-text);
     text-decoration: none;
-    font-weight: 500; /* Peso "Medium" */
+    font-weight: 500;
     transition: color 0.2s;
 }
 
 .event-card__location {
-    font-size: 1.25rem; /* Ajuste para melhor responsividade */
+    font-size: 1.25rem; 
     font-weight: 500;
     color: var(--text-color);
-    margin-top: auto; /* Empurra o local para o fundo, alinhando-o em todos os cards */
+    margin-top: auto;
     margin-bottom: 0.5rem;
 }
 
@@ -535,62 +507,59 @@ a {
 
 .event-card__footer {
     padding: 0 1.25rem 1.25rem;
-    margin-top: auto; /* Empurra o rodapé para o fundo do card */
+    margin-top: auto;
 }
 
 .event-card__tickets-btn {
     display: block;
     width: 100%;
-    padding: 0.65rem; /* Leve ajuste no padding */
+    padding: 0.65rem;
     background-color: var(--primary-color);
-    color: var(--background-start); /* Texto escuro para contrastar com o fundo branco */
+    color: var(--background-start); 
     text-align: center;
     text-decoration: none;
-    font-weight: 700; /* Peso "Bold" para o botão */
+    font-weight: 700;
     border-radius: 8px;
-    border: 1px solid transparent; /* Borda transparente para manter o tamanho no hover */
+    border: 1px solid transparent;
     transition: background-color 0.2s, transform 0.2s;
 }
 
 .event-card__tickets-btn:hover {
-    background-color: #F5EFE0; /* Escurece sutilmente o tom creme no hover */
-    transform: scale(1.02); /* Efeito de zoom sutil */
+    background-color: #F5EFE0; 
+    transform: scale(1.02); 
 }
 
 .event-card__tickets-btn--free {
     color: var(--subtle-text);
     cursor: default;
-    /* Herda o background e a borda do botão padrão */
     background-color: var(--card-background);
     border: 1px solid var(--border-color);
 }
 
-/* Impede que os botões não-clicáveis tenham o efeito de hover do botão principal */
 .event-card__tickets-btn--free:hover {
     background-color: var(--card-background);
     transform: none;
 }
 
-/* --- Estilos para o Modo Claro --- */
+/* Modo claro */
 
 .light-theme .event-card__tickets-btn {
-    background-color: var(--text-color); /* Fundo escuro (cor do texto do tema claro) */
-    color: var(--primary-color); /* Texto creme */
+    background-color: var(--text-color);
     border-color: transparent;
 }
 
 .light-theme .event-card__tickets-btn:hover {
-    background-color: #333; /* Escurece um pouco o fundo no hover */
-    color: var(--primary-color); /* Mantém a cor do texto creme */
+    background-color: #333;
+    color: var(--primary-color);
 }
 
 .site-footer {
     text-align: center;
-    padding: 1.5rem 0; /* Padding reduzido */
-    margin-top: 2rem; /* Margem superior reduzida */
+    padding: 1.5rem 0;
+    margin-top: 2rem;
     background-color: var(--background-end);
     color: var(--subtle-text);
-    font-size: 0.8rem; /* Fonte reduzida */
+    font-size: 0.8rem;
 }
 
 .site-footer p {
@@ -609,8 +578,6 @@ a {
     text-decoration: none;
     transition: color 0.2s;
 }
-
-/* --- Estilos para o Skeleton Loader --- */
 
 .skeleton-card {
     background-color: transparent;
@@ -661,7 +628,6 @@ a {
     }
 }
 
-/* --- Estilos para o Modal --- */
 
 .modal-overlay {
     position: fixed;
@@ -669,7 +635,7 @@ a {
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.8); /* Overlay mais escuro */
+    background-color: rgba(0, 0, 0, 0.8);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -685,7 +651,7 @@ a {
 }
 
 .modal {
-    background-color: #333; /* Tom um pouco mais claro para destacar o modal */
+    background-color: #333;
     border-radius: var(--border-radius);
     padding: 2rem;
     width: 90%;
@@ -732,7 +698,7 @@ a {
 
 .modal-detail-label {
     font-size: 0.8rem;
-    font-weight: 400; /* Peso "Regular" para os rótulos */
+    font-weight: 400; 
     color: var(--subtle-text);
     text-transform: uppercase;
     letter-spacing: 0.5px;
@@ -748,20 +714,16 @@ a {
     align-items: center;
     gap: 0.5rem;    
     color: var(--subtle-text);    
-    padding: 0.25rem 0.5rem; /* Adiciona um respiro para o fundo no hover */
-    margin: -0.25rem -0.5rem; /* Compensa o padding para não quebrar o layout */
-    border-radius: 6px; /* Bordas arredondadas para o fundo no hover */
-    background-color: transparent; /* Começa transparente */
+    padding: 0.25rem 0.5rem; 
+    margin: -0.25rem -0.5rem;
+    border-radius: 6px;
+    background-color: transparent;
     transition: color 0.2s, background-color 0.2s;
 }
 
 .modal-detail-value a:hover {
     color: var(--text-color);
-    background-color: var(--card-background); /* Fundo sutil no hover */
-}
-
-.location-container {
-    /* Estilos existentes já são suficientes */
+    background-color: var(--card-background);
 }
 
 .modal-actions {
@@ -816,22 +778,19 @@ a {
 }
 
 .instagram-story-btn {
-    /* Adiciona um fundo roxo sutil e ajusta a cor do texto/borda */
     background-color: rgba(138, 43, 226, 0.1);
     border-color: rgba(138, 43, 226, 0.4);
     color: #c7a4ff;
 }
 
 .instagram-story-btn:hover {
-    /* Escurece o fundo e usa a cor primária para a borda no hover */
     background-color: rgba(138, 43, 226, 0.2);
     border-color: var(--primary-color);
     color: var(--primary-color);
-    transform: scale(1.02); /* Mantém o efeito de zoom sutil */
+    transform: scale(1.02);
 }
 
 .tickets-btn {
-    /* Aplica o estilo principal de "call-to-action" */
     background-color: var(--primary-color);
     color: var(--background-start);
     border-color: transparent;
@@ -839,8 +798,8 @@ a {
 }
 
 .tickets-btn:hover {
-    background-color: #F5EFE0; /* Escurece sutilmente o tom creme no hover */
-    color: var(--background-start); /* Mantém a cor do texto no hover */
+    background-color: #F5EFE0;
+    color: var(--background-start);
 }
 
 .share-btn.tickets-btn--free {
@@ -852,12 +811,12 @@ a {
 .share-btn.tickets-btn--free:hover {
     background-color: var(--card-background);
     border-color: var(--border-color);
-    color: var(--subtle-text); /* Garante que a cor do texto não mude no hover */
+    color: var(--subtle-text); 
 }
 
 .modal-content p a {
     color: var(--primary-color);
-    font-weight: 500; /* Peso "Medium" */
+    font-weight: 500;
 }
 
 .modal-separator {
@@ -867,51 +826,40 @@ a {
     margin: 2rem 0;
 }
 
-/* --- Estilos para o Sticker do Instagram Story --- */
-/* Este container fica fora da tela e será usado para gerar a imagem */
 .story-sticker-container {
     position: absolute;
     top: -9999px;
     left: -9999px;
-    width: 450px; /* Proporção 9:16 */
+    width: 450px;
     height: 800px;
     padding: 3rem;
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: flex-start; /* Alinha o conteúdo ao topo */
-    /* Otimização de performance: Usa um gradiente simples em vez de uma imagem de fundo.
-       Isso acelera drasticamente a renderização do canvas no iOS. */
-    background-image: linear-gradient(rgba(18, 18, 18, 0.85), rgba(18, 18, 18, 0.95)), url('assets/mapa.jpg');
-    background-size: cover;
-    background-position: center;
+    justify-content: center;
+    background: linear-gradient(160deg, #3a3a3a, #1a1a1a);
     color: #fff;
     font-family: 'Satoshi', sans-serif;
-    overflow: hidden; /* Garante que nada vaze */
-    padding-top: 5rem; /* Adiciona um espaço no topo */
+    overflow: hidden;
 }
 
 .story-sticker__image {
     width: 100%;
-    height: 320px; /* Reduz a altura da imagem */
-    /* Usar background-image é mais robusto para evitar distorção */
-    background-size: cover;
-    background-position: center;
+    height: 400px;
+    object-fit: cover;
     border-radius: 12px;
     border: 2px solid #fff;
     box-shadow: 0 15px 40px rgba(0,0,0,0.6);
-    z-index: 1; /* Garante que a imagem fique acima do gradiente de fundo do container */
-    /* Efeito de "foto colada" */
 }
 
 .story-sticker__title {
     font-size: 3rem;
-    font-weight: 900; /* Mais pesado para impacto */
+    font-weight: 900;
     text-align: center;
     margin: 1.5rem 0 0.5rem 0;
     line-height: 1.2;
-    /* Usa a cor primária sólida para melhor legibilidade e renderização */
     color: var(--primary-color);
+    z-index: 1;
 }
 
 .story-sticker__details {
@@ -919,9 +867,9 @@ a {
     font-weight: 500;
     color: #ccc;
     text-align: center;
+    z-index: 1;
 }
 
-/* --- Estilos para o Modal de Contato --- */
 .contact-options {
     display: grid;
     gap: 1rem;
@@ -946,8 +894,6 @@ a {
     border-color: var(--primary-color);
 }
 
-
-/* --- Estilos para o Botão Voltar ao Topo --- */
 .back-to-top-btn {
     position: fixed;
     bottom: 20px;
@@ -987,7 +933,7 @@ a {
     box-shadow: 0 2px 8px rgba(0,0,0,0.2);
 }
 
-/* --- Responsividade para Cards no Mobile --- */
+/* Mobile */
 @media (max-width: 600px) {
     .site-header {
         padding-top: 1.5rem;
@@ -1001,70 +947,62 @@ a {
         line-height: 1.4;
     }
     .header-content {
-        align-items: center; /* Centraliza o título e o botão verticalmente */
+        align-items: center; 
     }
 
     .filters-wrapper {
-        flex-direction: column; /* Empilha os filtros verticalmente */
-        align-items: stretch; /* Garante que todos os filtros ocupem a largura total */
+        flex-direction: column;
+        align-items: stretch;
         margin-top: 1rem;
         gap: 0.5rem;
     }
 
-    .search-container {
-        /* A regra de flex-basis não é mais necessária com flex-direction: column */
-    }
-
-
     #search-input,
     .date-filter-container,
     .genre-filter {
-        height: 40px; /* Altura dos filtros reduzida */
+        height: 40px;
     }
 
-    /* Garante que a área de clique invisível do input de data
-       permaneça alinhada com o ícone na altura reduzida do mobile. */
     .date-filter {
-        right: 2.5rem; /* Ajuste fino para o alinhamento */
+        right: 2.5rem;
     }
 
     .genre-filter {
-        padding-top: 0; /* Remove o padding vertical padrão do select */
-        padding-bottom: 0; /* Remove o padding vertical padrão do select */
-        padding-left: 1rem; /* Alinha com o padding do campo de busca */
-        padding-right: 2.25rem; /* Menos espaço para a seta no mobile */
+        padding-top: 0;
+        padding-bottom: 0;
+        padding-left: 1rem; 
+        padding-right: 2.25rem;
     }
 
     .clear-all-filters-btn {
         height: 40px;
-        order: 2; /* Move para depois do botão de compartilhar */
+        order: 2;
     }
 
     .share-filters-btn {
         height: 40px;
-        order: 1; /* Move para antes do botão de limpar */
+        order: 1;
     }
 
     #event-grid {
-        /* Reduz o tamanho mínimo do card para permitir 2 colunas em telas menores */
         grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-        gap: 1rem; /* Reduz o espaçamento entre os cards */
+        gap: 1rem; 
     }
 
     .event-card__image {
-        height: 120px; /* Altura da imagem ainda mais reduzida */
+        height: 120px; 
     }
 
     .event-card__info {
-        padding: 0.5rem 0.75rem; /* Padding vertical ainda menor */
+        padding: 0.5rem 0.75rem;
     }
 
     .event-card__name {
-        font-size: 1rem; /* Fonte do nome do evento menor */
+        font-size: 1rem;
     }
 
     .event-card__location {
-        font-size: 1rem; /* Fonte do local menor */
+        font-size: 1rem;
     }
 
     .event-card__details {
@@ -1086,40 +1024,40 @@ a {
     }
 
     .modal {
-        width: calc(100% - 2rem); /* Garante uma margem nas laterais */
-        padding: 1rem; /* Padding geral ainda mais reduzido */
-        max-height: 80vh; /* Reduz a altura máxima para não ocupar a tela inteira */
-        overflow-y: auto; /* Adiciona scroll se o conteúdo for muito grande */
+        width: calc(100% - 2rem); 
+        padding: 1rem; 
+        max-height: 80vh; 
+        overflow-y: auto;
     }
 
     .modal-details-grid {
-        gap: 0.6rem; /* Espaçamento mínimo entre os detalhes */
+        gap: 0.6rem;
     }
 
     .modal-detail-label {
-        font-size: 0.7rem; /* Fonte do rótulo menor */
+        font-size: 0.7rem;
     }
 
     .modal-detail-value {
-        font-size: 0.85rem; /* Fonte do valor ainda menor */
+        font-size: 0.85rem;
     }
 
     .modal-content h2 {
-        font-size: 1.2rem; /* Título ainda menor */
+        font-size: 1.2rem;
     }
 
     .modal-actions {
-        margin-top: 1rem; /* Menos espaço antes dos botões */
-        flex-direction: column; /* Empilha os botões verticalmente */
+        margin-top: 1rem;
+        flex-direction: column;
         gap: 0.75rem;
     }
 
     .share-btn {
-        padding: 0.5rem; /* Padding dos botões ainda menor */
+        padding: 0.5rem;
         font-size: 0.8rem;
     }
 
     .modal-separator {
-        margin: 1rem 0; /* Espaçamento do separador reduzido */
+        margin: 1rem 0;
     }
 }
