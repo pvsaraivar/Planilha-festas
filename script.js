@@ -52,7 +52,7 @@ const eventImageMap = {
     'mysterious': 'assets/vintage.PNG',
     'vulgaris': 'assets/vulgaris.PNG',
     'esquenta da ignis erótica: preliminar':  'assets/preliminar.PNG',
-    'zep club': 'assets/zepelim.PNG'
+    'Zep Club': 'assets/zepelim.PNG'
 }
 
 /**

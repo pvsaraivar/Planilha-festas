@@ -836,17 +836,50 @@ a {
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
-    background: linear-gradient(160deg, #3a3a3a, #1a1a1a);
+    justify-content: flex-start;
+    background: #1a1a1a; /* Cor de fundo sólida como fallback */
     color: #fff;
     font-family: 'Satoshi', sans-serif;
     overflow: hidden;
 }
 
+.story-sticker__background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    z-index: 0; /* Fica na camada de baixo */
+}
+
+/* Adiciona o gradiente de overlay sobre o fundo */
+.story-sticker__background::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(rgba(18, 18, 18, 0.85), rgba(18, 18, 18, 0.95));
+}
+
+.story-sticker__content {
+    position: relative;
+    z-index: 1; /* Garante que todo o conteúdo fique acima do fundo */
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 5rem 3rem 3rem;
+}
+
 .story-sticker__image {
     width: 100%;
-    height: 400px;
-    object-fit: cover;
+    height: 320px;
+    background-size: cover;
+    background-position: center;
     border-radius: 12px;
     border: 2px solid #fff;
     box-shadow: 0 15px 40px rgba(0,0,0,0.6);
@@ -859,7 +892,6 @@ a {
     margin: 1.5rem 0 0.5rem 0;
     line-height: 1.2;
     color: var(--primary-color);
-    z-index: 1;
 }
 
 .story-sticker__details {
@@ -867,7 +899,6 @@ a {
     font-weight: 500;
     color: #ccc;
     text-align: center;
-    z-index: 1;
 }
 
 .contact-options {
