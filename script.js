@@ -1014,6 +1014,9 @@ async function createStorySticker(event) {
         detailsParts.push(location);
         const detailsText = detailsParts.join(' &bull; ');
 
+        // Aplica o fundo do mapa diretamente no estilo do container via JavaScript
+        stickerContainer.style.backgroundImage = `linear-gradient(rgba(18, 18, 18, 0.85), rgba(18, 18, 18, 0.95)), url(${mapImageAsDataUrl})`;
+
         // Etapa 2: Monta o HTML do sticker com a imagem já embutida.
         stickerContainer.innerHTML = `
             <img src="${eventImageAsDataUrl}" class="story-sticker__image" />
