@@ -1006,9 +1006,6 @@ async function createStorySticker(event) {
             readBlobAsDataURL(mapImageBlob)
         ]);
 
-        // Aplica o fundo do mapa diretamente no estilo do container via JavaScript
-        stickerContainer.style.backgroundImage = `linear-gradient(rgba(18, 18, 18, 0.85), rgba(18, 18, 18, 0.95)), url(${mapImageAsDataUrl})`;
-
         // Formata a string de horário para incluir no sticker
         const timeString = formatTimeString(startTime, endTime);
         const detailsParts = [date];
@@ -1018,9 +1015,12 @@ async function createStorySticker(event) {
 
         // Etapa 2: Monta o HTML do sticker com a imagem já embutida.
         stickerContainer.innerHTML = `
-            <img src="${eventImageAsDataUrl}" class="story-sticker__image" />
-            <h1 class="story-sticker__title">${name}</h1>
-            <p class="story-sticker__details">${detailsText}</p>
+            <div class="story-sticker__background" style="background-image: url(${mapImageAsDataUrl});"></div>
+            <div class="story-sticker__content">
+                <div class="story-sticker__image" style="background-image: url(${eventImageAsDataUrl});"></div>
+                <h1 class="story-sticker__title">${name}</h1>
+                <p class="story-sticker__details">${detailsText}</p>
+            </div>
         `;
 
         // Etapa 3: Gera o canvas. Agora, este passo será muito mais rápido.
