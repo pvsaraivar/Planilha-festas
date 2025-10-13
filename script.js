@@ -52,7 +52,7 @@ const eventImageMap = {
     'mysterious': 'assets/vintage.PNG',
     'vulgaris': 'assets/vulgaris.PNG',
     'esquenta da ignis erótica: preliminar':  'assets/preliminar.PNG',
-    'Zep Club': 'assets/zepelim.PNG'
+    'zep club': 'assets/zepelim.PNG'
 }
 
 /**
@@ -916,39 +916,47 @@ function openModal(event) {
             storyBtn.hidden = true;
         }
 
-        storyBtn.addEventListener('click', async () => {
+        let stickerFile = null; // Variável para armazenar o arquivo gerado
+
+        const handleShareClick = async () => {
             const originalText = storyBtn.innerHTML;
-            storyBtn.innerHTML = 'Gerando imagem...';
-            storyBtn.disabled = true;
 
-            try {
-                // Garante que as fontes customizadas estejam prontas, crucial para a estabilidade no iOS.
-                await document.fonts.ready;
+            // Se o arquivo ainda não foi gerado, gera primeiro.
+            if (!stickerFile) {
+                storyBtn.innerHTML = 'Gerando imagem...';
+                storyBtn.disabled = true;
+                try {
+                    await document.fonts.ready;
+                    const stickerBlob = await createStorySticker(event);
+                    stickerFile = new File([stickerBlob], `story-${createEventSlug(name)}.png`, { type: 'image/png' });
+                    
+                    // Atualiza o botão para a segunda etapa
+                    storyBtn.innerHTML = 'Compartilhar Agora';
+                    storyBtn.disabled = false;
 
-                const stickerBlob = await createStorySticker(event);
-                
-                const stickerFile = new File([stickerBlob], `story-${createEventSlug(name)}.png`, { type: 'image/png' });
-
-                // Verifica se o navegador pode compartilhar o arquivo gerado.
-                if (!navigator.canShare || !navigator.canShare({ files: [stickerFile] })) {
-                    throw new Error("Seu navegador não suporta o compartilhamento de arquivos. Tente usar o Safari no iPhone.");
+                } catch (err) {
+                    console.error('Erro ao gerar o sticker:', err);
+                    alert('Não foi possível gerar a imagem para compartilhamento.');
+                    storyBtn.innerHTML = originalText;
+                    storyBtn.disabled = false;
                 }
-                
-                // Usa a API de compartilhamento nativo para enviar o arquivo.
-                await navigator.share({
-                    files: [stickerFile],
-                });
-
-            } catch (err) {
-                console.error('Erro ao compartilhar no Story:', err);
-                // Fornece uma mensagem de erro mais clara e útil
-                alert(err.message || 'Não foi possível compartilhar a imagem. Esta função é melhor suportada no Safari em iPhones.');
-            } finally {
-                // Retorna o botão ao estado original imediatamente
-                storyBtn.innerHTML = originalText;
-                storyBtn.disabled = false;
+                return; // Sai da função para esperar o próximo clique do usuário
             }
-        });
+
+            // Se o arquivo já foi gerado, compartilha imediatamente.
+            if (stickerFile) {
+                try {
+                    if (!navigator.canShare || !navigator.canShare({ files: [stickerFile] })) {
+                        throw new Error("Seu navegador não suporta o compartilhamento de arquivos. Tente usar o Safari no iPhone.");
+                    }
+                    await navigator.share({ files: [stickerFile] });
+                } catch (err) {
+                    alert(err.message || 'Não foi possível compartilhar a imagem.');
+                }
+            }
+        };
+
+        storyBtn.addEventListener('click', handleShareClick);
     }
 }
 
