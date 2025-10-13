@@ -931,7 +931,7 @@ function openModal(event) {
                     stickerFile = new File([stickerBlob], `story-${createEventSlug(name)}.png`, { type: 'image/png' });
                     
                     // Atualiza o botão para a segunda etapa
-                    storyBtn.innerHTML = 'Compartilhar Agora';
+                    storyBtn.innerHTML = 'Compartilhar';
                     storyBtn.disabled = false;
 
                 } catch (err) {
