@@ -872,7 +872,7 @@ a {
 }
 
 .story-sticker__attractions {
-    font-size: 1.25rem; /* Tamanho da fonte igual ao dos detalhes */
+    font-size: 1.25rem; 
     font-weight: 500;
     color: #ccc;
     text-align: center;
@@ -942,6 +942,7 @@ a {
 }
 
 /* Mobile */
+
 @media (max-width: 600px) {
     .site-header {
         padding-top: 1.5rem;
