@@ -835,18 +835,50 @@ a {
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
-    background: linear-gradient(160deg, #3a3a3a, #1a1a1a);
+    justify-content: flex-start;
+    background: #1a1a1a; /* Cor de fundo sólida como fallback */
     color: #fff;
     font-family: 'Satoshi', sans-serif;
     overflow: hidden;
-    padding: 2rem;
+}
+
+.story-sticker__background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    z-index: 1; /* Camada de baixo */
+}
+
+/* Adiciona o gradiente de overlay sobre o fundo */
+.story-sticker__background::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(rgba(18, 18, 18, 0.85), rgba(18, 18, 18, 0.95));
+}
+
+.story-sticker__content {
+    position: relative;
+    z-index: 2; /* Camada de cima, na frente do fundo e do gradiente */
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 3rem 2rem; /* Diminui o padding superior para subir a imagem */
 }
 
 .story-sticker__image {
     width: 100%;
     height: 350px;
-    object-fit: cover;
+    background-size: cover;
+    background-position: center;
     border-radius: 12px;
     border: 2px solid #fff;
     box-shadow: 0 15px 40px rgba(0,0,0,0.6);
