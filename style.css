@@ -871,7 +871,7 @@ a {
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 3rem 2rem; /* Diminui o padding superior para subir a imagem */
+    padding: 4rem 2rem;
 }
 
 .story-sticker__image {
