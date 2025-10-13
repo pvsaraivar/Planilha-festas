@@ -51,7 +51,8 @@ const eventImageMap = {
     'puro êxtase': 'assets/extase.jpg',
     'mysterious': 'assets/vintage.PNG',
     'vulgaris': 'assets/vulgaris.PNG',
-    'esquenta da ignis erótica: preliminar':  'assets/preliminar.PNG'
+    'esquenta da ignis erótica: preliminar':  'assets/preliminar.PNG',
+    'zep club': 'assets/zepelim.PNG'
 }
 
 /**
@@ -921,38 +922,31 @@ function openModal(event) {
             storyBtn.disabled = true;
 
             try {
-                // Etapa 1: Copia o link do evento para a área de transferência IMEDIATAMENTE.
-                // Esta é a ação mais sensível a permissões no iOS e precisa acontecer primeiro.
-                const shareUrl = window.location.href;
-                await navigator.clipboard.writeText(shareUrl);
-
                 // Garante que as fontes customizadas estejam prontas, crucial para a estabilidade no iOS.
                 await document.fonts.ready;
 
                 const stickerBlob = await createStorySticker(event);
                 
-                // Etapa 2: Inicia o download da imagem do sticker.
-                const link = document.createElement('a');
-                link.href = URL.createObjectURL(stickerBlob);
-                link.download = `story-${createEventSlug(name)}.png`;
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-                URL.revokeObjectURL(link.href);
+                const stickerFile = new File([stickerBlob], `story-${createEventSlug(name)}.png`, { type: 'image/png' });
+
+                // Verifica se o navegador pode compartilhar o arquivo gerado.
+                if (!navigator.canShare || !navigator.canShare({ files: [stickerFile] })) {
+                    throw new Error("Seu navegador não suporta o compartilhamento de arquivos. Tente usar o Safari no iPhone.");
+                }
                 
-                // Etapa 3: Atualiza o botão com instruções para o usuário.
-                storyBtn.innerHTML = 'Link copiado! Cole no sticker de link dos seus stories';
+                // Usa a API de compartilhamento nativo para enviar o arquivo.
+                await navigator.share({
+                    files: [stickerFile],
+                });
 
             } catch (err) {
                 console.error('Erro ao compartilhar no Story:', err);
                 // Fornece uma mensagem de erro mais clara e útil
                 alert(err.message || 'Não foi possível compartilhar a imagem. Esta função é melhor suportada no Safari em iPhones.');
             } finally {
-                // Retorna o botão ao estado original após 3.5 segundos
-                setTimeout(() => {
-                    storyBtn.innerHTML = originalText;
-                    storyBtn.disabled = false;
-                }, 3500);
+                // Retorna o botão ao estado original imediatamente
+                storyBtn.innerHTML = originalText;
+                storyBtn.disabled = false;
             }
         });
     }
