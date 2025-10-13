@@ -926,17 +926,22 @@ function openModal(event) {
                 storyBtn.innerHTML = 'Gerando imagem...';
                 storyBtn.disabled = true;
                 try {
+                    // Etapa 1: Copia o link do evento para a área de transferência IMEDIATAMENTE.
+                    // Esta é a ação mais sensível a permissões no iOS e precisa acontecer primeiro.
+                    const shareUrl = window.location.href;
+                    await navigator.clipboard.writeText(shareUrl);
+
                     await document.fonts.ready;
                     const stickerBlob = await createStorySticker(event);
                     stickerFile = new File([stickerBlob], `story-${createEventSlug(name)}.png`, { type: 'image/png' });
                     
                     // Atualiza o botão para a segunda etapa
-                    storyBtn.innerHTML = 'Compartilhar';
+                    storyBtn.innerHTML = 'Compartilhar Agora';
                     storyBtn.disabled = false;
 
                 } catch (err) {
                     console.error('Erro ao gerar o sticker:', err);
-                    alert('Não foi possível gerar a imagem para compartilhamento.');
+                    alert(err.message || 'Não foi possível gerar a imagem para compartilhamento.');
                     storyBtn.innerHTML = originalText;
                     storyBtn.disabled = false;
                 }
@@ -950,6 +955,16 @@ function openModal(event) {
                         throw new Error("Seu navegador não suporta o compartilhamento de arquivos. Tente usar o Safari no iPhone.");
                     }
                     await navigator.share({ files: [stickerFile] });
+
+                    // Após o compartilhamento, instrui o usuário a usar o link copiado.
+                    storyBtn.innerHTML = 'Link copiado! Cole no sticker de link';
+                    storyBtn.disabled = true;
+                    setTimeout(() => {
+                        storyBtn.innerHTML = originalText;
+                        storyBtn.disabled = false;
+                        stickerFile = null; // Reseta para o próximo uso
+                    }, 3500);
+
                 } catch (err) {
                     alert(err.message || 'Não foi possível compartilhar a imagem.');
                 }
