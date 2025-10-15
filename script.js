@@ -1054,25 +1054,36 @@ function openModal(event) {
 
             // Se o arquivo ainda não foi gerado, gera primeiro.
             if (!stickerFile) {
-                storyBtn.innerHTML = 'Gerando imagem...';
                 storyBtn.disabled = true;
                 try {
                     // Etapa 1: Copia o link do evento para a área de transferência IMEDIATAMENTE.
-                    // Esta é a ação mais sensível a permissões no iOS e precisa acontecer primeiro.
                     const shareUrl = window.location.href;
                     await navigator.clipboard.writeText(shareUrl);
 
-                    await document.fonts.ready;
-                    const stickerBlob = await createStorySticker(event);
-                    stickerFile = new File([stickerBlob], `story-${createEventSlug(name)}.png`, { type: 'image/png' });
-                    
-                    // Atualiza o botão para a segunda etapa
-                    storyBtn.innerHTML = 'Compartilhar';
-                    storyBtn.disabled = false;
+                    // Etapa 2: Mostra feedback visual de que o link foi copiado.
+                    const checkIconSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
+                    storyBtn.innerHTML = `${checkIconSvg} Link copiado!`;
+
+                    // Etapa 3: Após um breve momento, começa a gerar a imagem.
+                    setTimeout(async () => {
+                        storyBtn.innerHTML = 'Gerando imagem...';
+                        try {
+                            await document.fonts.ready;
+                            const stickerBlob = await createStorySticker(event);
+                            stickerFile = new File([stickerBlob], `story-${createEventSlug(name)}.png`, { type: 'image/png' });
+                            
+                            // Atualiza o botão para a etapa de compartilhamento
+                            storyBtn.innerHTML = 'Compartilhar';
+                            storyBtn.disabled = false;
+                        } catch (err) {
+                            // Trata erro na geração da imagem
+                            throw err;
+                        }
+                    }, 1200); // Aguarda 1.2 segundos para o usuário ver a mensagem.
 
                 } catch (err) {
                     console.error('Erro ao gerar o sticker:', err);
-                    alert(err.message || 'Não foi possível gerar a imagem para compartilhamento.');
+                    alert(err.message || 'Não foi possível copiar o link ou gerar a imagem.');
                     storyBtn.innerHTML = originalText;
                     storyBtn.disabled = false;
                 }
