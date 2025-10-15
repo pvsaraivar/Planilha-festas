@@ -2,6 +2,7 @@
 let eventSlugFromUrl = null; // Armazena o slug do evento da URL para uso posterior
 
 let allEvents = []; // Armazena todos os eventos para filtragem
+let favoritedEventSlugs = new Set(); // Armazena os slugs dos eventos favoritados para consulta rápida
 
 document.addEventListener('DOMContentLoaded', () => {
     const sheetId = '1LAfG4Nt2g_P12HMCx-wEmWpXoX3yp1qAKdw89eLbeWU';
@@ -9,6 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Primeiro, lê os parâmetros da URL para saber se um evento específico deve ser aberto.
     applyFiltersFromURL();
+    loadFavorites(); // Carrega os favoritos do localStorage antes de exibir os eventos
     loadAndDisplayEvents(googleSheetUrl);
     setupFilters();
     setupModal();
@@ -207,6 +209,7 @@ function parseCSV(text) {
 function renderEvents(events, gridElement) {
     const dateInput = document.getElementById('date-filter');
     const selectedDate = dateInput ? dateInput.value : null;
+    loadFavorites(); // Garante que os favoritos estejam atualizados antes de renderizar
 
     gridElement.innerHTML = ''; // Limpa os skeletons ou a mensagem "Carregando..."
     if (events.length === 0) {
@@ -303,6 +306,7 @@ function setupFilters() {
     const dateInput = document.getElementById('date-filter');
     const genreFilter = document.getElementById('genre-filter');
     const clearSearchBtn = document.getElementById('clear-search-btn');
+    const favoritesFilterBtn = document.getElementById('favorites-filter-btn');
     const clearDateBtn = document.getElementById('clear-date-btn');
     const clearAllBtn = document.getElementById('clear-all-filters-btn');
     const datePickerTrigger = document.querySelector('.date-picker-trigger');
@@ -315,16 +319,18 @@ function setupFilters() {
         const searchTerm = searchInput.value.toLowerCase();
         const selectedDate = dateInput.value;
         const selectedGenre = genreFilter.value;
+        const favoritesOnly = favoritesFilterBtn.classList.contains('is-active');
 
         // Adiciona/remove a classe 'is-active' para feedback visual
         searchInput.classList.toggle('is-active', !!searchTerm);        
         dateInput.classList.toggle('is-active', !!selectedDate);
         genreFilter.classList.toggle('is-active', !!selectedGenre);
+        // O estado do botão de favoritos é controlado por clique, não aqui.
 
         // Mostra/esconde botões de limpar
         clearSearchBtn.hidden = !searchTerm;
         clearDateBtn.hidden = !selectedDate;
-        const anyFilterActive = !!searchTerm || !!selectedDate || (!!selectedGenre && selectedGenre !== '');
+        const anyFilterActive = !!searchTerm || !!selectedDate || (!!selectedGenre && selectedGenre !== '') || favoritesOnly;
         clearAllBtn.hidden = !anyFilterActive;
         shareFiltersBtn.hidden = !anyFilterActive;
 
@@ -343,6 +349,7 @@ function setupFilters() {
         if (searchTerm) params.set('search', searchTerm);
         if (selectedDate) params.set('date', selectedDate);
         if (selectedGenre) params.set('genre', selectedGenre);
+        if (favoritesOnly) params.set('favorites', 'true');
 
         const queryString = params.toString();
         const newUrl = queryString 
@@ -397,6 +404,14 @@ function setupFilters() {
             });
         }
 
+        // 4. Filtra por favoritos (sobre o resultado dos filtros anteriores)
+        if (favoritesOnly) {
+            filteredEvents = filteredEvents.filter(event => {
+                const eventSlug = createEventSlug(getProp(event, 'Evento') || getProp(event, 'Nome'));
+                return favoritedEventSlugs.has(eventSlug);
+            });
+        }
+
         renderEvents(getSortedEvents(filteredEvents), grid);
     };
 
@@ -428,6 +443,11 @@ function setupFilters() {
 
     genreFilter.addEventListener('change', applyFilters);
 
+    favoritesFilterBtn.addEventListener('click', () => {
+        favoritesFilterBtn.classList.toggle('is-active');
+        applyFilters();
+    });
+
     clearSearchBtn.addEventListener('click', () => {
         searchInput.value = '';
         applyFilters();
@@ -444,6 +464,7 @@ function setupFilters() {
         searchInput.value = '';
         dateInput.value = '';
         genreFilter.value = '';
+        favoritesFilterBtn.classList.remove('is-active');
         applyFilters();
     });
 
@@ -541,6 +562,10 @@ function createEventCardElement(event) {
     const card = document.createElement('article');
     card.className = 'event-card';
 
+    const eventName = getProp(event, 'Evento') || getProp(event, 'Nome') || 'Evento sem nome';
+    const eventSlug = createEventSlug(eventName);
+    const isEventFavorited = isFavorited(eventSlug);
+
     // Tenta buscar por "Evento" e, se não encontrar, tenta por "Nome".
     const name = getProp(event, 'Evento') || getProp(event, 'Nome') || 'Evento sem nome';
     const date = getProp(event, 'Data') || getProp(event, 'Date') || 'Data a confirmar';
@@ -614,6 +639,13 @@ function createEventCardElement(event) {
             card.classList.add('event-card--weekend');
         }
     }
+
+    const favoriteButtonHtml = `
+        <button class="favorite-btn ${isEventFavorited ? 'favorited' : ''}" data-event-slug="${eventSlug}" title="${isEventFavorited ? 'Remover dos favoritos' : 'Adicionar aos favoritos'}">
+            ${getHeartIcon(isEventFavorited)}
+        </button>
+    `;
+
     let ticketHtml = '';
     if (isPastEvent) {
         ticketHtml = `<div class="event-card__footer"><span class="event-card__tickets-btn event-card__tickets-btn--free">Evento já realizado</span></div>`;
@@ -637,6 +669,7 @@ function createEventCardElement(event) {
             ${instagramUrl ? `<p class="event-card__instagram"><a href="${instagramUrl}" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">${instagramIconSvg} Instagram</a></p>` : ''}
             <p class="event-card__location">${location}</p>
         </div>
+        ${favoriteButtonHtml}
         ${ticketHtml}
     `;
 
@@ -654,6 +687,13 @@ function createEventCardElement(event) {
         window.history.pushState({ path: newUrl }, '', newUrl);
 
         openModal(event);
+    });
+
+    // Adiciona listener para o botão de favorito
+    const favoriteBtn = card.querySelector('.favorite-btn');
+    favoriteBtn.addEventListener('click', (e) => {
+        e.stopPropagation(); // Impede que o clique no botão abra o modal
+        toggleFavorite(event, favoriteBtn);
     });
 
     return card;
@@ -705,6 +745,80 @@ function getProp(obj, propName) {
     return obj[key];
 }
 
+/**
+ * Carrega os slugs dos eventos favoritados do localStorage.
+ */
+function loadFavorites() {
+    const favorites = localStorage.getItem('favoritedEvents');
+    if (favorites) {
+        favoritedEventSlugs = new Set(JSON.parse(favorites));
+    }
+}
+
+/**
+ * Salva os slugs dos eventos favoritados no localStorage.
+ */
+function saveFavorites() {
+    localStorage.setItem('favoritedEvents', JSON.stringify(Array.from(favoritedEventSlugs)));
+}
+
+/**
+ * Verifica se um evento está favoritado.
+ * @param {string} eventSlug - O slug do evento.
+ * @returns {boolean} - True se o evento estiver favoritado.
+ */
+function isFavorited(eventSlug) {
+    return favoritedEventSlugs.has(eventSlug);
+}
+
+/**
+ * Retorna o SVG do ícone de coração, preenchido ou não.
+ * @param {boolean} isFilled - Se o coração deve ser preenchido.
+ * @returns {string} O HTML do SVG.
+ */
+function getHeartIcon(isFilled) {
+    const fill = isFilled ? 'currentColor' : 'none';
+    return `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="${fill}" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-heart"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>`;
+}
+
+/**
+ * Adiciona ou remove um evento dos favoritos e atualiza a UI de todos os botões de favorito para esse evento.
+ * @param {Object} event - O objeto do evento.
+ * @param {HTMLElement} clickedButtonElement - O botão de favorito que foi clicado (para feedback imediato).
+ */
+function toggleFavorite(event, clickedButtonElement) {
+    const eventSlug = createEventSlug(getProp(event, 'Evento') || getProp(event, 'Nome'));
+    const isCurrentlyFavorited = favoritedEventSlugs.has(eventSlug);
+
+    if (isCurrentlyFavorited) {
+        favoritedEventSlugs.delete(eventSlug);
+    } else {
+        favoritedEventSlugs.add(eventSlug);
+    }
+    saveFavorites();
+
+    // Atualiza todos os botões de favorito associados a este slug de evento
+    document.querySelectorAll(`.favorite-btn[data-event-slug="${eventSlug}"]`).forEach(btn => {
+        const isNowFavorited = favoritedEventSlugs.has(eventSlug);
+        if (isNowFavorited) {
+            btn.classList.add('favorited');
+        } else {
+            btn.classList.remove('favorited');
+        }
+        btn.innerHTML = getHeartIcon(isNowFavorited);
+        btn.title = isNowFavorited ? 'Remover dos favoritos' : 'Adicionar aos favoritos';
+    });
+
+    // Se o filtro de favoritos estiver ativo, reaplica os filtros para remover o card da tela
+    if (document.getElementById('favorites-filter-btn').classList.contains('is-active')) applyFilters();
+}
+
+/**
+ * Renderiza os eventos favoritados na seção "Meus Favoritos".
+ */
+function renderFavorites() {
+    const favoritesSection = document.getElementById('favorites-section');
+}
 /**
  * Configura os listeners para abrir e fechar o modal.
  */
@@ -783,6 +897,10 @@ function openModal(event) {
     const overlay = document.getElementById('modal-overlay');
     const modalContent = document.getElementById('modal-content');
 
+    const eventName = getProp(event, 'Evento') || getProp(event, 'Nome') || 'Evento sem nome';
+    const eventSlug = createEventSlug(eventName);
+    const isEventFavorited = isFavorited(eventSlug);
+
     const name = getProp(event, 'Evento') || getProp(event, 'Nome') || 'Evento sem nome';
     const date = getProp(event, 'Data') || getProp(event, 'Date') || 'Data a confirmar';
     const location = getProp(event, 'Local') || 'Localização não divulgada';
@@ -844,6 +962,10 @@ function openModal(event) {
     }
 
     modalContent.innerHTML = `
+        <button class="favorite-btn modal-favorite-btn ${isEventFavorited ? 'favorited' : ''}" data-event-slug="${eventSlug}" title="${isEventFavorited ? 'Remover dos favoritos' : 'Adicionar aos favoritos'}">
+            ${getHeartIcon(isEventFavorited)}
+        </button>
+
         <h2>${name}</h2>
         <div class="modal-details-grid">
             <div class="modal-detail-item">
@@ -880,6 +1002,12 @@ function openModal(event) {
 
     /* Copiar link */
     const copyLinkBtn = modalContent.querySelector('.copy-link-btn');
+
+    // Adiciona listener para o botão de favorito no modal
+    const modalFavoriteBtn = modalContent.querySelector('.modal-favorite-btn');
+    modalFavoriteBtn.addEventListener('click', () => {
+        toggleFavorite(event, modalFavoriteBtn);
+    });
     if (copyLinkBtn) {
        
         const shareUrl = window.location.href;
