@@ -56,7 +56,8 @@ const eventImageMap = {
     'esquenta da ignis erótica: preliminar':  'assets/preliminar.PNG',
     'zep club': 'assets/zepelim.PNG',
     'ziohm': 'assets/ziohm.PNG',
-    'link': 'assets/link.jpg'
+    'link': 'assets/link.jpg',
+    'baguncinha': 'assets/baguncinha.PNG'
 }
 
 /**
