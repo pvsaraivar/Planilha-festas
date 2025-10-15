@@ -1160,15 +1160,20 @@ async function createStorySticker(event) {
         detailsParts.push(location);
         const detailsText = detailsParts.join(' &bull; ');
 
-        // Aplica o fundo do mapa diretamente no estilo do container via JavaScript
-        stickerContainer.style.backgroundImage = `linear-gradient(rgba(18, 18, 18, 0.85), rgba(18, 18, 18, 0.95)), url(${mapImageAsDataUrl})`;
+        // Aplica o fundo do mapa com um gradiente mais suave
+        stickerContainer.style.backgroundImage = `linear-gradient(rgba(18, 18, 18, 0.6), rgba(18, 18, 18, 0.9)), url(${mapImageAsDataUrl})`;
 
         // Etapa 2: Monta o HTML do sticker com a imagem já embutida.
         stickerContainer.innerHTML = `
-            <img src="${eventImageAsDataUrl}" class="story-sticker__image" />
-            <h1 class="story-sticker__title">${name}</h1>
-            ${attractions ? `<p class="story-sticker__attractions">${attractions}</p>` : ''}
-            <p class="story-sticker__details">${detailsText}</p>
+            <div class="story-sticker__main-content">
+                <img src="${eventImageAsDataUrl}" class="story-sticker__image" />
+                <div class="story-sticker__text-wrapper">
+                    <h1 class="story-sticker__title">${name}</h1>
+                    ${attractions ? `<p class="story-sticker__attractions">${attractions}</p>` : ''}
+                    <p class="story-sticker__details">${detailsText}</p>
+                </div>
+            </div>
+            <div class="story-sticker__footer">Onde é hoje?</div>
         `;
 
         // Etapa 3: Gera o canvas. Agora, este passo será muito mais rápido.
@@ -1178,7 +1183,7 @@ async function createStorySticker(event) {
             allowTaint: true,
             // Otimização de performance: Força a escala para 1.
             // Evita que o html2canvas use o devicePixelRatio (2x ou 3x em iPhones),
-            // o que torna a geração da imagem muito mais rápida.
+            // o que torna a geração da imagem muito mais rápida. Aumentamos a resolução base no CSS.
             scale: 1 
         });
         return new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
