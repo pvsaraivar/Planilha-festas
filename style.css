@@ -447,31 +447,6 @@ a {
     font-weight: 500;
 }
 
-.show-past-btn {
-    height: 50px;
-    padding: 0 1.5rem;
-    background-color: transparent;
-    border: 1px solid var(--border-color);
-    color: var(--subtle-text);
-    border-radius: var(--border-radius);
-    cursor: pointer;
-    transition: all 0.2s;
-    font-family: inherit;
-    font-size: 1rem;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.show-past-btn:hover {
-    border-color: var(--primary-color);
-    color: var(--text-color);
-}
-.show-past-btn.is-active {
-    border-color: var(--primary-color);
-    color: var(--text-color);
-}
-
 /* --- Seção Eventos da Semana --- */
 #weekly-events-section {
     padding-top: 1rem;
@@ -694,6 +669,7 @@ a {
 
 .light-theme .event-card__tickets-btn {
     background-color: var(--text-color);
+    color: var(--background-end); /* Garante que o texto seja claro no fundo escuro */
     border-color: transparent;
 }
 

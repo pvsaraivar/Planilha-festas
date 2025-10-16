@@ -393,7 +393,6 @@ function setupFilters() {
     const genreFilter = document.getElementById('genre-filter');
     const clearSearchBtn = document.getElementById('clear-search-btn');
     const favoritesFilterBtn = document.getElementById('favorites-filter-btn');
-    const showPastBtn = document.getElementById('show-past-btn');
     const clearDateBtn = document.getElementById('clear-date-btn');
     const clearAllBtn = document.getElementById('clear-all-filters-btn');
     const datePickerTrigger = document.querySelector('.date-picker-trigger');
@@ -407,7 +406,6 @@ function setupFilters() {
         const selectedDate = dateInput.value;
         const selectedGenre = genreFilter.value;
         const favoritesOnly = favoritesFilterBtn.classList.contains('is-active');
-        const showPast = showPastBtn.classList.contains('is-active');
 
         // Adiciona/remove a classe 'is-active' para feedback visual
         searchInput.classList.toggle('is-active', !!searchTerm);        
@@ -418,7 +416,7 @@ function setupFilters() {
         // Mostra/esconde botões de limpar
         clearSearchBtn.hidden = !searchTerm;
         clearDateBtn.hidden = !selectedDate;
-        const anyFilterActive = !!searchTerm || !!selectedDate || (!!selectedGenre && selectedGenre !== '') || favoritesOnly || showPast;
+        const anyFilterActive = !!searchTerm || !!selectedDate || (!!selectedGenre && selectedGenre !== '') || favoritesOnly;
         clearAllBtn.hidden = !anyFilterActive;
         shareFiltersBtn.hidden = !anyFilterActive;
         // Atualiza o display do filtro de data com o novo estilo
@@ -464,23 +462,19 @@ function setupFilters() {
                 return eventDate === formattedDate;
             });
         } else {
-            // Se o botão "Histórico" estiver ativo, usa todos os eventos. Caso contrário, apenas os futuros.
-            if (showPast) {
-                filteredEvents = [...allEvents];
-            } else {
-                const today = new Date();
-                today.setHours(0, 0, 0, 0);
-                const parseDateForFilter = (dateString) => {
-                    if (!dateString || typeof dateString !== 'string') return null;
-                    const parts = dateString.split('/');
-                    if (parts.length !== 3) return null;
-                    return new Date(parts[2], parts[1] - 1, parts[0]);
-                };
-                filteredEvents = allEvents.filter(event => {
-                    const eventDate = parseDateForFilter(getProp(event, 'Data') || getProp(event, 'Date'));
-                    return eventDate && eventDate >= today;
-                });
-            }
+            // Por padrão, mostra apenas eventos futuros.
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const parseDateForFilter = (dateString) => {
+                if (!dateString || typeof dateString !== 'string') return null;
+                const parts = dateString.split('/');
+                if (parts.length !== 3) return null;
+                return new Date(parts[2], parts[1] - 1, parts[0]);
+            };
+            filteredEvents = allEvents.filter(event => {
+                const eventDate = parseDateForFilter(getProp(event, 'Data') || getProp(event, 'Date'));
+                return eventDate && eventDate >= today;
+            });
         }
 
         // 4. Filtra por favoritos (sobre o resultado dos filtros anteriores)
@@ -527,11 +521,6 @@ function setupFilters() {
         applyFilters();
     });
 
-    showPastBtn.addEventListener('click', () => {
-        showPastBtn.classList.toggle('is-active');
-        applyFilters();
-    });
-
     clearSearchBtn.addEventListener('click', () => {
         searchInput.value = '';
         applyFilters();
@@ -549,7 +538,6 @@ function setupFilters() {
         dateInput.value = '';
         genreFilter.value = '';
         favoritesFilterBtn.classList.remove('is-active');
-        showPastBtn.classList.remove('is-active');
         applyFilters();
     });
 
