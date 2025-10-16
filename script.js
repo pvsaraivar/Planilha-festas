@@ -20,6 +20,19 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 /**
+ * Envia um evento para o Google Analytics.
+ * @param {string} action - O nome da ação do evento (ex: 'click_button').
+ * @param {Object} params - Um objeto com parâmetros adicionais para o evento.
+ */
+function trackGAEvent(action, params) {
+  if (typeof gtag === 'function') {
+    gtag('event', action, params);
+  } else {
+    console.warn(`gtag function not found. Analytics event not tracked: ${action}`, params);
+  }
+}
+
+/**
  * Mapeamento de nomes de eventos para imagens locais específicas.
  * Isso substitui a longa cadeia de if/else if, tornando o código mais limpo e fácil de manter.
  * As chaves devem estar em minúsculas para corresponder à verificação.
@@ -87,6 +100,8 @@ async function loadAndDisplayEvents(csvPath) {
             return oculto !== 'sim' && oculto !== 'true';
         });
         
+        renderWeeklyEvents(allEvents);
+
         // Helper para converter "DD/MM/YYYY" para um objeto Date
         const parseDate = (dateString) => {
             if (!dateString || typeof dateString !== 'string') return null;
@@ -263,6 +278,76 @@ function populateGenreFilter(events) {
         genreFilter.appendChild(option);
     });
 }
+
+/**
+ * Renderiza a seção "Eventos da Semana" com os próximos eventos.
+ * @param {Array<Object>} allEvents - A lista completa de todos os eventos.
+ */
+function renderWeeklyEvents(allEvents) {
+    const weeklySection = document.getElementById('weekly-events-section');
+    if (!weeklySection) return;
+
+    const parseDate = (dateString) => {
+        if (!dateString || typeof dateString !== 'string') return null;
+        const parts = dateString.split('/');
+        if (parts.length !== 3) return null;
+        return new Date(parts[2], parts[1] - 1, parts[0]);
+    };
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const nextSevenDays = new Date(today);
+    nextSevenDays.setDate(today.getDate() + 7);
+
+    const upcomingEvents = allEvents
+        .map(event => ({ ...event, parsedDate: parseDate(getProp(event, 'Data') || getProp(event, 'Date')) }))
+        .filter(event => event.parsedDate && event.parsedDate >= today && event.parsedDate <= nextSevenDays)
+        .sort((a, b) => a.parsedDate - b.parsedDate);
+
+    if (upcomingEvents.length > 0) {
+        weeklySection.style.display = 'block'; // Mostra a seção
+        
+        const eventsHtml = upcomingEvents.map(event => {
+            const name = getProp(event, 'Evento') || getProp(event, 'Nome') || 'Evento';
+            const date = getProp(event, 'Data') || getProp(event, 'Date');
+            const location = getProp(event, 'Local') || 'Local a confirmar';
+            let imageUrl = getProp(event, 'Imagem (URL)');
+            
+            const eventNameLower = name.trim().toLowerCase();
+            if (eventImageMap[eventNameLower]) {
+                imageUrl = eventImageMap[eventNameLower];
+            }
+
+            const placeholderSvg = "data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3e%3crect width='100%25' height='100%25' fill='%23333'/%3e%3c/svg%3e";
+
+            return `
+                <a href="#" class="weekly-event-card" data-event-slug="${createEventSlug(name)}">
+                    <img src="${imageUrl || placeholderSvg}" alt="${name}" class="weekly-event-card__image" loading="lazy">
+                    <div class="weekly-event-card__info">
+                        <h3>${name}</h3>
+                        <p>${date} &bull; ${location}</p>
+                    </div>
+                </a>
+            `;
+        }).join('');
+
+        weeklySection.innerHTML = `
+            <h2 id="weekly-events-title">Eventos da Semana</h2>
+            <div class="weekly-events-grid">${eventsHtml}</div>
+        `;
+
+        // Adiciona listeners para abrir o modal ao clicar nos cards da semana
+        weeklySection.querySelectorAll('.weekly-event-card').forEach(card => {
+            card.addEventListener('click', (e) => {
+                e.preventDefault();
+                const slug = card.dataset.eventSlug;
+                const eventToOpen = allEvents.find(ev => createEventSlug(getProp(ev, 'Evento') || getProp(ev, 'Nome')) === slug);
+                if (eventToOpen) openModal(eventToOpen);
+            });
+        });
+    }
+}
 /**
  * Retorna uma cópia dos eventos ordenados por data.
  * @param {Array<Object>} events - A lista de eventos a ser ordenada.
@@ -308,6 +393,7 @@ function setupFilters() {
     const genreFilter = document.getElementById('genre-filter');
     const clearSearchBtn = document.getElementById('clear-search-btn');
     const favoritesFilterBtn = document.getElementById('favorites-filter-btn');
+    const showPastBtn = document.getElementById('show-past-btn');
     const clearDateBtn = document.getElementById('clear-date-btn');
     const clearAllBtn = document.getElementById('clear-all-filters-btn');
     const datePickerTrigger = document.querySelector('.date-picker-trigger');
@@ -321,6 +407,7 @@ function setupFilters() {
         const selectedDate = dateInput.value;
         const selectedGenre = genreFilter.value;
         const favoritesOnly = favoritesFilterBtn.classList.contains('is-active');
+        const showPast = showPastBtn.classList.contains('is-active');
 
         // Adiciona/remove a classe 'is-active' para feedback visual
         searchInput.classList.toggle('is-active', !!searchTerm);        
@@ -331,10 +418,9 @@ function setupFilters() {
         // Mostra/esconde botões de limpar
         clearSearchBtn.hidden = !searchTerm;
         clearDateBtn.hidden = !selectedDate;
-        const anyFilterActive = !!searchTerm || !!selectedDate || (!!selectedGenre && selectedGenre !== '') || favoritesOnly;
+        const anyFilterActive = !!searchTerm || !!selectedDate || (!!selectedGenre && selectedGenre !== '') || favoritesOnly || showPast;
         clearAllBtn.hidden = !anyFilterActive;
         shareFiltersBtn.hidden = !anyFilterActive;
-
         // Atualiza o display do filtro de data com o novo estilo
         if (selectedDate) {
             const [year, month, day] = selectedDate.split('-');
@@ -353,6 +439,11 @@ function setupFilters() {
         if (favoritesOnly) params.set('favorites', 'true');
 
         const queryString = params.toString();
+
+        if (anyFilterActive && !shareFiltersBtn.dataset.initialLoad) {
+            trackGAEvent('filter_used', { search_term: searchTerm, date: selectedDate, genre: selectedGenre, favorites: favoritesOnly });
+        }
+
         const newUrl = queryString 
             ? `${window.location.pathname}?${queryString}`
             : window.location.pathname;
@@ -373,36 +464,23 @@ function setupFilters() {
                 return eventDate === formattedDate;
             });
         } else {
-            // Se NENHUMA data for selecionada, a base para os outros filtros são os eventos futuros.
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
-            const parseDateForFilter = (dateString) => {
-                if (!dateString || typeof dateString !== 'string') return null;
-                const parts = dateString.split('/');
-                if (parts.length !== 3) return null;
-                return new Date(parts[2], parts[1] - 1, parts[0]);
-            };
-            filteredEvents = allEvents.filter(event => {
-                const eventDate = parseDateForFilter(getProp(event, 'Data') || getProp(event, 'Date'));
-                return eventDate && eventDate >= today;
-            });
-        }
-
-        // 2. Filtra por texto (sobre o resultado do filtro de data/futuros)
-        if (searchTerm) {
-            filteredEvents = filteredEvents.filter(event => {
-                const name = (getProp(event, 'Evento') || getProp(event, 'Nome') || '').toLowerCase();
-                const location = (getProp(event, 'Local') || '').toLowerCase();
-                return name.includes(searchTerm) || location.includes(searchTerm);
-            });
-        }
-
-        // 3. Filtra por gênero (sobre o resultado dos filtros anteriores)
-        if (selectedGenre) {
-            filteredEvents = filteredEvents.filter(event => {
-                const eventGenres = (getProp(event, 'Gênero') || '').toLowerCase();
-                return eventGenres.split(',').map(g => g.trim()).includes(selectedGenre);
-            });
+            // Se o botão "Histórico" estiver ativo, usa todos os eventos. Caso contrário, apenas os futuros.
+            if (showPast) {
+                filteredEvents = [...allEvents];
+            } else {
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                const parseDateForFilter = (dateString) => {
+                    if (!dateString || typeof dateString !== 'string') return null;
+                    const parts = dateString.split('/');
+                    if (parts.length !== 3) return null;
+                    return new Date(parts[2], parts[1] - 1, parts[0]);
+                };
+                filteredEvents = allEvents.filter(event => {
+                    const eventDate = parseDateForFilter(getProp(event, 'Data') || getProp(event, 'Date'));
+                    return eventDate && eventDate >= today;
+                });
+            }
         }
 
         // 4. Filtra por favoritos (sobre o resultado dos filtros anteriores)
@@ -449,6 +527,11 @@ function setupFilters() {
         applyFilters();
     });
 
+    showPastBtn.addEventListener('click', () => {
+        showPastBtn.classList.toggle('is-active');
+        applyFilters();
+    });
+
     clearSearchBtn.addEventListener('click', () => {
         searchInput.value = '';
         applyFilters();
@@ -466,11 +549,14 @@ function setupFilters() {
         dateInput.value = '';
         genreFilter.value = '';
         favoritesFilterBtn.classList.remove('is-active');
+        showPastBtn.classList.remove('is-active');
         applyFilters();
     });
 
     // Chama applyFilters uma vez na inicialização para definir o estado dos botões com base nos parâmetros da URL
     applyFilters();
+    // Marca que a carga inicial foi concluída para não rastrear o primeiro `applyFilters` como uma ação do usuário.
+    shareFiltersBtn.dataset.initialLoad = 'true';
 
     shareFiltersBtn.addEventListener('click', () => {
         // A URL já está correta na barra de endereço
@@ -479,6 +565,8 @@ function setupFilters() {
             const checkIconSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
             shareFiltersBtn.innerHTML = `${checkIconSvg} <span>Link Copiado!</span>`;
             shareFiltersBtn.disabled = true;
+
+            trackGAEvent('share', { method: 'Copy Filter Link', content_type: 'filters' });
             
             setTimeout(() => {
                 shareFiltersBtn.innerHTML = originalHtml;
@@ -526,6 +614,8 @@ function setupThemeToggle() {
         
         // Salva a preferência do usuário
         localStorage.setItem('theme', newTheme);
+
+        trackGAEvent('change_theme', { theme: newTheme });
     });
 }
 
@@ -619,55 +709,11 @@ function createEventCardElement(event) {
     const eventDate = parseDate(date);
     const isPastEvent = eventDate && eventDate < today;
 
-    // Adiciona uma classe especial se o evento ocorrer no fim de semana da semana atual (Sexta, Sábado, Domingo).
-    if (eventDate) {
-        const now = new Date();
-        now.setHours(0, 0, 0, 0);
-        const currentDay = now.getDay(); // 0=Dom, 1=Seg, ..., 6=Sáb
-
-        // Calcula o início do fim de semana relevante (a próxima sexta-feira)
-        const weekendStart = new Date(now);
-        // Dias até a próxima sexta-feira (dia 5)
-        const daysUntilFriday = (5 - currentDay + 7) % 7;
-        weekendStart.setDate(now.getDate() + daysUntilFriday);
-
-        // Calcula o fim do fim de semana (domingo)
-        const weekendEnd = new Date(weekendStart);
-        weekendEnd.setDate(weekendStart.getDate() + 2);
-
-        // Verifica se a data do evento está dentro do fim de semana da semana atual
-        if (eventDate >= weekendStart && eventDate <= weekendEnd) {
-            card.classList.add('event-card--weekend');
-        }
-    }
-
-    const favoriteButtonHtml = `
-        <button class="favorite-btn ${isEventFavorited ? 'favorited' : ''}" data-event-slug="${eventSlug}" title="${isEventFavorited ? 'Remover dos favoritos' : 'Adicionar aos favoritos'}">
-            ${getHeartIcon(isEventFavorited)}
-        </button>
-    `;
-
-    let ticketHtml = '';
-    if (isPastEvent) {
-        ticketHtml = `<div class="event-card__footer"><span class="event-card__tickets-btn event-card__tickets-btn--free">Evento já realizado</span></div>`;
-    } else if (ticketUrl) {
-        if (ticketUrl.toLowerCase().trim() === 'gratuito') {
-            ticketHtml = `<div class="event-card__footer"><span class="event-card__tickets-btn event-card__tickets-btn--free">Gratuito</span></div>`;
-        } else {
-            ticketHtml = `<div class="event-card__footer"><a href="${ticketUrl}" target="_blank" rel="noopener noreferrer" class="event-card__tickets-btn" onclick="event.stopPropagation()">Comprar ingresso</a></div>`;
-        }
-    } else {
-        ticketHtml = `<div class="event-card__footer"><span class="event-card__tickets-btn event-card__tickets-btn--free">Vendas não divulgadas</span></div>`;
-    }
-
-    card.innerHTML = `
-        <img src="${imageUrl || placeholderSvg}" alt="${name}" class="event-card__image" loading="lazy" onerror="this.onerror=null;this.src='${errorSvg}';">
-        <div class="event-card__info">
             <h2 class="event-card__name">${name}</h2>
             ${genreTagsHtml}
             <p class="event-card__details">${dateTimeString}</p>
             ${attractions ? `<p class="event-card__attractions">${attractions}</p>` : ''}
-            ${instagramUrl ? `<p class="event-card__instagram"><a href="${instagramUrl}" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">${instagramIconSvg} Instagram</a></p>` : ''}
+            ${instagramUrl ? `<p class="event-card__instagram"><a href="${instagramUrl}" target="_blank" rel="noopener noreferrer" onclick="trackGAEvent('click_instagram', { event_name: '${name.replace(/'/g, "\\'")}', source: 'card' }); event.stopPropagation();">${instagramIconSvg} Instagram</a></p>` : ''}
             <p class="event-card__location">${location}</p>
         </div>
         ${favoriteButtonHtml}
@@ -798,6 +844,8 @@ function toggleFavorite(event, clickedButtonElement) {
     }
     saveFavorites();
 
+    trackGAEvent(isCurrentlyFavorited ? 'unfavorite_event' : 'favorite_event', { event_name: getProp(event, 'Evento') || getProp(event, 'Nome') });
+
     // Atualiza todos os botões de favorito associados a este slug de evento
     document.querySelectorAll(`.favorite-btn[data-event-slug="${eventSlug}"]`).forEach(btn => {
         const isNowFavorited = favoritedEventSlugs.has(eventSlug);
@@ -870,6 +918,7 @@ function setupContactModal() {
         e.preventDefault();
         overlay.classList.add('is-visible');
         document.body.style.overflow = 'hidden';
+        trackGAEvent('open_contact_modal');
     };
 
     const closeModal = () => {
@@ -956,7 +1005,7 @@ function openModal(event) {
         if (ticketUrl.toLowerCase().trim() === 'gratuito') {
             ticketActionHtml = `<span class="share-btn tickets-btn tickets-btn--free">Gratuito</span>`;
         } else {
-            ticketActionHtml = `<a href="${ticketUrl}" target="_blank" rel="noopener noreferrer" class="share-btn tickets-btn">Comprar ingresso</a>`;
+            ticketActionHtml = `<a href="${ticketUrl}" target="_blank" rel="noopener noreferrer" class="share-btn tickets-btn" onclick="trackGAEvent('click_ticket', { event_name: '${name.replace(/'/g, "\\'")}', source: 'modal' })">Comprar ingresso</a>`;
         }
     } else {
         ticketActionHtml = `<span class="share-btn tickets-btn tickets-btn--free">Vendas não divulgadas</span>`;
@@ -1020,6 +1069,7 @@ function openModal(event) {
                 copyLinkBtn.innerHTML = `${checkIconSvg} Link Copiado!`;
                 copyLinkBtn.disabled = true;
                 setTimeout(() => {
+                    trackGAEvent('share', { method: 'Copy Link', content_type: 'event', item_id: name });
                     copyLinkBtn.innerHTML = originalHtml;
                     copyLinkBtn.disabled = false;
                 }, 2000);
@@ -1036,6 +1086,7 @@ function openModal(event) {
             const shareUrl = window.location.href;
             const shareText = `Confira este evento: *${name}* em ${date}! Saiba mais aqui: ${shareUrl}`;
             const whatsappUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareText)}`;            
+            trackGAEvent('share', { method: 'WhatsApp', content_type: 'event', item_id: name });
             window.open(whatsappUrl, '_blank');
         });
     }
@@ -1097,6 +1148,7 @@ function openModal(event) {
                         throw new Error("Seu navegador não suporta o compartilhamento de arquivos. Tente usar o Safari no iPhone.");
                     }
                     await navigator.share({ files: [stickerFile] });
+                    trackGAEvent('share', { method: 'Instagram Stories', content_type: 'event', item_id: name });
 
                     // Após o compartilhamento, instrui o usuário a usar o link copiado.
                     storyBtn.innerHTML = 'Link copiado! Cole no sticker de link';

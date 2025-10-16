@@ -447,15 +447,88 @@ a {
     font-weight: 500;
 }
 
-.event-card--weekend {
-    border-color: #2E8B57; 
+.show-past-btn {
+    height: 50px;
+    padding: 0 1.5rem;
+    background-color: transparent;
+    border: 1px solid var(--border-color);
+    color: var(--subtle-text);
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: inherit;
+    font-size: 1rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
 }
 
-
-.event-card--weekend:hover {
-    border-color: #32CD32;
+.show-past-btn:hover {
+    border-color: var(--primary-color);
+    color: var(--text-color);
+}
+.show-past-btn.is-active {
+    border-color: var(--primary-color);
+    color: var(--text-color);
 }
 
+/* --- Seção Eventos da Semana --- */
+#weekly-events-section {
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border-color);
+    display: none; /* Começa escondido, o JS mostra se houver eventos */
+}
+
+#weekly-events-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    color: var(--text-color);
+}
+
+.weekly-events-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 1.5rem;
+}
+
+.weekly-event-card {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    background-color: transparent;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    transition: background-color 0.2s, border-color 0.2s;
+    color: var(--text-color);
+}
+
+.weekly-event-card:hover {
+    background-color: var(--card-background);
+    border-color: var(--primary-color);
+}
+
+.weekly-event-card__image {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 6px;
+    flex-shrink: 0;
+}
+
+.weekly-event-card__info h3 {
+    font-size: 1rem;
+    font-weight: 700;
+    margin: 0 0 0.25rem 0;
+}
+
+.weekly-event-card__info p {
+    font-size: 0.85rem;
+    color: var(--subtle-text);
+    margin: 0;
+}
 
 .event-card__image {
     width: 100%;
@@ -1093,6 +1166,10 @@ a {
     .share-filters-btn {
         height: 40px;
         order: 1;
+    }
+
+    .weekly-events-grid {
+        grid-template-columns: 1fr; /* Uma coluna em telas pequenas */
     }
 
     #event-grid {
