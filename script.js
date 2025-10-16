@@ -709,6 +709,26 @@ function createEventCardElement(event) {
     const eventDate = parseDate(date);
     const isPastEvent = eventDate && eventDate < today;
 
+    const favoriteButtonHtml = `
+        <button class="favorite-btn ${isEventFavorited ? 'favorited' : ''}" data-event-slug="${eventSlug}" title="${isEventFavorited ? 'Remover dos favoritos' : 'Adicionar aos favoritos'}">
+            ${getHeartIcon(isEventFavorited)}
+        </button>
+    `;
+
+    let ticketHtml = '';
+    if (ticketUrl) {
+        if (ticketUrl.toLowerCase().trim() === 'gratuito') {
+            ticketHtml = `<div class="event-card__footer"><span class="event-card__tickets-btn event-card__tickets-btn--free">Gratuito</span></div>`;
+        } else {
+            ticketHtml = `<div class="event-card__footer"><a href="${ticketUrl}" target="_blank" rel="noopener noreferrer" class="event-card__tickets-btn" onclick="trackGAEvent('click_ticket', { event_name: '${name.replace(/'/g, "\\'")}', source: 'card' }); event.stopPropagation();">Comprar ingresso</a></div>`;
+        }
+    } else {
+        ticketHtml = `<div class="event-card__footer"><span class="event-card__tickets-btn event-card__tickets-btn--free">Vendas não divulgadas</span></div>`;
+    }
+
+    card.innerHTML = `
+        <img src="${imageUrl || placeholderSvg}" alt="${name}" class="event-card__image" loading="lazy" onerror="this.onerror=null;this.src='${errorSvg}';">
+        <div class="event-card__info">
             <h2 class="event-card__name">${name}</h2>
             ${genreTagsHtml}
             <p class="event-card__details">${dateTimeString}</p>
@@ -719,10 +739,6 @@ function createEventCardElement(event) {
         ${favoriteButtonHtml}
         ${ticketHtml}
     `;
-
-    // card.addEventListener('click', () => {
-    //     openModal(event);
-    // });
 
     card.addEventListener('click', () => {
         const eventSlug = createEventSlug(name);
