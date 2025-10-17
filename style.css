@@ -584,7 +584,7 @@ a {
 
 .event-card__footer {
     padding: 0 1.25rem 1.25rem;
-    margin-top: auto;
+    order: 3; /* Garante que o rodapé seja o último item */
 }
 
 .event-card__tickets-btn {
@@ -860,6 +860,35 @@ a {
     background-color: var(--card-background);
 }
 
+.coupon-container {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    background-color: var(--background-start);
+    padding: 0.5rem 0.75rem;
+    border-radius: 6px;
+    border: 1px solid var(--border-color);
+}
+
+.coupon-code {
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: var(--primary-color);
+    flex-grow: 1;
+}
+
+.copy-coupon-btn {
+    background-color: var(--primary-color);
+    color: var(--background-start);
+    border: none;
+    border-radius: 4px;
+    padding: 0.25rem 0.75rem;
+    font-size: 0.8rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
 .modal-actions {
     display: flex;
     gap: 1rem;
@@ -888,23 +917,40 @@ a {
     color: var(--text-color);
 }
 
+.whatsapp-btn {
+    background-color: #25D366;
+    color: #fff;
+    border-color: #25D366;
+}
+
 .whatsapp-btn:hover {
     background-color: #20b058;
     border-color: #20b058;
     color: #fff;
 }
 
-.light-theme .whatsapp-btn {
+.instagram-story-btn {
     background-color: rgba(138, 43, 226, 0.1);
     border-color: rgba(138, 43, 226, 0.4);
     color: #c7a4ff;
 }
 
+.tickets-btn {
+    background-color: var(--primary-color);
+    color: var(--background-start);
+    border-color: transparent;
+    font-weight: 700;
+}
 .instagram-story-btn:hover {
     background-color: rgba(138, 43, 226, 0.2);
     border-color: var(--primary-color);
     color: var(--primary-color);
     transform: scale(1.02);
+}
+
+.tickets-btn:hover {
+    background-color: #F5EFE0;
+    color: var(--background-start);
 }
 
 .share-btn.tickets-btn--free {

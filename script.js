@@ -656,6 +656,7 @@ function createEventCardElement(event) {
     const genres = getProp(event, 'Gênero');
     const ticketUrl = getProp(event, 'Ingressos (URL)');
     const instagramUrl = getProp(event, 'Instagram (URL)');
+    const coupon = getProp(event, 'Cupom');
 
     // Usando Data URI para o placeholder, garantindo que funcione offline.
     // ... (código do placeholder)
@@ -963,6 +964,7 @@ function openModal(event) {
     const endTime = getProp(event, 'Fim');
     const ticketUrl = getProp(event, 'Ingressos (URL)');
     const instagramUrl = getProp(event, 'Instagram (URL)');
+    const coupon = getProp(event, 'Cupom');
 
     let locationHtml = `<span>${location}</span>`;
 
@@ -1000,6 +1002,18 @@ function openModal(event) {
         `;
     }
 
+    let couponDetailHtml = '';
+    if (coupon) {
+        couponDetailHtml = `
+            <div class="modal-detail-item">
+                <span class="modal-detail-label">Cupom de Desconto</span>
+                <div class="coupon-container">
+                    <span class="modal-detail-value coupon-code">${coupon}</span>
+                    <button class="copy-coupon-btn" data-coupon="${coupon}">Copiar</button>
+                </div>
+            </div>
+        `;
+    }
     const copyLinkIconSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.72"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.72-1.72"></path></svg>`;
     const whatsappIconSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.894 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.886-.001 2.269.655 4.357 1.849 6.081l-1.214 4.425 4.56-1.195z"/></svg>`;
     const instagramIconSvgModal = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>`;
@@ -1040,6 +1054,7 @@ function openModal(event) {
                 <span class="modal-detail-value">${attractions}</span>
             </div>
             ${instagramDetailHtml}
+            ${couponDetailHtml}
         </div>
 
         <hr class="modal-separator">
@@ -1062,6 +1077,24 @@ function openModal(event) {
     modalFavoriteBtn.addEventListener('click', () => {
         toggleFavorite(event, modalFavoriteBtn);
     });
+
+    const copyCouponBtn = modalContent.querySelector('.copy-coupon-btn');
+    if (copyCouponBtn) {
+        copyCouponBtn.addEventListener('click', () => {
+            const couponCode = copyCouponBtn.dataset.coupon;
+            navigator.clipboard.writeText(couponCode).then(() => {
+                const originalText = copyCouponBtn.textContent;
+                copyCouponBtn.textContent = 'Copiado!';
+                copyCouponBtn.disabled = true;
+                setTimeout(() => {
+                    copyCouponBtn.textContent = originalText;
+                    copyCouponBtn.disabled = false;
+                }, 2000);
+            }).catch(err => {
+                console.error('Falha ao copiar o cupom: ', err);
+            });
+        });
+    }
     if (copyLinkBtn) {
        
         const shareUrl = window.location.href;
