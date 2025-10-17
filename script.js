@@ -333,7 +333,7 @@ function renderWeeklyEvents(allEvents) {
         }).join('');
 
         weeklySection.innerHTML = `
-            <h2 id="weekly-events-title">Eventos da Semana</h2>
+            <h2 id="weekly-events-title">Eventos da semana</h2>
             <div class="weekly-events-grid">${eventsHtml}</div>
         `;
 
@@ -406,6 +406,12 @@ function setupFilters() {
         const selectedDate = dateInput.value;
         const selectedGenre = genreFilter.value;
         const favoritesOnly = favoritesFilterBtn.classList.contains('is-active');
+
+        // Oculta a seção de eventos da semana se uma data for selecionada
+        const weeklySection = document.getElementById('weekly-events-section');
+        if (weeklySection) {
+            weeklySection.style.display = selectedDate ? 'none' : 'block';
+        }
 
         // Adiciona/remove a classe 'is-active' para feedback visual
         searchInput.classList.toggle('is-active', !!searchTerm);        
