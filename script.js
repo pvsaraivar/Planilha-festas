@@ -70,7 +70,8 @@ const eventImageMap = {
     'zep club': 'assets/zepelim.PNG',
     'ziohm': 'assets/ziohm.PNG',
     'link': 'assets/link.jpg',
-    'baguncinha': 'assets/baguncinha.PNG'
+    'baguncinha': 'assets/baguncinha.PNG',
+    'clube fatal': 'assets/clubefatal.PNG'
 }
 
 /**
@@ -297,12 +298,12 @@ function renderWeeklyEvents(allEvents) {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
-    const nextSevenDays = new Date(today);
-    nextSevenDays.setDate(today.getDate() + 7);
+    const nextFiveDays = new Date(today);
+    nextFiveDays.setDate(today.getDate() + 5);
 
     const upcomingEvents = allEvents
         .map(event => ({ ...event, parsedDate: parseDate(getProp(event, 'Data') || getProp(event, 'Date')) }))
-        .filter(event => event.parsedDate && event.parsedDate >= today && event.parsedDate <= nextSevenDays)
+        .filter(event => event.parsedDate && event.parsedDate >= today && event.parsedDate <= nextFiveDays)
         .sort((a, b) => a.parsedDate - b.parsedDate);
 
     if (upcomingEvents.length > 0) {
@@ -407,24 +408,25 @@ function setupFilters() {
         const selectedGenre = genreFilter.value;
         const favoritesOnly = favoritesFilterBtn.classList.contains('is-active');
 
-        // Oculta a seção de eventos da semana se uma data for selecionada
-        const weeklySection = document.getElementById('weekly-events-section');
-        if (weeklySection) {
-            weeklySection.style.display = selectedDate ? 'none' : 'block';
-        }
-
         // Adiciona/remove a classe 'is-active' para feedback visual
         searchInput.classList.toggle('is-active', !!searchTerm);        
         dateInput.classList.toggle('is-active', !!selectedDate);
         genreFilter.classList.toggle('is-active', !!selectedGenre);
         // O estado do botão de favoritos é controlado por clique, não aqui.
 
-        // Mostra/esconde botões de limpar
+        // Mostra/esconde botões de limpar e define se algum filtro está ativo
         clearSearchBtn.hidden = !searchTerm;
         clearDateBtn.hidden = !selectedDate;
         const anyFilterActive = !!searchTerm || !!selectedDate || (!!selectedGenre && selectedGenre !== '') || favoritesOnly;
         clearAllBtn.hidden = !anyFilterActive;
         shareFiltersBtn.hidden = !anyFilterActive;
+
+        // Oculta a seção "Eventos da semana" se qualquer filtro estiver ativo
+        const weeklySection = document.getElementById('weekly-events-section');
+        if (weeklySection) {
+            weeklySection.style.display = anyFilterActive ? 'none' : 'block';
+        }
+
         // Atualiza o display do filtro de data com o novo estilo
         if (selectedDate) {
             const [year, month, day] = selectedDate.split('-');
@@ -480,6 +482,28 @@ function setupFilters() {
             filteredEvents = allEvents.filter(event => {
                 const eventDate = parseDateForFilter(getProp(event, 'Data') || getProp(event, 'Date'));
                 return eventDate && eventDate >= today;
+            });
+        }
+
+        // 2. Filtra por termo de busca (sobre o resultado do filtro de data)
+        if (searchTerm) {
+            filteredEvents = filteredEvents.filter(event => {
+                const name = (getProp(event, 'Evento') || getProp(event, 'Nome') || '').toLowerCase();
+                const location = (getProp(event, 'Local') || '').toLowerCase();
+                const attractions = (getProp(event, 'Atrações') || '').toLowerCase();
+                return name.includes(searchTerm) || location.includes(searchTerm) || attractions.includes(searchTerm);
+            });
+        }
+
+        // 3. Filtra por gênero (sobre o resultado dos filtros anteriores)
+        if (selectedGenre) {
+            filteredEvents = filteredEvents.filter(event => {
+                const genresString = getProp(event, 'Gênero');
+                if (!genresString) return false;
+                // Converte a string de gêneros do evento para um array de minúsculas
+                const eventGenres = genresString.split(',').map(g => g.trim().toLowerCase());
+                // Verifica se o gênero selecionado está na lista de gêneros do evento
+                return eventGenres.includes(selectedGenre);
             });
         }
 
@@ -711,7 +735,9 @@ function createEventCardElement(event) {
     `;
 
     let ticketHtml = '';
-    if (ticketUrl) {
+    if (isPastEvent) {
+        ticketHtml = `<div class="event-card__footer"><span class="event-card__tickets-btn event-card__tickets-btn--free event-card__status--highlight">Evento já realizado</span></div>`;
+    } else if (ticketUrl) {
         if (ticketUrl.toLowerCase().trim() === 'gratuito') {
             ticketHtml = `<div class="event-card__footer"><span class="event-card__tickets-btn event-card__tickets-btn--free">Gratuito</span></div>`;
         } else {
@@ -1024,8 +1050,21 @@ function openModal(event) {
     const whatsappIconSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.894 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.886-.001 2.269.655 4.357 1.849 6.081l-1.214 4.425 4.56-1.195z"/></svg>`;
     const instagramIconSvgModal = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>`;
 
+    // Verifica se o evento já passou para definir o botão de ação
+    const parseDate = (dateString) => {
+        if (!dateString || typeof dateString !== 'string') return null;
+        const parts = dateString.split('/');
+        if (parts.length !== 3) return null;
+        return new Date(parts[2], parts[1] - 1, parts[0]);
+    };
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const isPastEvent = parseDate(date) && parseDate(date) < today;
+
     let ticketActionHtml = '';
-    if (ticketUrl) {
+    if (isPastEvent) {
+        ticketActionHtml = `<span class="share-btn tickets-btn tickets-btn--free event-card__status--highlight">Evento já realizado</span>`;
+    } else if (ticketUrl) {
         if (ticketUrl.toLowerCase().trim() === 'gratuito') {
             ticketActionHtml = `<span class="share-btn tickets-btn tickets-btn--free">Gratuito</span>`;
         } else {
@@ -1316,6 +1355,7 @@ function setupBackToTopButton() {
         } else {
             backToTopBtn.classList.remove('visible');
         }
+
     });
 
     // Rola para o topo ao clicar
