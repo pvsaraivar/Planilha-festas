@@ -13,14 +13,14 @@
 }
 
 .light-theme {
-    --background-start: #F5F5F7;
-    --background-end: #FFFFFF;
-    --card-background: #FFFFFF;
-    --text-color: #1D1D1F;
+    --background-start: #FDFBF7; /* Um tom creme muito suave para o fundo principal */
+    --background-end: #FFFFFF;   /* Branco para os elementos, como o rodapé */
+    --card-background: #FFFFFF;  /* Cartões brancos para se destacarem sobre o fundo creme */
+    --text-color: #4A4A4A;       /* Cinza escuro em vez de preto para um texto mais suave */
     --subtle-text: #6E6E73;
     --border-color: #D2D2D7;
     --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-    --background-overlay: rgba(255, 255, 255, 0.9);
+    --background-overlay: rgba(253, 251, 247, 0.9); /* Sobreposição ajustada para o tom creme */
 }
 
 *,
