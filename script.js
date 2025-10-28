@@ -74,7 +74,8 @@ const eventImageMap = {
     'clube fatal': 'assets/clubefatal.PNG',
     'delorean night': 'assets/delorean.PNG',
     'calunia dance club': 'assets/calunia.PNG',
-    'penumbra 7 anos': 'assets/penumbra.PNG'
+    'penumbra 7 anos': 'assets/penumbra.PNG',
+    'baile da bateu': 'assets/bailebateu.PNG'
 }
 
 /**
