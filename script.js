@@ -75,7 +75,8 @@ const eventImageMap = {
     'delorean night': 'assets/delorean.PNG',
     'calunia dance club': 'assets/calunia.PNG',
     'penumbra 7 anos': 'assets/penumbra.PNG',
-    'baile da bateu': 'assets/bailebateu.PNG'
+    'baile da bateu': 'assets/bailebateu.PNG',
+    'honeyball': 'assets/honeyball.jpg'
 }
 
 /**
