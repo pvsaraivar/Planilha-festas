@@ -467,8 +467,9 @@ function setupFilters() {
         // 1. Filtra por data PRIMEIRO, pois ele define a base de eventos.
         if (selectedDate) {
             // Se uma data for selecionada, a busca é feita em TODOS os eventos.
-            const [year, month, day] = selectedDate.split('-');
-            const formattedDate = `${day}/${month}/${year}`;
+            const [year, month, day] = selectedDate.split('-'); // 'YYYY', 'MM', 'DD'
+            // Remove o zero à esquerda do dia e do mês para corresponder ao formato da planilha (ex: '1/11/2024' em vez de '01/11/2024')
+            const formattedDate = `${parseInt(day, 10)}/${parseInt(month, 10)}/${year}`;
             
             filteredEvents = allEvents.filter(event => {
                 const eventDate = getProp(event, 'Data') || getProp(event, 'Date');
