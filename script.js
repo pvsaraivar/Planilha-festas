@@ -76,7 +76,8 @@ const eventImageMap = {
     'calunia dance club': 'assets/calunia.PNG',
     'penumbra 7 anos': 'assets/penumbra.PNG',
     'baile da bateu': 'assets/bailebateu.PNG',
-    'honeyball': 'assets/honeyball.jpg'
+    'honeyball': 'assets/honeyball.jpg',
+    '4rtin': 'assets/4tin.PNG'
 }
 
 /**
@@ -476,6 +477,7 @@ function setupFilters() {
                 return eventDate === formattedDate;
             });
         } else {
+
             // Por padrão, mostra apenas eventos futuros.
             const today = new Date();
             today.setHours(0, 0, 0, 0);
