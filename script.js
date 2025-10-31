@@ -77,7 +77,8 @@ const eventImageMap = {
     'penumbra 7 anos': 'assets/penumbra.PNG',
     'baile da bateu': 'assets/bailebateu.PNG',
     'honeyball': 'assets/honeyball.jpg',
-    '4rtin': 'assets/4tin.PNG'
+    '4rtin': 'assets/4tin.PNG',
+    'quental e friends': 'assets/quental.PNG'
 }
 
 /**
@@ -749,7 +750,7 @@ function createEventCardElement(event) {
         if (ticketUrl.toLowerCase().trim() === 'gratuito') {
             ticketHtml = `<div class="event-card__footer"><span class="event-card__tickets-btn event-card__tickets-btn--free">Gratuito</span></div>`;
         } else {
-            ticketHtml = `<div class="event-card__footer"><a href="${ticketUrl}" target="_blank" rel="noopener noreferrer" class="event-card__tickets-btn" onclick="trackGAEvent('click_ticket', { event_name: '${name.replace(/'/g, "\\'")}', source: 'card' }); event.stopPropagation();">Comprar ingresso</a></div>`;
+            ticketHtml = `<div class="event-card__footer"><a href="${ticketUrl}" target="_blank" rel="noopener noreferrer" class="event-card__tickets-btn" onclick="trackGAEvent('click_ticket', { event_name: '${name.replace(/'/g, "\\'")}', source: 'card' }); event.stopPropagation();">Comprar Ingresso</a></div>`;
         }
     } else {
         ticketHtml = `<div class="event-card__footer"><span class="event-card__tickets-btn event-card__tickets-btn--free">Vendas não divulgadas</span></div>`;
@@ -761,7 +762,7 @@ function createEventCardElement(event) {
             <h2 class="event-card__name">${name}</h2>
             ${genreTagsHtml}
             <p class="event-card__details">${dateTimeString}</p>
-            ${attractions ? `<p class="event-card__attractions">${attractions}</p>` : ''}
+            ${attractions ? `<p class="event-card__attractions">${attractions.split(',')[0]}</p>` : ''}
             ${instagramUrl ? `<p class="event-card__instagram"><a href="${instagramUrl}" target="_blank" rel="noopener noreferrer" onclick="trackGAEvent('click_instagram', { event_name: '${name.replace(/'/g, "\\'")}', source: 'card' }); event.stopPropagation();">${instagramIconSvg} Instagram</a></p>` : ''}
             <p class="event-card__location">${location}</p>
         </div>
@@ -1076,7 +1077,7 @@ function openModal(event) {
         if (ticketUrl.toLowerCase().trim() === 'gratuito') {
             ticketActionHtml = `<span class="share-btn tickets-btn tickets-btn--free">Gratuito</span>`;
         } else {
-            ticketActionHtml = `<a href="${ticketUrl}" target="_blank" rel="noopener noreferrer" class="share-btn tickets-btn" onclick="trackGAEvent('click_ticket', { event_name: '${name.replace(/'/g, "\\'")}', source: 'modal' })">Comprar ingresso</a>`;
+            ticketActionHtml = `<a href="${ticketUrl}" target="_blank" rel="noopener noreferrer" class="share-btn tickets-btn" onclick="trackGAEvent('click_ticket', { event_name: '${name.replace(/'/g, "\\'")}', source: 'modal' })">Comprar Ingresso</a>`;
         }
     } else {
         ticketActionHtml = `<span class="share-btn tickets-btn tickets-btn--free">Vendas não divulgadas</span>`;
@@ -1158,8 +1159,8 @@ function openModal(event) {
                 const originalHtml = copyLinkBtn.innerHTML;
                 copyLinkBtn.innerHTML = `${checkIconSvg} Link Copiado!`;
                 copyLinkBtn.disabled = true;
+                trackGAEvent('share', { method: 'Copy Link', content_type: 'event', item_id: name });
                 setTimeout(() => {
-                    trackGAEvent('share', { method: 'Copy Link', content_type: 'event', item_id: name });
                     copyLinkBtn.innerHTML = originalHtml;
                     copyLinkBtn.disabled = false;
                 }, 2000);
