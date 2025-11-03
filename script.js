@@ -763,7 +763,7 @@ function createEventCardElement(event) {
             <h2 class="event-card__name">${name}</h2>
             ${genreTagsHtml}
             <p class="event-card__details">${dateTimeString}</p>
-            ${attractions ? `<p class="event-card__attractions">${attractions.split(',')[0]}</p>` : ''}
+            ${attractions ? `<p class="event-card__attractions">${attractions}</p>` : ''}
             ${instagramUrl ? `<p class="event-card__instagram"><a href="${instagramUrl}" target="_blank" rel="noopener noreferrer" onclick="trackGAEvent('click_instagram', { event_name: '${name.replace(/'/g, "\\'")}', source: 'card' }); event.stopPropagation();">${instagramIconSvg} Instagram</a></p>` : ''}
             <p class="event-card__location">${location}</p>
         </div>
