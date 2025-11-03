@@ -78,7 +78,8 @@ const eventImageMap = {
     'baile da bateu': 'assets/bailebateu.PNG',
     'honeyball': 'assets/honeyball.jpg',
     '4rtin': 'assets/4tin.PNG',
-    'quental e friends': 'assets/quental.PNG'
+    'quental e friends': 'assets/quental.PNG',
+    'atrita house music': 'assets/atritahm.PNG'
 }
 
 /**
