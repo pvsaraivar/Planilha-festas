@@ -79,7 +79,15 @@ const eventImageMap = {
     'honeyball': 'assets/honeyball.jpg',
     '4rtin': 'assets/4tin.PNG',
     'quental e friends': 'assets/quental.PNG',
-    'atrita house music': 'assets/atritahm.PNG'
+    'atrita house music': 'assets/atritahm.PNG',
+    'verãodoismil': 'assets/verao2k.PNG',
+    'na pista praia': 'assets/napista2.PNG',
+    'voyage fliperama': 'assets/voyagefliperama.PNG',
+    'pacific eletrohits vol. 2': 'assets/pacificeletrohits.PNG',
+    'sexpressions': 'assets/sexpressions.PNG',
+    'batrita 3': 'assets/batrita.jpg',
+    'frenetica': 'assets/frenetica.PNG'
+
 }
 
 /**
