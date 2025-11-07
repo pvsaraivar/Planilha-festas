@@ -86,7 +86,8 @@ const eventImageMap = {
     'pacific eletrohits vol. 2': 'assets/pacificeletrohits.PNG',
     'sexpressions': 'assets/sexpressions.PNG',
     'batrita 3': 'assets/batrita.jpg',
-    'frenetica': 'assets/frenetica.PNG'
+    'frenetica': 'assets/frenetica.PNG',
+    'submundo coletivo noiz4': 'assets/lajenoiz4.PNG'
 
 }
 
