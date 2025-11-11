@@ -87,7 +87,11 @@ const eventImageMap = {
     'sexpressions': 'assets/sexpressions.PNG',
     'batrita 3': 'assets/batrita.jpg',
     'frenetica': 'assets/frenetica.PNG',
-    'submundo coletivo noiz4': 'assets/lajenoiz4.PNG'
+    'submundo coletivo noiz4': 'assets/lajenoiz4.PNG',
+    'melange': 'assets/melange.PNG',
+    'ovo frito': 'assets/ovofrito.PNG',
+    'joao rave': 'assets/joaorave.PNG',
+    'beije': 'assets/beije.PNG'
 
 }
 
