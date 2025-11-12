@@ -91,7 +91,8 @@ const eventImageMap = {
     'melange': 'assets/melange.PNG',
     'ovo frito': 'assets/ovofrito.PNG',
     'joao rave': 'assets/joaorave.PNG',
-    'beije': 'assets/beije.PNG'
+    'beije': 'assets/beije.PNG',
+    'abstracto sessions': 'assets/abstractosessions.PNG'
 
 }
 
