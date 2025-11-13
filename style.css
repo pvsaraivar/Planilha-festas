@@ -1213,6 +1213,7 @@ a {
 
     .event-card__tickets-btn {
         padding: 0.5rem;
+        font-size: 0.9rem;
     }
 
     .modal {

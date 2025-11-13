@@ -92,7 +92,10 @@ const eventImageMap = {
     'ovo frito': 'assets/ovofrito.PNG',
     'joao rave': 'assets/joaorave.PNG',
     'beije': 'assets/beije.PNG',
-    'abstracto sessions': 'assets/abstractosessions.PNG'
+    'abstracto sessions': 'assets/abstractosessions.PNG',
+    'argel e firma': 'assets/argelefirma.PNG',
+    'sunset trance': 'assets/sunsettrance1.PNG',
+    'dark club de natal': 'assets/darkclubnatal.PNG'
 
 }
 
@@ -762,8 +765,11 @@ function createEventCardElement(event) {
     if (isPastEvent) {
         ticketHtml = `<div class="event-card__footer"><span class="event-card__tickets-btn event-card__tickets-btn--free event-card__status--highlight">Evento já realizado</span></div>`;
     } else if (ticketUrl) {
-        if (ticketUrl.toLowerCase().trim() === 'gratuito') {
+        const ticketInfo = ticketUrl.toLowerCase().trim();
+        if (ticketInfo === 'gratuito') {
             ticketHtml = `<div class="event-card__footer"><span class="event-card__tickets-btn event-card__tickets-btn--free">Gratuito</span></div>`;
+        } else if (ticketInfo === 'couvert') {
+            ticketHtml = `<div class="event-card__footer"><span class="event-card__tickets-btn event-card__tickets-btn--free">Couvert no local</span></div>`;
         } else {
             ticketHtml = `<div class="event-card__footer"><a href="${ticketUrl}" target="_blank" rel="noopener noreferrer" class="event-card__tickets-btn" onclick="trackGAEvent('click_ticket', { event_name: '${name.replace(/'/g, "\\'")}', source: 'card' }); event.stopPropagation();">Comprar Ingresso</a></div>`;
         }
@@ -1089,8 +1095,11 @@ function openModal(event) {
     if (isPastEvent) {
         ticketActionHtml = `<span class="share-btn tickets-btn tickets-btn--free event-card__status--highlight">Evento já realizado</span>`;
     } else if (ticketUrl) {
-        if (ticketUrl.toLowerCase().trim() === 'gratuito') {
+        const ticketInfo = ticketUrl.toLowerCase().trim();
+        if (ticketInfo === 'gratuito') {
             ticketActionHtml = `<span class="share-btn tickets-btn tickets-btn--free">Gratuito</span>`;
+        } else if (ticketInfo === 'couvert') {
+            ticketActionHtml = `<span class="share-btn tickets-btn tickets-btn--free">Couvert no local</span>`;
         } else {
             ticketActionHtml = `<a href="${ticketUrl}" target="_blank" rel="noopener noreferrer" class="share-btn tickets-btn" onclick="trackGAEvent('click_ticket', { event_name: '${name.replace(/'/g, "\\'")}', source: 'modal' })">Comprar Ingresso</a>`;
         }
