@@ -124,6 +124,31 @@ a {
     color: var(--text-color);
 }
 
+.main-nav {
+    margin-top: 2rem;
+    display: flex;
+    gap: 0.5rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.nav-btn {
+    padding: 0.75rem 1.5rem;
+    cursor: pointer;
+    border: none;
+    background-color: transparent;
+    color: var(--subtle-text);
+    font-family: inherit;
+    font-size: 1rem;
+    border-bottom: 2px solid transparent;
+    transition: color 0.2s, border-color 0.2s;
+}
+
+.nav-btn.is-active {
+    color: var(--text-color);
+    font-weight: 500;
+    border-bottom-color: var(--primary-color);
+}
+
 .moon-icon {
     display: none; 
 }
@@ -139,6 +164,11 @@ a {
 .search-container {
     position: relative; 
     flex-grow: 1;
+    min-width: 250px;
+}
+
+.sets-search-container {
+    flex-grow: 2;
     min-width: 250px;
 }
 
@@ -253,7 +283,7 @@ a {
     color: var(--text-color);
 }
 
-#search-input {
+#search-input, .search-input {
     width: 100%;
     padding: 0.75rem 2.5rem 0.75rem 1rem;
     font-size: 1rem;
@@ -265,7 +295,8 @@ a {
     color: var(--text-color); 
 }
 
-#search-input:focus {
+#search-input:focus,
+.search-input:focus {
     outline: 2px solid transparent;
     outline-offset: 2px;
     border-color: var(--primary-color);
@@ -293,7 +324,8 @@ a {
 
 .date-filter.is-active ~ .date-filter-container,
 .genre-filter.is-active,
-#search-input.is-active {
+#search-input.is-active,
+.search-input.is-active {
     border-color: var(--primary-color);
     box-shadow: 0 0 0 1px var(--primary-color);
 }
@@ -445,6 +477,55 @@ a {
     background-color: rgba(233, 30, 99, 0.1);
     color: #E91E63;
     font-weight: 500;
+}
+/* Grid para os sets */
+#sets-section {
+    padding-top: 2rem;
+}
+
+#sets-title {
+    text-align: center;
+    margin-bottom: 2rem;
+    font-size: 2rem;
+    font-weight: 700;
+}
+
+.sets-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+    gap: 1.5rem;
+    padding-bottom: 2rem;
+}
+
+.set-card {
+    background-color: var(--card-background);
+    border-radius: 12px;
+    padding: 1rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease-in-out;
+    border: 1px solid var(--border-color);
+}
+
+.set-card:hover {
+    transform: translateY(-5px);
+    border-color: var(--primary-color);
+}
+
+.set-card__title {
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+    color: var(--text-color);
+}
+
+.set-card__details {
+    font-size: 0.85rem;
+    color: var(--subtle-text);
+    margin-top: -0.75rem;
+    margin-bottom: 1rem;
+}
+
+.set-card iframe {
+    border-radius: 8px;
 }
 
 /* --- Seção Eventos da Semana --- */
@@ -1254,4 +1335,20 @@ a {
     .modal-separator {
         margin: 1rem 0;
     }
+
+    .main-nav {
+        margin-top: 1rem;
+        flex-direction: column;
+        gap: 0;
+    }
+
+    .nav-btn {
+        padding: 0.75rem 0;
+        text-align: left;
+    }
+
+    .sets-grid {
+        grid-template-columns: 1fr;
+    }
+
 }

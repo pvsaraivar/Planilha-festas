@@ -17,6 +17,8 @@ document.addEventListener('DOMContentLoaded', () => {
     setupContactModal();
     setupBackToTopButton();
     setupThemeToggle();
+    setupNavigation(); 
+    setupSetsFeature(); // Configura a aba de sets (carregamento e busca)
 });
 
 /**
@@ -98,6 +100,197 @@ const eventImageMap = {
     'dark club de natal': 'assets/darkclubnatal.PNG',
     'boiler fuzz': 'assets/boilerfuzz.PNG'
 
+}
+
+/**
+ * Renderiza a lista de sets na seção de sets.
+ * @param {Array<Object>} sets - O array de sets a ser renderizado.
+ */
+function renderSets(sets) {
+    const grid = document.getElementById('sets-grid');
+    if (!grid) {
+        console.error('Container da grade de sets não encontrado.');
+        return;
+    }
+
+    if (sets.length === 0) {
+        grid.innerHTML = '<p class="empty-grid-message">Nenhum set encontrado.</p>';
+        return;
+    }
+
+    const setsHtml = sets.map(set => {
+        const playerHtml = `<iframe width="100%" height="315" src="${set.embedUrl}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
+
+        return `
+            <div class="set-card">
+                <h3 class="set-card__title">${set.title}</h3>
+                <p class="set-card__details">Produtora: ${set.produtora} &bull; Artista: ${set.artist}</p>
+                ${playerHtml}
+            </div>
+        `;
+    }).join('');
+
+    grid.innerHTML = setsHtml;
+}
+function setupNavigation() {
+    const navEventsBtn = document.getElementById('nav-events-btn');
+    const navSetsBtn = document.getElementById('nav-sets-btn');
+    const eventsContent = document.querySelector('.main-content'); // Container principal dos eventos
+    const setsSection = document.getElementById('sets-section');
+    const weeklySection = document.getElementById('weekly-events-section');
+    const filtersWrapper = document.querySelector('.filters-wrapper');
+    const setsFiltersWrapper = document.getElementById('sets-filters-wrapper');
+
+    if (!navEventsBtn || !navSetsBtn || !eventsContent || !setsSection || !weeklySection || !filtersWrapper || !setsFiltersWrapper) {
+        console.warn('Elementos de navegação ou filtros não encontrados. A troca de abas não funcionará completamente.');
+        return;
+    }
+
+    navEventsBtn.addEventListener('click', () => {
+        eventsContent.style.display = 'block';
+        filtersWrapper.style.display = 'flex'; // Mostra os filtros de eventos
+        setsFiltersWrapper.style.display = 'none'; // Esconde os filtros de sets
+
+        // Mostra a seção de eventos da semana apenas se nenhum filtro estiver ativo
+        const anyFilterActive = document.getElementById('clear-all-filters-btn').hidden === false;
+        if (!anyFilterActive) {
+            weeklySection.style.display = 'block';
+        }
+        setsSection.style.display = 'none';
+        
+        navEventsBtn.classList.add('is-active');
+        navSetsBtn.classList.remove('is-active');
+    });
+
+    navSetsBtn.addEventListener('click', () => {
+        eventsContent.style.display = 'none';        
+        filtersWrapper.style.display = 'none'; // Esconde os filtros de eventos
+        setsFiltersWrapper.style.display = 'flex'; // Mostra os filtros de sets
+        weeklySection.style.display = 'none'; // Oculta os eventos da semana
+        setsSection.style.display = 'block';
+        navSetsBtn.classList.add('is-active');
+        navEventsBtn.classList.remove('is-active');
+
+        // O carregamento dos sets é disparado em setupSetsFeature
+    });
+}
+
+/**
+ * Configura a aba de "Sets Gravados", incluindo o carregamento dos dados e a funcionalidade de busca.
+ */
+function setupSetsFeature() {
+    // URL da nova aba da planilha. Substitua pela URL correta quando a tiver.
+    const setsSheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQSJHdHpGeR9FMMOt1ZwPmxu7bcWZSoxV1igHKduAYtReCgn3VqJeVJwrWkCg9amHWYa3gn1WCGvIup/pub?gid=566530562&single=true&output=csv'; // <-- COLE A URL DA SUA PLANILHA DE SETS AQUI
+
+    const searchInput = document.getElementById('sets-search-input');
+    const clearBtn = document.getElementById('clear-sets-search-btn');
+    const loader = document.getElementById('sets-search-loader');
+    const grid = document.getElementById('sets-grid');
+    let debounceTimer;
+    let allSets = []; // Armazena todos os sets carregados da planilha
+
+    if (!searchInput || !clearBtn || !loader || !grid) {
+        console.warn('Elementos da seção de sets não encontrados. A funcionalidade estará desativada.');
+        return;
+    }
+
+    /**
+     * Extrai o ID de um vídeo do YouTube de várias URLs possíveis.
+     * @param {string} url - A URL do YouTube.
+     * @returns {string|null} O ID do vídeo ou null se não for encontrado.
+     */
+    function getYouTubeID(url) {
+        if (!url) return null;
+        const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+        const match = url.match(regExp);
+        return (match && match[2].length === 11) ? match[2] : null;
+    }
+
+    /**
+     * Carrega e processa os sets da planilha.
+     */
+    async function loadSets() {
+        if (!setsSheetUrl) {
+            grid.innerHTML = '<p class="empty-grid-message">A URL da planilha de sets não foi configurada.</p>';
+            return;
+        }
+
+        try {
+            const response = await fetch(setsSheetUrl);
+            if (!response.ok) throw new Error(`Falha ao carregar a planilha de sets (Status: ${response.status})`);
+            
+            const csvText = await response.text();
+            const lines = csvText.trim().split(/\r?\n/);
+            if (lines.length < 2) return;
+            
+            // A primeira linha contém os cabeçalhos: "Nome do Set", "Produtora A", "Produtora B", ...
+            const headers = lines.shift().split(','); 
+            const tempSets = [];
+
+            for (let i = 0; i < lines.length; i++) {
+                const row = lines[i].split(',');
+                const setNameRaw = row[0] || ''; // O nome do set (Artista - Título) está na primeira coluna
+
+                // Itera a partir da segunda coluna, que contém os links sob as produtoras
+                for (let j = 1; j < headers.length; j++) {
+                    const link = row[j] ? row[j].trim() : null;
+                    if (link && setNameRaw) { // Garante que só processe se houver um link e um nome de set na linha
+                        const videoId = getYouTubeID(link);
+                        if (videoId) {
+                            // CORREÇÃO: Usa o nome do set da planilha (setNameRaw) em vez do título do documento
+                            const [artist = 'Artista Desconhecido', title = 'Set sem nome'] = setNameRaw.split(' - ');
+                            tempSets.push({
+                                title: title.trim(),
+                                artist: artist.trim(),
+                                produtora: headers[j].trim(),
+                                embedUrl: `https://www.youtube-nocookie.com/embed/${videoId}`
+                            });
+                        }
+                    }
+                }
+            }
+            allSets = tempSets;
+            renderSets(allSets);
+
+        } catch (error) {
+            console.error("Falha ao carregar ou processar os sets:", error);
+            grid.innerHTML = `<p class="empty-grid-message" style="color: red;">Ocorreu um erro ao carregar os sets.</p>`;
+        }
+    }
+
+    /**
+     * Aplica o filtro de busca aos sets.
+     */
+    function applySetFilter() {
+        const searchTerm = searchInput.value.toLowerCase().trim();
+        clearBtn.hidden = !searchTerm;
+
+        const filteredSets = allSets.filter(set => {
+            const title = set.title.toLowerCase();
+            const artist = set.artist.toLowerCase();
+            const produtora = set.produtora.toLowerCase();
+            return title.includes(searchTerm) || artist.includes(searchTerm) || produtora.includes(searchTerm);
+        });
+
+        renderSets(filteredSets);
+    }
+
+    // Listeners
+    searchInput.addEventListener('input', () => {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(applySetFilter, 300);
+    });
+
+    clearBtn.addEventListener('click', () => {
+        searchInput.value = '';
+        applySetFilter();
+        searchInput.focus();
+    });
+
+    // Carrega os sets na primeira vez que a aba é aberta
+    document.getElementById('nav-sets-btn').addEventListener('click', () => {
+        if (allSets.length === 0) loadSets();
+    }, { once: true }); // O listener é removido após o primeiro clique
 }
 
 /**

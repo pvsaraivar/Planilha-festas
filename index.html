@@ -37,9 +37,13 @@
                     <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
                 </button>
             </div>
+            <nav class="main-nav">
+                <button id="nav-events-btn" class="nav-btn is-active">Eventos</button>
+                <button id="nav-sets-btn" class="nav-btn">Sets gravados</button>
+            </nav>
             <div class="filters-wrapper">
                 <div class="search-container">
-                    <input type="text" id="search-input" placeholder="Buscar por festa ou local"><span id="search-loader" class="search-loader" hidden></span><button id="clear-search-btn" class="clear-search-btn" hidden>&times;</button>
+                    <input type="text" id="search-input" placeholder="Buscar por festa, local ou atração"><span id="search-loader" class="search-loader" hidden></span><button id="clear-search-btn" class="clear-search-btn" hidden>&times;</button>
                 </div>
 
                 <div class="date-filter-container">
@@ -65,6 +69,13 @@
                     <span>Copiar link</span>
                 </button>
             </div>
+            <div id="sets-filters-wrapper" class="filters-wrapper" style="display: none;">
+                <div class="search-container">
+                    <div class="sets-search-container">
+                        <input type="text" id="sets-search-input" class="search-input" placeholder="Buscar por set, produtora ou artista"><span id="sets-search-loader" class="search-loader" hidden></span><button id="clear-sets-search-btn" class="clear-search-btn" hidden>&times;</button>
+                    </div>
+                </div>
+            </div>
         </div>
     </header>
 
@@ -72,10 +83,17 @@
         <!-- O conteúdo dos eventos da semana será injetado aqui pelo script.js -->
     </section>
 
-    <main id="event-grid" class="container">
-        <p>Carregando festas...</p>
-    </main>
+    <div class="main-content">
+        <main id="event-grid" class="container">
+            <p>Carregando festas...</p>
+        </main>
+    </div>
 
+    <section id="sets-section" class="container" style="display: none;">
+        <div id="sets-grid" class="sets-grid">
+            <!-- Os sets serão inseridos aqui pelo JavaScript -->
+        </div>
+    </section>
     <div id="modal-overlay" class="modal-overlay">
         <div id="modal" class="modal">
             <button id="modal-close-btn" class="modal-close-btn">&times;</button>
