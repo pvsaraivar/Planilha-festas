@@ -95,7 +95,8 @@ const eventImageMap = {
     'abstracto sessions': 'assets/abstractosessions.PNG',
     'argel e firma': 'assets/argelefirma.PNG',
     'sunset trance': 'assets/sunsettrance1.PNG',
-    'dark club de natal': 'assets/darkclubnatal.PNG'
+    'dark club de natal': 'assets/darkclubnatal.PNG',
+    'boiler fuzz': 'assets/boilerfuzz.PNG'
 
 }
 
