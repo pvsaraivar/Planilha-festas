@@ -501,6 +501,7 @@ a {
     background-color: transparent;
     border-radius: var(--border-radius);
     padding: 1rem;
+    padding: 0.5rem 1rem 1rem;
     box-shadow: var(--shadow);
     transition: transform 0.2s ease-in-out, border-color 0.2s ease-in-out, background-color 0.2s ease-in-out;
     border: 1px solid var(--border-color);
@@ -515,6 +516,7 @@ a {
 
 .set-card__title {
     font-size: 1.2rem;
+    margin-top: 0;
     margin-bottom: 1rem;
     color: var(--text-color);
 }
