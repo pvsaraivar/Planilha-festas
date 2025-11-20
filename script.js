@@ -287,10 +287,11 @@ function setupSetsFeature() {
         searchInput.focus();
     });
 
-    // Carrega os sets na primeira vez que a aba é aberta
-    document.getElementById('nav-sets-btn').addEventListener('click', () => {
-        if (allSets.length === 0) loadSets();
-    }, { once: true }); // O listener é removido após o primeiro clique
+    // Otimização: Carrega os sets em segundo plano assim que a página é iniciada,
+    // em vez de esperar o clique na aba. Isso torna a exibição instantânea.
+    if (allSets.length === 0) {
+        loadSets();
+    }
 }
 
 /**
