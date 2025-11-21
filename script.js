@@ -185,7 +185,11 @@ function setupNavigation() {
         navEventsBtn.classList.remove('is-active');
         navProducersBtn.classList.remove('is-active');
 
-        // O carregamento dos sets é disparado em setupSetsFeature
+        // Carrega os sets apenas na primeira vez que a aba é clicada.
+        // A verificação `allSets.length === 0` previne recarregamentos desnecessários.
+        if (typeof loadSets === 'function' && window.allSets.length === 0) {
+            loadSets();
+        }
     });
 
     navProducersBtn.addEventListener('click', () => {
@@ -216,13 +220,7 @@ function setupSetsFeature() {
     const loader = document.getElementById('sets-search-loader');
     const grid = document.getElementById('sets-grid');
     let debounceTimer;
-    let allSets = []; // Armazena todos os sets carregados da planilha
-
-    if (!searchInput || !clearBtn || !loader || !grid) {
-        console.warn('Elementos da seção de sets não encontrados. A funcionalidade estará desativada.');
-        return;
-    }
-
+    
     /**
      * Extrai o ID de um vídeo do YouTube de várias URLs possíveis.
      * @param {string} url - A URL do YouTube.
@@ -235,15 +233,19 @@ function setupSetsFeature() {
         return (match && match[2].length === 11) ? match[2] : null;
     }
 
-    /**
-     * Carrega e processa os sets da planilha.
-     */
-    async function loadSets() {
+    // Expõe `allSets` e `loadSets` globalmente para que a navegação possa acessá-los.
+    window.allSets = []; 
+    window.loadSets = async function() {
+
+    if (!searchInput || !clearBtn || !loader || !grid) {
+        console.warn('Elementos da seção de sets não encontrados. A funcionalidade estará desativada.');
+        return;
+    }
+
         if (!setsSheetUrl) {
             grid.innerHTML = '<p class="empty-grid-message">A URL da planilha de sets não foi configurada.</p>';
             return;
         }
-
         try {
             const response = await fetch(setsSheetUrl);
             if (!response.ok) throw new Error(`Falha ao carregar a planilha de sets (Status: ${response.status})`);
@@ -283,7 +285,7 @@ function setupSetsFeature() {
                 }
             });
 
-            allSets = tempSets;
+            window.allSets = tempSets;
             renderSets(allSets);
 
         } catch (error) {
@@ -299,7 +301,7 @@ function setupSetsFeature() {
         const searchTerm = searchInput.value.toLowerCase().trim();
         clearBtn.hidden = !searchTerm;
 
-        const filteredSets = allSets.filter(set => {
+        const filteredSets = window.allSets.filter(set => {
             const setName = set.setName.toLowerCase();
             const artist = set.artist.toLowerCase();
             const produtora = set.produtora.toLowerCase();
@@ -320,12 +322,6 @@ function setupSetsFeature() {
         applySetFilter();
         searchInput.focus();
     });
-
-    // Otimização: Carrega os sets em segundo plano assim que a página é iniciada,
-    // em vez de esperar o clique na aba. Isso torna a exibição instantânea.
-    if (allSets.length === 0) {
-        loadSets();
-    }
 }
 
 /**
