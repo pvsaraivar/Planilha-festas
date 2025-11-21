@@ -209,7 +209,7 @@ function setupNavigation() {
  * Configura a aba de "Sets Gravados", incluindo o carregamento dos dados e a funcionalidade de busca.
  */
 function setupSetsFeature() {
-    const setsSheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQSJHdHpGeR9FMMOt1ZwPmxu7bcWZSoxV1igHKduAYtReCgn3VqJeVJwrWkCg9amHWYa3gn1WCGvIup/pub?gid=49414-7666&single=true&output=csv';
+    const setsSheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQSJHdHpGeR9FMMOt1ZwPmxu7bcWZSoxV1igHKduAYtReCgn3VqJeVJwrWkCg9amHWYa3gn1WCGvIup/pub?gid=494147666&single=true&output=csv';
 
     const searchInput = document.getElementById('sets-search-input');
     const clearBtn = document.getElementById('clear-sets-search-btn');
