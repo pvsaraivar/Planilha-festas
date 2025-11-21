@@ -123,11 +123,11 @@ function renderSets(sets) {
     }
 
     const setsHtml = sets.map(set => {
-        const playerHtml = `<iframe width="100%" height="315" src="${set.embedUrl}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
+        const playerHtml = `<iframe width="100%" height="315" src="${set.embedUrl}" title="YouTube video player for ${set.setName}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
 
         return `
             <div class="set-card">
-                <h3 class="set-card__title">${set.title}</h3>
+                <h3 class="set-card__title">${set.setName}</h3>
                 <p class="set-card__details">Produtora: ${set.produtora} &bull; Artista: ${set.artist}</p>
                 ${playerHtml}
             </div>
@@ -249,28 +249,27 @@ function setupSetsFeature() {
             const response = await fetch(setsSheetUrl);
             if (!response.ok) throw new Error(`Falha ao carregar a planilha de sets (Status: ${response.status})`);
             
+            // Lógica de processamento de CSV aprimorada
             const csvText = await response.text();
-            const lines = csvText.trim().split(/\r?\n/);
-            if (lines.length < 2) return;
-            
-            // A primeira linha contém os cabeçalhos: "Nome do Set", "Produtora A", "Produtora B", ...
-            const headers = lines.shift().split(','); 
+            const parsedData = parseCSV(csvText); // Usa a função parseCSV robusta
+            if (parsedData.length === 0) return;
+
+            const headers = Object.keys(parsedData[0]);
             const tempSets = [];
 
-            for (let i = 0; i < lines.length; i++) {
-                const row = lines[i].split(',');
-                const setNameRaw = row[0] || ''; // O nome do set (Artista - Título) está na primeira coluna
+            parsedData.forEach(row => {
+                const setNameRaw = getProp(row, 'Nome do Set') || '';
 
-                // Itera a partir da segunda coluna, que contém os links sob as produtoras
                 for (let j = 1; j < headers.length; j++) {
-                    const link = row[j] ? row[j].trim() : null;
-                    if (link && setNameRaw) { // Garante que só processe se houver um link e um nome de set na linha
+                    const produtoraName = headers[j];
+                    const link = getProp(row, produtoraName);
+
+                    if (link && setNameRaw) {
                         const videoId = getYouTubeID(link);
                         if (videoId) {
-                            // CORREÇÃO: Usa o nome do set da planilha (setNameRaw) em vez do título do documento
-                            const [artist = 'Artista Desconhecido', title = 'Set sem nome'] = setNameRaw.split(' - ');
+                            const [artist = 'Artista Desconhecido'] = setNameRaw.split(' - ');
                             tempSets.push({
-                                title: title.trim(),
+                                setName: setNameRaw.trim(),
                                 artist: artist.trim(),
                                 produtora: headers[j].trim(),
                                 embedUrl: `https://www.youtube-nocookie.com/embed/${videoId}`
@@ -278,7 +277,7 @@ function setupSetsFeature() {
                         }
                     }
                 }
-            }
+            });
             allSets = tempSets;
             renderSets(allSets);
 
@@ -296,10 +295,10 @@ function setupSetsFeature() {
         clearBtn.hidden = !searchTerm;
 
         const filteredSets = allSets.filter(set => {
-            const title = set.title.toLowerCase();
+            const setName = set.setName.toLowerCase();
             const artist = set.artist.toLowerCase();
             const produtora = set.produtora.toLowerCase();
-            return title.includes(searchTerm) || artist.includes(searchTerm) || produtora.includes(searchTerm);
+            return setName.includes(searchTerm) || artist.includes(searchTerm) || produtora.includes(searchTerm);
         });
 
         renderSets(filteredSets);
