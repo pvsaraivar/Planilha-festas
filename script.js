@@ -99,7 +99,8 @@ const eventImageMap = {
     'sunset trance': 'assets/sunsettrance1.PNG',
     'dark club de natal': 'assets/darkclubnatal.PNG',
     'boiler fuzz': 'assets/boilerfuzz.PNG',
-    'radar feat bateu': 'assets/bateuradar.PNG'
+    'radar feat bateu': 'assets/bateuradar.PNG',
+    'gasguita feroz':  'assets/gasguitaferoz.PNG'
 
 }
 
