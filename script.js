@@ -251,27 +251,37 @@ function setupSetsFeature() {
             
             // Lógica de processamento de CSV aprimorada
             const csvText = await response.text();
-            const parsedData = parseCSV(csvText); // Usa a função parseCSV robusta
-            if (parsedData.length === 0) return;
+            const lines = csvText.trim().split(/\r?\n/);
+            if (lines.length < 2) return; // Precisa de cabeçalho e pelo menos uma linha de dados
 
-            const headers = Object.keys(parsedData[0]);
+            // Extrai os cabeçalhos da primeira linha para garantir a ordem correta das colunas.
+            const headerLine = lines.shift();
+            const headerRegex = /(?:"([^"]*(?:""[^"]*)*)"|([^,]+))(?:,|$)/g;
+            const headers = [];
+            let match;
+            while (match = headerRegex.exec(headerLine)) {
+                headers.push((match[1] ? match[1].replace(/""/g, '"') : match[2]).trim());
+            }
+
+            // Processa o restante das linhas usando a função parseCSV
+            const parsedData = parseCSV(lines.join('\n'));
             const tempSets = [];
 
             parsedData.forEach(row => {
                 const setNameRaw = getProp(row, 'Nome do Set') || '';
 
+                // Itera sobre os cabeçalhos para encontrar os links das produtoras
                 for (let j = 1; j < headers.length; j++) {
                     const produtoraName = headers[j];
                     const link = getProp(row, produtoraName);
 
-                    if (link && setNameRaw) {
+                    if (link && setNameRaw) { // Garante que só processe se houver um link e um nome de set
                         const videoId = getYouTubeID(link);
                         if (videoId) {
-                            const [artist = 'Artista Desconhecido'] = setNameRaw.split(' - ');
                             tempSets.push({
                                 setName: setNameRaw.trim(),
-                                artist: artist.trim(),
-                                produtora: headers[j].trim(),
+                                artist: (setNameRaw.split(' - ')[0] || 'Artista Desconhecido').trim(),
+                                produtora: produtoraName,
                                 embedUrl: `https://www.youtube-nocookie.com/embed/${videoId}`
                             });
                         }
