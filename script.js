@@ -18,6 +18,7 @@ document.addEventListener('DOMContentLoaded', () => {
     setupBackToTopButton();
     setupThemeToggle();
     setupNavigation(); 
+    setupProducersFeature(); // Configura a aba de produtoras
     setupSetsFeature(); // Configura a aba de sets (carregamento e busca)
 });
 
@@ -138,13 +139,16 @@ function renderSets(sets) {
 function setupNavigation() {
     const navEventsBtn = document.getElementById('nav-events-btn');
     const navSetsBtn = document.getElementById('nav-sets-btn');
+    const navProducersBtn = document.getElementById('nav-producers-btn'); // Novo botão
     const eventsContent = document.querySelector('.main-content'); // Container principal dos eventos
     const setsSection = document.getElementById('sets-section');
+    const producersSection = document.getElementById('producers-section'); // Nova seção
     const weeklySection = document.getElementById('weekly-events-section');
     const filtersWrapper = document.querySelector('.filters-wrapper');
     const setsFiltersWrapper = document.getElementById('sets-filters-wrapper');
+    const producersFiltersWrapper = document.getElementById('producers-filters-wrapper'); // Novo filtro
 
-    if (!navEventsBtn || !navSetsBtn || !eventsContent || !setsSection || !weeklySection || !filtersWrapper || !setsFiltersWrapper) {
+    if (!navEventsBtn || !navSetsBtn || !navProducersBtn || !eventsContent || !setsSection || !producersSection || !weeklySection || !filtersWrapper || !setsFiltersWrapper || !producersFiltersWrapper) {
         console.warn('Elementos de navegação ou filtros não encontrados. A troca de abas não funcionará completamente.');
         return;
     }
@@ -153,6 +157,7 @@ function setupNavigation() {
         eventsContent.style.display = 'block';
         filtersWrapper.style.display = 'flex'; // Mostra os filtros de eventos
         setsFiltersWrapper.style.display = 'none'; // Esconde os filtros de sets
+        producersFiltersWrapper.style.display = 'none'; // Esconde os filtros de produtoras
 
         // Mostra a seção de eventos da semana apenas se nenhum filtro estiver ativo
         const anyFilterActive = document.getElementById('clear-all-filters-btn').hidden === false;
@@ -160,21 +165,43 @@ function setupNavigation() {
             weeklySection.style.display = 'block';
         }
         setsSection.style.display = 'none';
+        producersSection.style.display = 'none';
         
         navEventsBtn.classList.add('is-active');
         navSetsBtn.classList.remove('is-active');
+        navProducersBtn.classList.remove('is-active');
     });
 
     navSetsBtn.addEventListener('click', () => {
         eventsContent.style.display = 'none';        
         filtersWrapper.style.display = 'none'; // Esconde os filtros de eventos
         setsFiltersWrapper.style.display = 'flex'; // Mostra os filtros de sets
+        producersFiltersWrapper.style.display = 'none'; // Esconde os filtros de produtoras
         weeklySection.style.display = 'none'; // Oculta os eventos da semana
         setsSection.style.display = 'block';
+        producersSection.style.display = 'none';
+
         navSetsBtn.classList.add('is-active');
         navEventsBtn.classList.remove('is-active');
+        navProducersBtn.classList.remove('is-active');
 
         // O carregamento dos sets é disparado em setupSetsFeature
+    });
+
+    navProducersBtn.addEventListener('click', () => {
+        eventsContent.style.display = 'none';
+        filtersWrapper.style.display = 'none'; // Esconde os filtros de eventos
+        setsFiltersWrapper.style.display = 'none'; // Esconde os filtros de sets
+        producersFiltersWrapper.style.display = 'flex'; // Mostra os filtros de produtoras
+        weeklySection.style.display = 'none'; // Oculta os eventos da semana
+        setsSection.style.display = 'none';
+        producersSection.style.display = 'block';
+
+        navProducersBtn.classList.add('is-active');
+        navEventsBtn.classList.remove('is-active');
+        navSetsBtn.classList.remove('is-active');
+
+        // O carregamento das produtoras é disparado em setupProducersFeature
     });
 }
 
@@ -295,6 +322,133 @@ function setupSetsFeature() {
     if (allSets.length === 0) {
         loadSets();
     }
+}
+
+/**
+ * Configura a aba de "Produtoras", incluindo o carregamento dos dados e a funcionalidade de busca.
+ */
+function setupProducersFeature() {
+    // IMPORTANTE: Crie uma nova aba na sua planilha para as produtoras e cole a URL de publicação CSV aqui.
+    // Colunas esperadas: Nome, Logo (URL), Instagram (URL)
+    const producersSheetUrl = ''; // <-- COLE A URL DA SUA PLANILHA DE PRODUTORAS AQUI
+
+    const searchInput = document.getElementById('producers-search-input');
+    const clearBtn = document.getElementById('clear-producers-search-btn');
+    const grid = document.getElementById('producers-grid');
+    let debounceTimer;
+    let allProducers = [];
+
+    if (!searchInput || !clearBtn || !grid) {
+        console.warn('Elementos da seção de produtoras não encontrados. A funcionalidade estará desativada.');
+        return;
+    }
+
+    /**
+     * Carrega e processa as produtoras da planilha.
+     */
+    async function loadProducers() {
+        if (!producersSheetUrl) {
+            grid.innerHTML = '<p class="empty-grid-message">A URL da planilha de produtoras não foi configurada.</p>';
+            return;
+        }
+
+        showSkeletonLoader(grid, 6);
+
+        try {
+            const response = await fetch(producersSheetUrl);
+            if (!response.ok) throw new Error(`Falha ao carregar a planilha de produtoras (Status: ${response.status})`);
+
+            const csvText = await response.text();
+            allProducers = parseCSV(csvText).map(producer => ({
+                name: getProp(producer, 'Nome') || 'Produtora Desconhecida',
+                logoUrl: getProp(producer, 'Logo (URL)'),
+                instagramUrl: getProp(producer, 'Instagram (URL)')
+            })).sort((a, b) => a.name.localeCompare(b.name)); // Ordena por nome
+            
+            renderProducers(allProducers);
+
+        } catch (error) {
+            console.error("Falha ao carregar ou processar as produtoras:", error);
+            grid.innerHTML = `<p class="empty-grid-message" style="color: red;">Ocorreu um erro ao carregar as produtoras.</p>`;
+        }
+    }
+
+    /**
+     * Renderiza a lista de produtoras na grade.
+     * @param {Array<Object>} producers - O array de produtoras a ser renderizado.
+     */
+    function renderProducers(producers) {
+        if (!grid) return;
+
+        if (producers.length === 0) {
+            grid.innerHTML = '<p class="empty-grid-message">Nenhuma produtora encontrada.</p>';
+            return;
+        }
+
+        const instagramIconSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>`;
+        const placeholderSvg = "data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 300'%3e%3crect width='100%25' height='100%25' fill='%23e9ecef'/%3e%3ctext x='50%25' y='50%25' fill='%236c757d' font-size='20' text-anchor='middle' dominant-baseline='middle'%3eLogo%3c/text%3e%3c/svg%3e";
+
+        const producersHtml = producers.map(producer => `
+            <article class="event-card" data-producer-name="${producer.name}" style="cursor: pointer;" title="Ver eventos de ${producer.name}">
+                <img src="${producer.logoUrl || placeholderSvg}" alt="Logo de ${producer.name}" class="event-card__image" loading="lazy">
+                <div class="event-card__info">
+                    <h2 class="event-card__name">${producer.name}</h2>
+                </div>
+                <div class="event-card__footer">
+                    ${producer.instagramUrl ? `
+                        <a href="${producer.instagramUrl}" target="_blank" rel="noopener noreferrer" class="event-card__tickets-btn" onclick="event.stopPropagation(); trackGAEvent('click_instagram', { producer_name: '${producer.name.replace(/'/g, "\\'")}' });">
+                            ${instagramIconSvg} Instagram
+                        </a>
+                    ` : ''}
+                </div>
+            </article>
+        `).join('');
+ 
+        grid.innerHTML = producersHtml;
+
+        // Adiciona o listener de clique para cada card de produtora
+        grid.querySelectorAll('.event-card').forEach(card => {
+            card.addEventListener('click', (e) => {
+                // Impede que o clique no link do Instagram propague para o card
+                if (e.target.closest('a')) return;
+
+                const producerName = card.dataset.producerName;
+                if (!producerName) return;
+
+                // 1. Muda para a aba de eventos
+                document.getElementById('nav-events-btn').click();
+
+                // 2. Preenche o campo de busca e dispara o filtro
+                const searchInput = document.getElementById('search-input');
+                searchInput.value = producerName;
+                searchInput.dispatchEvent(new Event('input', { bubbles: true }));
+            });
+        });
+    }
+
+    function applyProducerFilter() {
+        const searchTerm = searchInput.value.toLowerCase().trim();
+        clearBtn.hidden = !searchTerm;
+
+        const filteredProducers = allProducers.filter(producer => 
+            producer.name.toLowerCase().includes(searchTerm)
+        );
+
+        renderProducers(filteredProducers);
+    }
+
+    searchInput.addEventListener('input', () => {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(applyProducerFilter, 300);
+    });
+
+    clearBtn.addEventListener('click', () => {
+        searchInput.value = '';
+        applyProducerFilter();
+        searchInput.focus();
+    });
+
+    loadProducers();
 }
 
 /**
@@ -715,8 +869,9 @@ function setupFilters() {
             filteredEvents = filteredEvents.filter(event => {
                 const name = (getProp(event, 'Evento') || getProp(event, 'Nome') || '').toLowerCase();
                 const location = (getProp(event, 'Local') || '').toLowerCase();
+                const producer = (getProp(event, 'Produtora') || '').toLowerCase(); // Adicionado
                 const attractions = (getProp(event, 'Atrações') || '').toLowerCase();
-                return name.includes(searchTerm) || location.includes(searchTerm) || attractions.includes(searchTerm);
+                return name.includes(searchTerm) || location.includes(searchTerm) || attractions.includes(searchTerm) || producer.includes(searchTerm);
             });
         }
 
