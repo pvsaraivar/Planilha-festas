@@ -248,33 +248,27 @@ function setupSetsFeature() {
             const response = await fetch(setsSheetUrl);
             if (!response.ok) throw new Error(`Falha ao carregar a planilha de sets (Status: ${response.status})`);
             
-            // Lógica de processamento de CSV aprimorada
             const csvText = await response.text();
-            const lines = csvText.trim().split(/\r?\n/);
-            if (lines.length < 2) return; // Precisa de cabeçalho e pelo menos uma linha de dados
-
-            // Extrai os cabeçalhos da primeira linha para garantir a ordem correta das colunas.
-            const headerLine = lines.shift();
-            const headerRegex = /(?:"([^"]*(?:""[^"]*)*)"|([^,]+))(?:,|$)/g;
-            const headers = [];
-            let match;
-            while (match = headerRegex.exec(headerLine)) {
-                headers.push((match[1] ? match[1].replace(/""/g, '"') : match[2]).trim());
+            const parsedData = parseCSV(csvText);
+            if (parsedData.length === 0) {
+                renderSets([]); // Renderiza a mensagem de "Nenhum set encontrado"
+                return;
             }
 
-            // Processa o restante das linhas usando a função parseCSV
-            const parsedData = parseCSV(lines.join('\n'));
+            // A primeira linha de dados define as colunas. `parseCSV` já nos deu objetos com as chaves corretas.
+            const headers = Object.keys(parsedData[0]);
             const tempSets = [];
 
             parsedData.forEach(row => {
                 const setNameRaw = getProp(row, 'Nome do Set') || '';
 
                 // Itera sobre os cabeçalhos para encontrar os links das produtoras
+                // Começa em j=1 para pular a coluna "Nome do Set"
                 for (let j = 1; j < headers.length; j++) {
                     const produtoraName = headers[j];
                     const link = getProp(row, produtoraName);
 
-                    if (link && setNameRaw) { // Garante que só processe se houver um link e um nome de set
+                    if (link && setNameRaw) {
                         const videoId = getYouTubeID(link);
                         if (videoId) {
                             tempSets.push({
