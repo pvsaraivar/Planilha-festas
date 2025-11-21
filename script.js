@@ -557,34 +557,34 @@ function applyFiltersFromURL() {
  * @returns {Array<Object>} Um array de objetos, onde cada objeto representa um evento.
  */
 function parseCSV(text) {
-    // Divide as linhas tratando tanto \n (Unix) quanto \r\n (Windows)
     const lines = text.trim().split(/\r?\n/);
     if (lines.length < 2) return [];
 
     let headerLine = lines.shift();
-    // Remove o caractere BOM (Byte Order Mark) invisível que o Google Sheets pode adicionar.
     if (headerLine.charCodeAt(0) === 0xFEFF) {
         headerLine = headerLine.substring(1);
     }
-    // Normaliza os cabeçalhos: remove espaços e aspas no início/fim.
-    const headers = headerLine.split(',').map(h => 
-        h.trim().replace(/^"|"$/g, '')
-    );    
-    // Regex aprimorada para evitar loops infinitos em linhas que terminam com vírgula.
-    const regex = /("([^"]*(""[^"]*)*)"|([^,]*))(,|$)/g;
+
+    // Regex para extrair cabeçalhos, lidando com cabeçalhos entre aspas que podem ter vírgulas.
+    const headerRegex = /(?:"([^"]*(?:""[^"]*)*)"|([^,]+))(?:,|$)/g;
+    const headers = [];
+    let match;
+    while (match = headerRegex.exec(headerLine)) {
+        headers.push(match[1] ? match[1].replace(/""/g, '"') : match[2]);
+    }
 
     return lines.map(line => {
-        if (line.trim() === '') return null; // Pula linhas completamente vazias
+        if (line.trim() === '') return null;
 
         const event = {};
         let headerIndex = 0;
-        let match;
-        // Redefine o índice da regex para cada nova linha
-        regex.lastIndex = 0;
+        // Regex para extrair valores da linha, similar à de cabeçalhos.
+        const valueRegex = /(?:"([^"]*(?:""[^"]*)*)"|([^,]*))(?:,|$)/g;
+        valueRegex.lastIndex = 0; // Reseta o índice da regex para cada linha.
 
-        while (match = regex.exec(line)) {
+        while (match = valueRegex.exec(line)) {
             if (headerIndex < headers.length) {
-                const value = match[2] !== undefined ? match[2].replace(/""/g, '"') : match[4];
+                const value = match[1] !== undefined ? match[1].replace(/""/g, '"') : match[2];
                 event[headers[headerIndex]] = value.trim();
             }
             headerIndex++;
