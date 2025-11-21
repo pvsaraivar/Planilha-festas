@@ -210,7 +210,7 @@ function setupNavigation() {
  */
 function setupSetsFeature() {
     // URL da nova aba da planilha. Substitua pela URL correta quando a tiver.
-    const setsSheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQSJHdHpGeR9FMMOt1ZwPmxu7bcWZSoxV1igHKduAYtReCgn3VqJeVJwrWkCg9amHWYa3gn1WCGvIup/pub?gid=566530562&single=true&output=csv'; // <-- COLE A URL DA SUA PLANILHA DE SETS AQUI
+    const setsSheetUrl = 'COLE_A_NOVA_URL_AQUI'; // <-- SUBSTITUA PELA NOVA URL GERADA PELA PLANILHA
 
     const searchInput = document.getElementById('sets-search-input');
     const clearBtn = document.getElementById('clear-sets-search-btn');
