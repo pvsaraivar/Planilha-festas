@@ -221,6 +221,12 @@ function setupSetsFeature() {
     const grid = document.getElementById('sets-grid');
     let debounceTimer;
     
+    // A verificação dos elementos deve ser feita aqui, no início da configuração.
+    if (!searchInput || !clearBtn || !loader || !grid) {
+        console.warn('Elementos da seção de sets não encontrados. A funcionalidade estará desativada.');
+        return;
+    }
+
     /**
      * Extrai o ID de um vídeo do YouTube de várias URLs possíveis.
      * @param {string} url - A URL do YouTube.
@@ -236,11 +242,6 @@ function setupSetsFeature() {
     // Expõe `allSets` e `loadSets` globalmente para que a navegação possa acessá-los.
     window.allSets = []; 
     window.loadSets = async function() {
-
-    if (!searchInput || !clearBtn || !loader || !grid) {
-        console.warn('Elementos da seção de sets não encontrados. A funcionalidade estará desativada.');
-        return;
-    }
 
         if (!setsSheetUrl) {
             grid.innerHTML = '<p class="empty-grid-message">A URL da planilha de sets não foi configurada.</p>';
