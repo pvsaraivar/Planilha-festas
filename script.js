@@ -248,39 +248,39 @@ function setupSetsFeature() {
             const response = await fetch(setsSheetUrl);
             if (!response.ok) throw new Error(`Falha ao carregar a planilha de sets (Status: ${response.status})`);
             
-            const csvText = await response.text();
-            const parsedData = parseCSV(csvText);
-            if (parsedData.length === 0) {
+            // Lógica de processamento de CSV simplificada e específica para os sets
+            const csvText = await response.text().then(text => text.trim());
+            const lines = csvText.split(/\r?\n/);
+
+            if (lines.length < 2) {
                 renderSets([]); // Renderiza a mensagem de "Nenhum set encontrado"
                 return;
             }
 
-            // A primeira linha de dados define as colunas. `parseCSV` já nos deu objetos com as chaves corretas.
-            const headers = Object.keys(parsedData[0]);
+            const headers = lines.shift().split(',');
             const tempSets = [];
 
-            parsedData.forEach(row => {
-                const setNameRaw = getProp(row, 'Nome do Set') || '';
+            lines.forEach(line => {
+                const columns = line.split(',');
+                const setNameRaw = columns[0] || '';
 
-                // Itera sobre os cabeçalhos para encontrar os links das produtoras
-                // Começa em j=1 para pular a coluna "Nome do Set"
+                // Itera sobre as colunas de produtoras (a partir da segunda coluna)
                 for (let j = 1; j < headers.length; j++) {
-                    const produtoraName = headers[j];
-                    const link = getProp(row, produtoraName);
-
-                    if (link && setNameRaw) {
+                    const link = columns[j] ? columns[j].trim() : null;
+                    if (link && setNameRaw) { // Garante que só processe se houver um link e um nome de set
                         const videoId = getYouTubeID(link);
                         if (videoId) {
                             tempSets.push({
                                 setName: setNameRaw.trim(),
                                 artist: (setNameRaw.split(' - ')[0] || 'Artista Desconhecido').trim(),
-                                produtora: produtoraName,
+                                produtora: headers[j].trim(),
                                 embedUrl: `https://www.youtube-nocookie.com/embed/${videoId}`
                             });
                         }
                     }
                 }
             });
+
             allSets = tempSets;
             renderSets(allSets);
 
