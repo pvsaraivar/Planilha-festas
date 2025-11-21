@@ -100,7 +100,8 @@ const eventImageMap = {
     'dark club de natal': 'assets/darkclubnatal.PNG',
     'boiler fuzz': 'assets/boilerfuzz.PNG',
     'radar feat bateu': 'assets/bateuradar.PNG',
-    'gasguita feroz':  'assets/gasguitaferoz.PNG'
+    'gasguita feroz':  'assets/gasguitaferoz.PNG',
+    'baile do ddzin convida baile do brota': 'assets/bailedoddzinbrota.jpg'
 
 }
 
