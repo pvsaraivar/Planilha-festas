@@ -580,15 +580,14 @@ function parseCSV(text) {
         let headerIndex = 0;
         // Regex para extrair valores da linha, similar à de cabeçalhos.
         const valueRegex = /(?:"([^"]*(?:""[^"]*)*)"|([^,]*))(?:,|$)/g;
+        valueRegex.lastIndex = 0; // Reseta o índice da regex para cada linha.
 
         // Itera sobre a linha para extrair cada valor de célula
-        while ((match = valueRegex.exec(line)) && headerIndex < headers.length) {
-            if (headerIndex < headers.length) {
-                const value = match[1] !== undefined ? match[1].replace(/""/g, '"') : match[2];
-                event[headers[headerIndex]] = value.trim();
-            }
+        while (headerIndex < headers.length) {
+            const match = valueRegex.exec(line);
+            const value = (match && match[1]) ? match[1].replace(/""/g, '"') : (match && match[2]) ? match[2] : '';
+            event[headers[headerIndex]] = value.trim();
             headerIndex++;
-            if (match[5] === '') break;
         }
         return event;
     }).filter(Boolean); // Filtra quaisquer linhas nulas (malformadas)
