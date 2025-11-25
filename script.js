@@ -102,7 +102,9 @@ const eventImageMap = {
     'boiler fuzz': 'assets/boilerfuzz.PNG',
     'radar feat bateu': 'assets/bateuradar.PNG',
     'gasguita feroz':  'assets/gasguitaferoz.PNG',
-    'baile do ddzin convida baile do brota': 'assets/bailedoddzinbrota.jpg'
+    'baile do ddzin convida baile do brota': 'assets/bailedoddzinbrota.jpg',
+    'clandestina': 'assets/clandestina.PNG'
+
 
 }
 
