@@ -286,7 +286,7 @@ function setupSetsFeature() {
             const dateMap = new Map();
             cacheData.forEach(row => {
                 const setName = getProp(row, 'SetName');
-                const publishedDate = getProp(row, 'Data de Publicação');
+                const publishedDate = getProp(row, 'publisheddate');
                 if (setName && publishedDate) {
                     dateMap.set(setName, publishedDate);
                 }
