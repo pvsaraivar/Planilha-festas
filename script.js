@@ -215,7 +215,8 @@ function setupNavigation() {
  * Configura a aba de "Sets Gravados", incluindo o carregamento dos dados e a funcionalidade de busca.
  */
 function setupSetsFeature() {
-    const setsSheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQSJHdHpGeR9FMMOt1ZwPmxu7bcWZSoxV1igHKduAYtReCgn3VqJeVJwrWkCg9amHWYa3gn1WCGvIup/pub?gid=494147666&single=true&output=csv';
+    // IMPORTANTE: Cole aqui a nova URL da aba "SetsPublicados" que você acabou de gerar.
+    const setsSheetUrl = 'COLE_AQUI_A_URL_QUE_VOCÊ_COPIOU_DA_ABA_SETSPUBLICADOS';
 
     const searchInput = document.getElementById('sets-search-input');
     const clearBtn = document.getElementById('clear-sets-search-btn');
@@ -253,42 +254,26 @@ function setupSetsFeature() {
             const response = await fetch(setsSheetUrl);
             if (!response.ok) throw new Error(`Falha ao carregar a planilha de sets (Status: ${response.status})`);
             
+            // A nova abordagem é muito mais simples: usamos a função parseCSV que já é robusta.
             const csvText = await response.text();
-            const parsedData = parseCSV(csvText); // Usa a função parseCSV robusta
+            const parsedData = parseCSV(csvText);
 
             if (parsedData.length === 0) {
                 renderSets([]); // Renderiza a mensagem de "Nenhum set encontrado"
                 return;
             }
 
-            // A primeira linha de dados define as colunas. `parseCSV` já nos deu objetos com as chaves corretas.
-            const headers = Object.keys(parsedData[0]);
-            const tempSets = [];
+            // Mapeia os dados já processados pelo Apps Script para o formato que o site precisa.
+            window.allSets = parsedData.map(row => {
+                const videoId = getYouTubeID(getProp(row, 'VideoURL'));
+                return {
+                    setName: getProp(row, 'SetName'),
+                    artist: getProp(row, 'Artist'),
+                    produtora: getProp(row, 'Produtora'),
+                    embedUrl: videoId ? `https://www.youtube-nocookie.com/embed/${videoId}` : null
+                };
+            }).filter(set => set.embedUrl); // Filtra sets que não conseguiram gerar um embedUrl
 
-            parsedData.forEach(row => {
-                const setNameRaw = getProp(row, 'Nome do Set') || '';
-
-                // Itera sobre os cabeçalhos para encontrar os links das produtoras
-                // Começa em j=1 para pular a coluna "Nome do Set"
-                for (let j = 1; j < headers.length; j++) {
-                    const produtoraName = headers[j];
-                    const link = getProp(row, produtoraName);
-
-                    if (link && setNameRaw) { // Garante que só processe se houver um link e um nome de set
-                        const videoId = getYouTubeID(link);
-                        if (videoId) {
-                            tempSets.push({
-                                setName: setNameRaw.trim(),
-                                artist: (setNameRaw.split(' - ')[0] || 'Artista Desconhecido').trim(),
-                                produtora: produtoraName,
-                                embedUrl: `https://www.youtube-nocookie.com/embed/${videoId}`
-                            });
-                        }
-                    }
-                }
-            });
-
-            window.allSets = tempSets;
             renderSets(allSets);
 
         } catch (error) {
