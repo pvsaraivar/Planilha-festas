@@ -233,13 +233,11 @@ function setupSetsFeature() {
     const clearBtn = document.getElementById('clear-sets-search-btn');
     const loader = document.getElementById('sets-search-loader');
     const grid = document.getElementById('sets-grid');
-    const sortByDateBtn = document.getElementById('sort-by-date-btn');
-    const sortByArtistBtn = document.getElementById('sort-by-artist-btn');
 
     let debounceTimer;
     
     // A verificação dos elementos deve ser feita aqui, no início da configuração.
-    if (!searchInput || !clearBtn || !loader || !grid || !sortByDateBtn || !sortByArtistBtn) {
+    if (!searchInput || !clearBtn || !loader || !grid) {
         console.warn('Elementos da seção de sets não encontrados. A funcionalidade estará desativada.');
         return;
     }
@@ -311,51 +309,23 @@ function setupSetsFeature() {
                     publishedDate: dateMap.get(setName) || null
                 };
             }).filter(set => set.embedUrl && !set.isShort); // Garante que apenas sets com vídeo válido e que não sejam Shorts sejam mostrados
+
+            // 4. Embaralha os sets para que não apareçam sempre na mesma ordem.
+            // Algoritmo de Fisher-Yates para um embaralhamento eficiente.
+            for (let i = window.allSets.length - 1; i > 0; i--) {
+                // Escolhe um índice aleatório antes do elemento atual
+                const j = Math.floor(Math.random() * (i + 1));
+                // Troca o elemento atual com o elemento do índice aleatório
+                [window.allSets[i], window.allSets[j]] = [window.allSets[j], window.allSets[i]];
+            }
             
-            sortAndRenderSets('date'); // 4. Ordena por data como padrão inicial
+            renderSets(window.allSets);
 
         } catch (error) {
             console.error("Falha ao carregar ou processar os sets:", error);
             grid.innerHTML = `<p class="empty-grid-message" style="color: red;">Ocorreu um erro ao carregar os sets.</p>`;
         }
     }
-
-    /**
-     * Ordena a lista global de sets e a renderiza novamente.
-     * @param {'date' | 'artist'} sortBy - O critério de ordenação.
-     */
-    function sortAndRenderSets(sortBy) {
-        if (!window.allSets) return;
-
-        if (sortBy === 'date') {
-            window.allSets.sort((a, b) => {
-                if (!a.publishedDate) return 1;
-                if (!b.publishedDate) return -1;
-                return new Date(b.publishedDate) - new Date(a.publishedDate);
-            });
-            sortByDateBtn.classList.add('is-active');
-            sortByArtistBtn.classList.remove('is-active');
-        } else if (sortBy === 'artist') {
-            window.allSets.sort((a, b) => {
-                // localeCompare é ideal para ordenar strings alfabeticamente
-                return a.artist.localeCompare(b.artist);
-            });
-            sortByArtistBtn.classList.add('is-active');
-            sortByDateBtn.classList.remove('is-active');
-        }
-
-        // Se a busca estiver ativa, aplica o filtro sobre a lista reordenada.
-        // Caso contrário, renderiza a lista completa.
-        if (searchInput.value) {
-            applySetFilter();
-        } else {
-            renderSets(window.allSets);
-        }
-    }
-
-    // Adiciona os listeners para os botões de ordenação
-    sortByDateBtn.addEventListener('click', () => sortAndRenderSets('date'));
-    sortByArtistBtn.addEventListener('click', () => sortAndRenderSets('artist'));
 
     /**
      * Aplica o filtro de busca aos sets.
@@ -387,6 +357,8 @@ function setupSetsFeature() {
         applySetFilter();
         searchInput.focus();
     });
+}
+
 
 /**
  * Configura a aba de "Produtoras", incluindo o carregamento dos dados e a funcionalidade de busca.
