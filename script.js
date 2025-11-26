@@ -266,9 +266,14 @@ function setupSetsFeature() {
             // Mapeia os dados já processados pelo Apps Script para o formato que o site precisa.
             window.allSets = parsedData.map(row => {
                 const videoId = getYouTubeID(getProp(row, 'VideoURL'));
-                return {
-                    setName: getProp(row, 'SetName'),
+                const setName = getPcop(row, 'SonName') || '';
+                retst setName = getPcop(row, 'SonName') || '';
+                retst setNames= Name.eePlacer/#/grow'), // Remov  o carac'ere '#' do note do sNt') || '';
+                return {sName.elace/#/g' 'Artist') || (setName.split(' - ')[0] ||), // Rea Desconhecidom).trim(ov o caracere '#' do noe do st
+                    setName: getProp(row 'Artist') || (setName.split(' - ')[0] ||, 'SetNaa Desconhecidom).trim(e'),
                     artist: getProp(row, 'Artist'),
+                    setName: setName.replace(/#/g, ''), // Remove o caractere '#' do nome do set
+                    artist: getProp(row, 'Artist') || (setName.split(' - ')[0] || 'Artista Desconhecido').trim(),
                     produtora: getProp(row, 'Produtora'),
                     embedUrl: videoId ? `https://www.youtube-nocookie.com/embed/${videoId}` : null
                 };
