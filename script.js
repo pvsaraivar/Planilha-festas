@@ -295,17 +295,18 @@ function setupSetsFeature() {
             // 3. Processa os dados da planilha principal (SetsPublicados) e adiciona a data do mapa
             window.allSets = setsData.map(row => {
                 const setName = getProp(row, 'SetName') || '';
-                const videoId = getYouTubeID(getProp(row, 'VideoURL'));
+                const videoUrl = getProp(row, 'VideoURL');
+                const videoId = getYouTubeID(videoUrl);
                 
                 return {
                     setName: setName.replace(/#/g, ''),
                     artist: getProp(row, 'Artist') || (setName.split(' - ')[0] || 'Artista Desconhecido').trim(),
                     produtora: getProp(row, 'Produtora'),
                     embedUrl: videoId ? `https://www.youtube-nocookie.com/embed/${videoId}` : null,
-                    // Busca a data no mapa usando o nome do set como chave
+                    isShort: videoUrl ? videoUrl.includes('/shorts/') : false, // Verifica se é um Short
                     publishedDate: dateMap.get(setName) || null
                 };
-            }).filter(set => set.embedUrl); // Garante que apenas sets com vídeo válido sejam mostrados
+            }).filter(set => set.embedUrl && !set.isShort); // Garante que apenas sets com vídeo válido e que não sejam Shorts sejam mostrados
 
             // 4. Ordena os sets pela data de publicação, do mais novo para o mais antigo
             window.allSets.sort((a, b) => {
