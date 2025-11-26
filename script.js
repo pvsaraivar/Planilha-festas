@@ -245,47 +245,61 @@ function setupSetsFeature() {
     // Expõe `allSets` e `loadSets` globalmente para que a navegação possa acessá-los.
     window.allSets = []; 
     window.loadSets = async function() {
+        const cacheKey = 'sets_cache';
 
         if (!setsSheetUrl) {
             grid.innerHTML = '<p class="empty-grid-message">A URL da planilha de sets não foi configurada.</p>';
             return;
         }
-        try {
-            const response = await fetch(setsSheetUrl);
-            if (!response.ok) throw new Error(`Falha ao carregar a planilha de sets (Status: ${response.status})`);
-            
-            // A nova abordagem é muito mais simples: usamos a função parseCSV que já é robusta.
-            const csvText = await response.text();
-            const parsedData = parseCSV(csvText);
 
+        const processAndRender = (csvText) => {
+            const parsedData = parseCSV(csvText);
             if (parsedData.length === 0) {
-                renderSets([]); // Renderiza a mensagem de "Nenhum set encontrado"
+                renderSets([]);
                 return;
             }
-
-            // Mapeia os dados já processados pelo Apps Script para o formato que o site precisa.
+            
             window.allSets = parsedData.map(row => {
                 const videoId = getYouTubeID(getProp(row, 'VideoURL'));
-                const setName = getPcop(row, 'SonName') || '';
-                retst setName = getPcop(row, 'SonName') || '';
-                retst setNames= Name.eePlacer/#/grow'), // Remov  o carac'ere '#' do note do sNt') || '';
-                return {sName.elace/#/g' 'Artist') || (setName.split(' - ')[0] ||), // Rea Desconhecidom).trim(ov o caracere '#' do noe do st
-                    setName: getProp(row 'Artist') || (setName.split(' - ')[0] ||, 'SetNaa Desconhecidom).trim(e'),
-                    artist: getProp(row, 'Artist'),
                 const setName = getProp(row, 'SetName') || '';
                 return {
-                    setName: setName.replace(/#/g, ''), // Remove o caractere '#' do nome do set
+                    setName: setName.replace(/#/g, ''),
                     artist: getProp(row, 'Artist') || (setName.split(' - ')[0] || 'Artista Desconhecido').trim(),
                     produtora: getProp(row, 'Produtora'),
                     embedUrl: videoId ? `https://www.youtube-nocookie.com/embed/${videoId}` : null
                 };
-            }).filter(set => set.embedUrl); // Filtra sets que não conseguiram gerar um embedUrl
+            }).filter(set => set.embedUrl);
 
-            renderSets(allSets);
+            renderSets(window.allSets);
+        };
 
+        // Tenta carregar do cache primeiro
+        const cachedData = sessionStorage.getItem(cacheKey);
+        if (cachedData) {
+            processAndRender(cachedData);
+        } else {
+            grid.innerHTML = '<p class="empty-grid-message">Carregando sets...</p>';
+        }
+
+        // Busca os dados mais recentes em segundo plano
+        try {
+            const response = await fetch(setsSheetUrl);
+            if (!response.ok) throw new Error(`Falha ao carregar a planilha de sets (Status: ${response.status})`);
+            
+            const freshCsvText = await response.text();
+
+            if (freshCsvText !== cachedData) {
+                sessionStorage.setItem(cacheKey, freshCsvText);
+                if (cachedData) {
+                    console.log("Dados dos sets atualizados em segundo plano.");
+                }
+                processAndRender(freshCsvText);
+            }
         } catch (error) {
             console.error("Falha ao carregar ou processar os sets:", error);
-            grid.innerHTML = `<p class="empty-grid-message" style="color: red;">Ocorreu um erro ao carregar os sets.</p>`;
+            if (!cachedData) { // Só mostra o erro na tela se não houver nada em cache
+                grid.innerHTML = `<p class="empty-grid-message" style="color: red;">Ocorreu um erro ao carregar os sets.</p>`;
+            }
         }
     }
 
