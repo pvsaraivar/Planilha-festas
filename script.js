@@ -138,7 +138,7 @@ function renderSets(sets) {
         return `
             <div class="set-card">
                 <h3 class="set-card__title">${set.setName}</h3>
-                <p class="set-card__details">Produtora: ${set.produtora} &bull; Artista: ${set.artist}${formattedDate ? ` &bull; Publicado em: ${formattedDate}` : ''}</p>
+                <p class="set-card__details">Produtora: ${set.produtora || 'N/A'} &bull; Artista: ${set.artist}${formattedDate ? ` &bull; Publicado em: ${formattedDate}` : ''}</p>
                 ${playerHtml}
             </div>
         `;
