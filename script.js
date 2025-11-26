@@ -266,10 +266,15 @@ function setupSetsFeature() {
                     setName: setName.replace(/#/g, ''),
                     artist: getProp(row, 'Artist') || (setName.split(' - ')[0] || 'Artista Desconhecido').trim(),
                     produtora: getProp(row, 'Produtora'),
-                    embedUrl: videoId ? `https://www.youtube-nocookie.com/embed/${videoId}` : null
+                    embedUrl: videoId ? `https://www.youtube-nocookie.com/embed/${videoId}` : null,
+                    publishedDate: getProp(row, 'PublishedDate') // Adiciona a data de publicação ao objeto do set
                 };
             }).filter(set => set.embedUrl);
-
+            
+            // Ordena os sets pela data de publicação, do mais novo para o mais antigo.
+            // A data já está no formato correto (ISO 8601) vinda da planilha.
+            window.allSets.sort((a, b) => new Date(b.publishedDate) - new Date(a.publishedDate));
+            
             renderSets(window.allSets);
         };
 
@@ -318,6 +323,10 @@ function setupSetsFeature() {
         });
 
         renderSets(filteredSets);
+        // Reordena a lista filtrada para garantir que a ordem cronológica seja mantida.
+        const sortedFilteredSets = filteredSets.sort((a, b) => new Date(b.publishedDate) - new Date(a.publishedDate));
+
+        renderSets(sortedFilteredSets);
     }
 
     // Listeners
