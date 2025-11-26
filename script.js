@@ -226,7 +226,7 @@ function setupSetsFeature() {
     // URL da aba principal de sets ("SetsPublicados")
     const setsSheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQSJHdHpGeR9FMMOt1ZwPmxu7bcWZSoxV1igHKduAYtReCgn3VqJeVJwrWkCg9amHWYa3gn1WCGvIup/pub?gid=1607121527&single=true&output=csv';
     // URL da aba de cache de vídeos, que contém a data de publicação ("VideoCache")
-    const videoCacheSheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQSJHdHpGeR9FMMOt1ZwPmxu7bcWZSoxV1igHKduAYtReCgn3VqJeVJwrWkCg9amHWYa3gn1WCGvIup/pub?gid=1162863361&single=true&output=csv';
+    const videoCacheSheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQSJHdHpGeR9FMMOt1ZwPmxu7bcWZSoxV1igHKduAYtReCgn3VqJeVJwrWkCg9amHWYa3gn1WCGvIup/pub?gid=1975133328&single=true&output=csv';
 
     const searchInput = document.getElementById('sets-search-input');
     const clearBtn = document.getElementById('clear-sets-search-btn');
