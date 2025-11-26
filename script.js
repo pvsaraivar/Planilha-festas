@@ -103,8 +103,8 @@ const eventImageMap = {
     'radar feat bateu': 'assets/bateuradar.PNG',
     'gasguita feroz':  'assets/gasguitaferoz.PNG',
     'baile do ddzin convida baile do brota': 'assets/bailedoddzinbrota.jpg',
-    'clandestina': 'assets/clandestina.PNG'
-
+    'clandestina': 'assets/clandestina.PNG',
+    'mirage djs': 'assets/miragedjs.PNG'
 
 }
 
@@ -125,12 +125,20 @@ function renderSets(sets) {
     }
 
     const setsHtml = sets.map(set => {
+        // Formata a data de publicação para o formato DD/MM/AAAA
+        let formattedDate = '';
+        if (set.publishedDate) {
+            const publicationDate = new Date(set.publishedDate);
+            // toLocaleDateString garante o formato local correto (ex: 25/11/2025)
+            formattedDate = publicationDate.toLocaleDateString('pt-BR');
+        }
+
         const playerHtml = `<iframe width="100%" height="315" src="${set.embedUrl}" title="YouTube video player for ${set.setName}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
 
         return `
             <div class="set-card">
                 <h3 class="set-card__title">${set.setName}</h3>
-                <p class="set-card__details">Produtora: ${set.produtora} &bull; Artista: ${set.artist}</p>
+                <p class="set-card__details">Produtora: ${set.produtora} &bull; Artista: ${set.artist}${formattedDate ? ` &bull; Publicado em: ${formattedDate}` : ''}</p>
                 ${playerHtml}
             </div>
         `;
@@ -215,8 +223,10 @@ function setupNavigation() {
  * Configura a aba de "Sets Gravados", incluindo o carregamento dos dados e a funcionalidade de busca.
  */
 function setupSetsFeature() {
-    // IMPORTANTE: Cole aqui a nova URL da aba "SetsPublicados" que você acabou de gerar.
+    // URL da aba principal de sets ("SetsPublicados")
     const setsSheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQSJHdHpGeR9FMMOt1ZwPmxu7bcWZSoxV1igHKduAYtReCgn3VqJeVJwrWkCg9amHWYa3gn1WCGvIup/pub?gid=1607121527&single=true&output=csv';
+    // URL da aba de cache de vídeos, que contém a data de publicação ("VideoCache")
+    const videoCacheSheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQSJHdHpGeR9FMMOt1ZwPmxu7bcWZSoxV1igHKduAYtReCgn3VqJeVJwrWkCg9amHWYa3gn1WCGvIup/pub?gid=1975133328&single=true&output=csv';
 
     const searchInput = document.getElementById('sets-search-input');
     const clearBtn = document.getElementById('clear-sets-search-btn');
@@ -245,66 +255,71 @@ function setupSetsFeature() {
     // Expõe `allSets` e `loadSets` globalmente para que a navegação possa acessá-los.
     window.allSets = []; 
     window.loadSets = async function() {
-        const cacheKey = 'sets_cache';
-
-        if (!setsSheetUrl) {
-            grid.innerHTML = '<p class="empty-grid-message">A URL da planilha de sets não foi configurada.</p>';
+        if (!setsSheetUrl || !videoCacheSheetUrl) {
+            grid.innerHTML = '<p class="empty-grid-message">As URLs das planilhas de sets não foram configuradas.</p>';
             return;
         }
 
-        const processAndRender = (csvText) => {
-            const parsedData = parseCSV(csvText);
-            if (parsedData.length === 0) {
-                renderSets([]);
-                return;
-            }
+        grid.innerHTML = '<p class="empty-grid-message">Carregando sets...</p>';
+
+        // Busca os dados mais recentes em segundo plano
+        try {
+            // 1. Busca dados das duas planilhas em paralelo
+            const [setsResponse, cacheResponse] = await Promise.all([
+                fetch(setsSheetUrl),
+                fetch(videoCacheSheetUrl)
+            ]);
+
+            if (!setsResponse.ok) throw new Error(`Falha ao carregar a planilha de sets (Status: ${setsResponse.status})`);
+            if (!cacheResponse.ok) throw new Error(`Falha ao carregar o cache de vídeos (Status: ${cacheResponse.status})`);
             
-            window.allSets = parsedData.map(row => {
-                const videoId = getYouTubeID(getProp(row, 'VideoURL'));
+            const [setsCsv, cacheCsv] = await Promise.all([
+                setsResponse.text(),
+                cacheResponse.text()
+            ]);
+
+            const setsData = parseCSV(setsCsv);
+            const cacheData = parseCSV(cacheCsv);
+
+            // 2. Cria um mapa de datas a partir do VideoCache para busca rápida
+            // A chave do mapa será o "Nome do Set" para encontrar a data correspondente.
+            const dateMap = new Map();
+            cacheData.forEach(row => {
+                const setName = getProp(row, 'Nome do Set');
+                const publishedDate = getProp(row, 'Data de Publicação');
+                if (setName && publishedDate) {
+                    dateMap.set(setName, publishedDate);
+                }
+            });
+
+            // 3. Processa os dados da planilha principal (SetsPublicados) e adiciona a data do mapa
+            window.allSets = setsData.map(row => {
                 const setName = getProp(row, 'SetName') || '';
+                const videoId = getYouTubeID(getProp(row, 'VideoURL'));
+                
                 return {
                     setName: setName.replace(/#/g, ''),
                     artist: getProp(row, 'Artist') || (setName.split(' - ')[0] || 'Artista Desconhecido').trim(),
                     produtora: getProp(row, 'Produtora'),
                     embedUrl: videoId ? `https://www.youtube-nocookie.com/embed/${videoId}` : null,
-                    publishedDate: getProp(row, 'PublishedDate') // Adiciona a data de publicação ao objeto do set
+                    // Busca a data no mapa usando o nome do set como chave
+                    publishedDate: dateMap.get(setName) || null
                 };
-            }).filter(set => set.embedUrl);
-            
-            // Ordena os sets pela data de publicação, do mais novo para o mais antigo.
-            // A data já está no formato correto (ISO 8601) vinda da planilha.
-            window.allSets.sort((a, b) => new Date(b.publishedDate) - new Date(a.publishedDate));
+            }).filter(set => set.embedUrl); // Garante que apenas sets com vídeo válido sejam mostrados
+
+            // 4. Ordena os sets pela data de publicação, do mais novo para o mais antigo
+            window.allSets.sort((a, b) => {
+                // Coloca sets sem data no final da lista
+                if (!a.publishedDate) return 1;
+                if (!b.publishedDate) return -1;
+                return new Date(b.publishedDate) - new Date(a.publishedDate);
+            });
             
             renderSets(window.allSets);
-        };
 
-        // Tenta carregar do cache primeiro
-        const cachedData = sessionStorage.getItem(cacheKey);
-        if (cachedData) {
-            processAndRender(cachedData);
-        } else {
-            grid.innerHTML = '<p class="empty-grid-message">Carregando sets...</p>';
-        }
-
-        // Busca os dados mais recentes em segundo plano
-        try {
-            const response = await fetch(setsSheetUrl);
-            if (!response.ok) throw new Error(`Falha ao carregar a planilha de sets (Status: ${response.status})`);
-            
-            const freshCsvText = await response.text();
-
-            if (freshCsvText !== cachedData) {
-                sessionStorage.setItem(cacheKey, freshCsvText);
-                if (cachedData) {
-                    console.log("Dados dos sets atualizados em segundo plano.");
-                }
-                processAndRender(freshCsvText);
-            }
         } catch (error) {
             console.error("Falha ao carregar ou processar os sets:", error);
-            if (!cachedData) { // Só mostra o erro na tela se não houver nada em cache
-                grid.innerHTML = `<p class="empty-grid-message" style="color: red;">Ocorreu um erro ao carregar os sets.</p>`;
-            }
+            grid.innerHTML = `<p class="empty-grid-message" style="color: red;">Ocorreu um erro ao carregar os sets.</p>`;
         }
     }
 
@@ -322,7 +337,6 @@ function setupSetsFeature() {
             return setName.includes(searchTerm) || artist.includes(searchTerm) || produtora.includes(searchTerm);
         });
 
-        renderSets(filteredSets);
         // Reordena a lista filtrada para garantir que a ordem cronológica seja mantida.
         const sortedFilteredSets = filteredSets.sort((a, b) => new Date(b.publishedDate) - new Date(a.publishedDate));
 
