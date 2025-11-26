@@ -272,6 +272,8 @@ function setupSetsFeature() {
                 return {sName.elace/#/g' 'Artist') || (setName.split(' - ')[0] ||), // Rea Desconhecidom).trim(ov o caracere '#' do noe do st
                     setName: getProp(row 'Artist') || (setName.split(' - ')[0] ||, 'SetNaa Desconhecidom).trim(e'),
                     artist: getProp(row, 'Artist'),
+                const setName = getProp(row, 'SetName') || '';
+                return {
                     setName: setName.replace(/#/g, ''), // Remove o caractere '#' do nome do set
                     artist: getProp(row, 'Artist') || (setName.split(' - ')[0] || 'Artista Desconhecido').trim(),
                     produtora: getProp(row, 'Produtora'),
@@ -449,68 +451,85 @@ function setupProducersFeature() {
  * @param {string} csvPath - O caminho para o arquivo CSV.
  */
 async function loadAndDisplayEvents(csvPath) {
-    const grid = document.getElementById('event-grid');
-    if (!grid) {
-        console.error("Erro Crítico: Container da grade de eventos não encontrado.");
-        return;
+  const grid = document.getElementById('event-grid');
+  if (!grid) {
+    console.error("Erro Crítico: Container da grade de eventos não encontrado.");
+    return;
+  }
+
+  const cacheKey = 'events_cache';
+
+  // Função para processar e renderizar os eventos a partir do texto CSV
+  const processAndRender = (csvText) => {
+    const parsedEvents = parseCSV(csvText);
+    
+    allEvents = parsedEvents.filter(event => {
+      const oculto = (getProp(event, 'Oculto') || '').toLowerCase();
+      return oculto !== 'sim' && oculto !== 'true';
+    });
+    
+    renderWeeklyEvents(allEvents);
+
+    const parseDate = (dateString) => {
+      if (!dateString || typeof dateString !== 'string') return null;
+      const parts = dateString.split('/');
+      if (parts.length !== 3) return null;
+      return new Date(parts[2], parts[1] - 1, parts[0]);
+    };
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const futureEvents = allEvents.filter(event => {
+      const eventDate = parseDate(getProp(event, 'Data') || getProp(event, 'Date'));
+      return eventDate && eventDate >= today;
+    });
+
+    renderEvents(getSortedEvents(futureEvents), grid);
+    populateGenreFilter(allEvents);
+
+    if (eventSlugFromUrl) {
+      const eventToOpen = allEvents.find(e => createEventSlug(getProp(e, 'Evento') || getProp(e, 'Nome')) === eventSlugFromUrl);
+      if (eventToOpen) openModal(eventToOpen);
     }
+  };
 
-    showSkeletonLoader(grid, 6); // Mostra 6 cartões de esqueleto imediatamente
+  // Tenta carregar do cache primeiro
+  const cachedData = sessionStorage.getItem(cacheKey);
+  if (cachedData) {
+    processAndRender(cachedData);
+  } else {
+    showSkeletonLoader(grid, 6);
+  }
 
-    try {
-        const response = await fetch(csvPath);
-        if (!response.ok) {
-            throw new Error(`Falha ao carregar o arquivo '${csvPath}'. Verifique se o nome do arquivo está correto e se ele está na mesma pasta do index.html. (Status: ${response.status})`);
-        }
-        const csvText = await response.text();
-        const parsedEvents = parseCSV(csvText);
-        
-        // Filtra os eventos que não estão marcados como "Oculto" na planilha
-        allEvents = parsedEvents.filter(event => {
-            const oculto = (getProp(event, 'Oculto') || '').toLowerCase();
-            return oculto !== 'sim' && oculto !== 'true';
-        });
-        
-        renderWeeklyEvents(allEvents);
-
-        // Helper para converter "DD/MM/YYYY" para um objeto Date
-        const parseDate = (dateString) => {
-            if (!dateString || typeof dateString !== 'string') return null;
-            const parts = dateString.split('/');
-            if (parts.length !== 3) return null;
-            return new Date(parts[2], parts[1] - 1, parts[0]);
-        };
-
-        // Pega a data de hoje, zerando o horário para comparar apenas o dia
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-
-        // Filtra para mostrar apenas eventos futuros na carga inicial
-        const futureEvents = allEvents.filter(event => {
-            const eventDate = parseDate(getProp(event, 'Data') || getProp(event, 'Date'));
-            return eventDate && eventDate >= today;
-        });
-
-        // Renderiza apenas os eventos futuros ordenados
-        renderEvents(getSortedEvents(futureEvents), grid);
-        // Preenche o filtro de gênero com base nos eventos carregados
-        populateGenreFilter(allEvents);
-        // Se um slug de evento foi passado na URL, tenta abrir o modal correspondente
-        if (eventSlugFromUrl) {
-            const eventToOpen = allEvents.find(e => createEventSlug(getProp(e, 'Evento') || getProp(e, 'Nome')) === eventSlugFromUrl);
-            if (eventToOpen) openModal(eventToOpen);
-        }
-
-    } catch (error) {
-        console.error("Falha ao carregar ou renderizar os eventos:", error);
-        // Verifica se o erro é uma falha de rede (como ERR_NAME_NOT_RESOLVED)
-        if (error instanceof TypeError && error.message === 'Failed to fetch') {
-            grid.innerHTML = `<p style="color: #c0392b;"><b>Falha na conexão.</b> Verifique sua internet e tente recarregar a página.</p>`;
-        } else {
-            // Para outros tipos de erro (ex: CSV malformado)
-            grid.innerHTML = `<p style="color: red;">Ocorreu um erro inesperado ao carregar os eventos. Verifique o console para mais detalhes.</p>`;
-        }
+  // Busca os dados mais recentes em segundo plano
+  try {
+    const response = await fetch(csvPath);
+    if (!response.ok) {
+      throw new Error(`Falha ao carregar a planilha (Status: ${response.status})`);
     }
+    const freshCsvText = await response.text();
+
+    // Se os dados novos forem diferentes do cache (ou se não houver cache),
+    // atualiza a tela e o cache.
+    if (freshCsvText !== cachedData) {
+      sessionStorage.setItem(cacheKey, freshCsvText);
+      if (cachedData) { // Se já havia cache, significa que estamos atualizando
+        console.log("Dados dos eventos atualizados em segundo plano.");
+      }
+      processAndRender(freshCsvText);
+    }
+  } catch (error) {
+    console.error("Falha ao carregar ou renderizar os eventos:", error);
+    // Só mostra o erro na tela se não houver dados em cache para exibir.
+    if (!cachedData) {
+      if (error instanceof TypeError && error.message === 'Failed to fetch') {
+        grid.innerHTML = `<p style="color: #c0392b;"><b>Falha na conexão.</b> Verifique sua internet e tente recarregar a página.</p>`;
+      } else {
+        grid.innerHTML = `<p style="color: red;">Ocorreu um erro inesperado ao carregar os eventos. Verifique o console para mais detalhes.</p>`;
+      }
+    }
+  }
 }
 
 /**
