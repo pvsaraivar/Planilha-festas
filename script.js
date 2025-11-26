@@ -308,13 +308,14 @@ function setupSetsFeature() {
                 };
             }).filter(set => set.embedUrl && !set.isShort); // Garante que apenas sets com vídeo válido e que não sejam Shorts sejam mostrados
 
-            // 4. Ordena os sets pela data de publicação, do mais novo para o mais antigo
-            window.allSets.sort((a, b) => {
-                // Coloca sets sem data no final da lista
-                if (!a.publishedDate) return 1;
-                if (!b.publishedDate) return -1;
-                return new Date(b.publishedDate) - new Date(a.publishedDate);
-            });
+            // 4. Embaralha os sets para que não apareçam sempre na mesma ordem.
+            // Algoritmo de Fisher-Yates para um embaralhamento eficiente.
+            for (let i = window.allSets.length - 1; i > 0; i--) {
+                // Escolhe um índice aleatório antes do elemento atual
+                const j = Math.floor(Math.random() * (i + 1));
+                // Troca o elemento atual com o elemento do índice aleatório
+                [window.allSets[i], window.allSets[j]] = [window.allSets[j], window.allSets[i]];
+            }
             
             renderSets(window.allSets);
 
