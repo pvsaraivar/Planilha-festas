@@ -1801,4 +1801,4 @@ function setupBackToTopButton() {
         });
     });
 }
-}
+
