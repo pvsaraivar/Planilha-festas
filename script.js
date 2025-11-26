@@ -285,7 +285,7 @@ function setupSetsFeature() {
             // A chave do mapa será o "Nome do Set" para encontrar a data correspondente.
             const dateMap = new Map();
             cacheData.forEach(row => {
-                const setName = getProp(row, 'Nome do Set');
+                const setName = getProp(row, 'SetName');
                 const publishedDate = getProp(row, 'Data de Publicação');
                 if (setName && publishedDate) {
                     dateMap.set(setName, publishedDate);
