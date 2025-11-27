@@ -6,7 +6,9 @@ let favoritedEventSlugs = new Set(); // Armazena os slugs dos eventos favoritado
 
 document.addEventListener('DOMContentLoaded', () => {
     const sheetId = '1LAfG4Nt2g_P12HMCx-wEmWpXoX3yp1qAKdw89eLbeWU';
-    const googleSheetUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/export?format=csv`;
+    const eventsGid = '0'; // GID da aba "eventos" (geralmente 0 se for a primeira aba criada)
+    // A URL agora aponta especificamente para a aba de eventos usando o GID.
+    const googleSheetUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/export?format=csv&gid=${eventsGid}`;
     
     // Primeiro, lê os parâmetros da URL para saber se um evento específico deve ser aberto.
     applyFiltersFromURL();
@@ -105,7 +107,8 @@ const eventImageMap = {
     'baile do ddzin convida baile do brota': 'assets/bailedoddzinbrota.jpg',
     'clandestina': 'assets/clandestina.PNG',
     'mirage djs': 'assets/miragedjs.PNG',
-    'boiler fuzz 2': 'assets/boilerfuzz2.PNG'
+    'boiler fuzz 2': 'assets/boilerfuzz2.PNG',
+    'papoco batuke kent': 'assets/papocobatuke.PNG'
 
 }
 
