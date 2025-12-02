@@ -109,7 +109,6 @@ const eventImageMap = {
     'mirage djs': 'assets/miragedjs.PNG',
     'boiler fuzz 2': 'assets/boilerfuzz2.PNG',
     'papoco batuke kent': 'assets/papocobatuke.PNG'
-
 }
 
 /**
