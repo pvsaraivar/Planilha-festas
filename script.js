@@ -57,7 +57,7 @@ const eventImageMap = {
     'bunker': 'assets/bunker.jpg',
     'baile do ddzin': 'assets/bailedoddzin.jpg',
     'titanica': 'assets/titanica.jpg',
-    'fabrika tunnel edition': 'assets/fabrika.jpg',
+    'fabrika: tunnel edition': 'assets/fabrika.jpg',
     'insana 2': 'assets/insana.PNG',
     'bleed': 'assets/bleed.PNG',
     'cade o funk que tava aqui?': 'assets/funkbateu.PNG',
