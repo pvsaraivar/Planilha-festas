@@ -136,7 +136,16 @@ function renderSets(sets) {
             formattedDate = publicationDate.toLocaleDateString('pt-BR');
         }
 
-        const playerHtml = `<iframe width="100%" height="315" src="${set.embedUrl}" title="YouTube video player for ${set.setName}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
+        // Extrai o videoId da embedUrl para usar na thumbnail e no carregamento sob demanda
+        const videoId = set.embedUrl.split('/').pop();
+        const thumbnailUrl = `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`;
+
+        // Em vez de um iframe, criamos um container com a thumbnail que, ao ser clicado, carregará o vídeo.
+        const playerHtml = `
+            <div class="set-player-container" data-video-id="${videoId}" style="background-image: url('${thumbnailUrl}');">
+                <button class="set-play-button" aria-label="Play set ${set.setName}"></button>
+            </div>
+        `;
 
         return `
             <div class="set-card">
@@ -229,7 +238,7 @@ function setupSetsFeature() {
     // URL da aba principal de sets ("SetsPublicados")
     const setsSheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQSJHdHpGeR9FMMOt1ZwPmxu7bcWZSoxV1igHKduAYtReCgn3VqJeVJwrWkCg9amHWYa3gn1WCGvIup/pub?gid=1607121527&single=true&output=csv';
     // URL da aba de cache de vídeos, que contém a data de publicação ("VideoCache")
-    const videoCacheSheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQSJHdHpGeR9FMMOt1ZwPmxu7bcWZSoxV1igHKduAYtReCgn3VqJeVJwrWkCg9amHWYa3gn1WCGvIup/pub?gid=1607121527&single=true&output=csv';
+    const videoCacheSheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQSJHdHpGeR9FMMOt1ZwPmxu7bcWZSoxV1igHKduAYtReCgn3VqJeVJwrWkCg9amHWYa3gn1WCGvIup/pub?gid=1975133328&single=true&output=csv';
 
     const searchInput = document.getElementById('sets-search-input');
     const clearBtn = document.getElementById('clear-sets-search-btn');
@@ -358,6 +367,26 @@ function setupSetsFeature() {
         searchInput.value = '';
         applySetFilter();
         searchInput.focus();
+    });
+
+    // Adiciona um único listener na grade para lidar com o clique em qualquer vídeo (event delegation)
+    grid.addEventListener('click', (e) => {
+        const playerContainer = e.target.closest('.set-player-container');
+
+        if (playerContainer) {
+            const videoId = playerContainer.dataset.videoId;
+            if (videoId) {
+                // Cria o iframe e o configura para autoplay
+                const iframe = document.createElement('iframe');
+                iframe.setAttribute('src', `https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1`);
+                iframe.setAttribute('frameborder', '0');
+                iframe.setAttribute('allow', 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture');
+                iframe.setAttribute('allowfullscreen', 'true');
+                
+                // Substitui o container da thumbnail pelo iframe
+                playerContainer.parentNode.replaceChild(iframe, playerContainer);
+            }
+        }
     });
 }
 
