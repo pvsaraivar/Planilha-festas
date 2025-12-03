@@ -108,7 +108,8 @@ const eventImageMap = {
     'clandestina': 'assets/clandestina.PNG',
     'mirage djs': 'assets/miragedjs.PNG',
     'boiler fuzz 2': 'assets/boilerfuzz2.PNG',
-    'papoco batuke kent': 'assets/papocobatuke.PNG'
+    'papoco batuke kent': 'assets/papocobatuke.PNG',
+    'wav sunset': 'assets/wavsunset2.PNG'
 }
 
 /**
