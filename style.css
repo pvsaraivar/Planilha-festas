@@ -532,6 +532,14 @@ a {
     border-radius: 8px;
 }
 
+.set-video-iframe {
+    width: 100%;
+    aspect-ratio: 16 / 9; /* Garante a proporção correta do vídeo */
+    border: none;
+    border-radius: 8px;
+}
+
+
 /* --- Seção Eventos da Semana --- */
 #weekly-events-section {
     padding-top: 1rem;
