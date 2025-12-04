@@ -532,6 +532,25 @@ a {
     border-radius: 8px;
 }
 
+.set-player-container {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    background-size: cover;
+    background-position: center;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    transition: transform 0.2s ease;
+}
+
+.set-player-container:hover {
+    transform: scale(1.02);
+}
+
 .set-video-iframe {
     width: 100%;
     aspect-ratio: 16 / 9; /* Garante a proporção correta do vídeo */
