@@ -138,7 +138,11 @@ function renderSets(sets) {
         }
 
         // Extrai o videoId da embedUrl para usar na thumbnail e no carregamento sob demanda
-        const videoId = set.embedUrl.split('/').pop();
+        // Adiciona uma verificação para garantir que embedUrl não seja nulo
+        const videoId = set.embedUrl ? set.embedUrl.split('/').pop() : null;
+        if (!videoId) {
+            return ''; // Se não houver ID de vídeo, não renderiza o card
+        }
         const thumbnailUrl = `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`;
 
         // Em vez de um iframe, criamos um container com a thumbnail que, ao ser clicado, carregará o vídeo.
@@ -1259,6 +1263,7 @@ function createEventSlug(name) {
     if (!name) return 'evento-sem-nome';
     return name
         .toLowerCase()
+        .replace(/[^\w\s-]/g, '') // Remove todos os caracteres não alfanuméricos, exceto espaços e hífens
         .normalize("NFD").replace(/[\u0300-\u036f]/g, "") // Remove acentos
         .replace(/[^a-z0-9\s-]/g, '') // Remove caracteres especiais, exceto espaços e hífens
         .trim()
