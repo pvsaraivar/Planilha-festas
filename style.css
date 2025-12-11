@@ -558,6 +558,11 @@ a {
     border-radius: 8px;
 }
 
+.soundcloud-iframe {
+    border: none;
+    width: 100%;
+    height: 166px; /* Altura padrão do player compacto do SoundCloud */
+}
 
 /* --- Seção Eventos da Semana --- */
 #weekly-events-section {
