@@ -112,7 +112,7 @@ const eventImageMap = {
     'papoco batuke kent': 'assets/papocobatuke.PNG',
     'wav sunset': 'assets/wavsunset2.PNG',
     'showcase ignis': 'assets/showcaseignis.PNG',
-    'fritaria parquelandia': 'assets/fritariaparquelandia.PNG',
+    'fritaria parquelândia': 'assets/fritariaparquelandia.PNG',
 }
 
 /**
