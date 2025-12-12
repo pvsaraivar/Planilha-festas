@@ -113,6 +113,8 @@ const eventImageMap = {
     'wav sunset': 'assets/wavsunset2.PNG',
     'showcase ignis': 'assets/showcaseignis.PNG',
     'fritaria parquelândia': 'assets/fritariaparq.PNG',
+    'Ovo Frito': 'assets/ovofrito2.PNG'
+
 }
 
 /**
