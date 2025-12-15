@@ -113,8 +113,11 @@ const eventImageMap = {
     'wav sunset': 'assets/wavsunset2.PNG',
     'showcase ignis': 'assets/showcaseignis.PNG',
     'fritaria parquelândia': 'assets/fritariaparq.PNG',
-    'Ovo Frito': 'assets/ovofrito2.PNG'
-
+    'Ovo Frito': 'assets/ovofrito2.PNG',
+    'Mirage 4 anos': 'assets/mirage4.PNG',
+    'Festa do fim do mundo': 'assets/discovoador.PNG',
+    'Deep after':'assets/deepafter.PNG'
+    
 }
 
 /**
@@ -443,6 +446,12 @@ function setupSoundCloudFeature() {
     // e cole a URL de publicação CSV aqui.
     // Colunas esperadas: SetName, Artist, SoundCloudURL
     const soundCloudSheetUrl = ''; // <-- COLE A URL DA SUA PLANILHA DO SOUNDCLOUD AQUI
+    // URL da aba principal de sets do SoundCloud ("SoundCloudPublicados")
+    // Colunas esperadas: SetName, Artist, Produtora, SoundCloudURL (opcional se estiver no cache)
+    const soundCloudSheetUrl = ''; // <-- COLE A URL DA ABA "SoundCloudPublicados" AQUI
+    
+    // URL da aba de cache do SoundCloud ("SoundCloudCache") - Gerada pelo Apps Script
+    const soundCloudCacheSheetUrl = ''; // <-- COLE A URL DA ABA "SoundCloudCache" AQUI
 
     const searchInput = document.getElementById('soundcloud-search-input');
     const clearBtn = document.getElementById('clear-soundcloud-search-btn');
@@ -458,6 +467,8 @@ function setupSoundCloudFeature() {
     window.loadSoundCloudSets = async function() {
         if (!soundCloudSheetUrl) {
             grid.innerHTML = '<p class="empty-grid-message">A URL da planilha do SoundCloud não foi configurada.</p>';
+        if (!soundCloudSheetUrl || !soundCloudCacheSheetUrl) {
+            grid.innerHTML = '<p class="empty-grid-message">As URLs das planilhas do SoundCloud não foram configuradas.</p>';
             return;
         }
 
@@ -466,13 +477,45 @@ function setupSoundCloudFeature() {
         try {
             const response = await fetch(soundCloudSheetUrl);
             if (!response.ok) throw new Error(`Falha ao carregar a planilha do SoundCloud (Status: ${response.status})`);
+            // Busca dados das duas planilhas em paralelo (igual ao YouTube)
+            const [setsResponse, cacheResponse] = await Promise.all([
+                fetch(soundCloudSheetUrl),
+                fetch(soundCloudCacheSheetUrl)
+            ]);
 
             const csvText = await response.text();
             const parsedData = parseCSV(csvText);
+            if (!setsResponse.ok) throw new Error(`Falha ao carregar a planilha do SoundCloud (Status: ${setsResponse.status})`);
+            if (!cacheResponse.ok) throw new Error(`Falha ao carregar o cache do SoundCloud (Status: ${cacheResponse.status})`);
 
             window.allSoundCloudSets = parsedData.map(row => {
+            const [setsCsv, cacheCsv] = await Promise.all([
+                setsResponse.text(),
+                cacheResponse.text()
+            ]);
+
+            const setsData = parseCSV(setsCsv);
+            const cacheData = parseCSV(cacheCsv);
+
+            // Cria mapa de datas e URLs do cache
+            const cacheMap = new Map();
+            cacheData.forEach(row => {
+                const setName = getProp(row, 'SetName') || getProp(row, 'Title'); // Tenta SetName ou Title
+                if (setName) {
+                    cacheMap.set(setName, {
+                        date: getProp(row, 'publisheddate') || getProp(row, 'pubDate'),
+                        url: getProp(row, 'SoundCloudURL') || getProp(row, 'Link')
+                    });
+                }
+            });
+
+            window.allSoundCloudSets = setsData.map(row => {
                 const setName = getProp(row, 'SetName') || '';
                 const soundCloudUrl = getProp(row, 'SoundCloudURL');
+                
+                // Pega a URL da planilha principal ou do cache
+                const soundCloudUrl = getProp(row, 'SoundCloudURL') || (cacheMap.get(setName) ? cacheMap.get(setName).url : null);
+                const cachedDate = cacheMap.get(setName) ? cacheMap.get(setName).date : null;
                 
                 // Formata a URL para o player embed
                 const embedUrl = soundCloudUrl ? `https://w.soundcloud.com/player/?url=${encodeURIComponent(soundCloudUrl)}&color=%23ff5500&auto_play=false&hide_related=true&show_comments=false&show_user=true&show_reposts=false&show_teaser=true` : null;
@@ -480,6 +523,9 @@ function setupSoundCloudFeature() {
                 return {
                     setName: setName,
                     artist: getProp(row, 'Artist') || (setName.split(' - ')[0] || 'Artista Desconhecido').trim(),
+                    produtora: getProp(row, 'Produtora'),
+                    publishedDate: getProp(row, 'Data') || getProp(row, 'Data de Publicação') || getProp(row, 'PublishedDate'),
+                    publishedDate: cachedDate || getProp(row, 'Data'), // Prioriza a data do cache (automática)
                     embedUrl: embedUrl
                 };
             }).filter(set => set.embedUrl);
@@ -505,7 +551,8 @@ function setupSoundCloudFeature() {
         const filteredSets = window.allSoundCloudSets.filter(set => {
             const setName = set.setName.toLowerCase();
             const artist = set.artist.toLowerCase();
-            return setName.includes(searchTerm) || artist.includes(searchTerm);
+            const produtora = (set.produtora || '').toLowerCase();
+            return setName.includes(searchTerm) || artist.includes(searchTerm) || produtora.includes(searchTerm);
         });
 
         renderSoundCloudSets(filteredSets);
@@ -536,13 +583,24 @@ function renderSoundCloudSets(sets) {
         return;
     }
 
-    const setsHtml = sets.map(set => `
+    const setsHtml = sets.map(set => {
+        let formattedDate = '';
+        if (set.publishedDate) {
+            const publicationDate = new Date(set.publishedDate);
+            if (!isNaN(publicationDate.getTime())) {
+                formattedDate = publicationDate.toLocaleDateString('pt-BR');
+            } else {
+                formattedDate = set.publishedDate;
+            }
+        }
+
+        return `
         <div class="set-card">
             <h3 class="set-card__title">${set.setName}</h3>
-            <p class="set-card__details">Artista: ${set.artist}</p>
+            <p class="set-card__details">Produtora: ${set.produtora || 'N/A'} &bull; Artista: ${set.artist}${formattedDate ? ` &bull; Publicado em: ${formattedDate}` : ''}</p>
             <iframe class="soundcloud-iframe" scrolling="no" frameborder="no" allow="autoplay" src="${set.embedUrl}"></iframe>
         </div>
-    `).join('');
+    `}).join('');
 
     grid.innerHTML = setsHtml;
 }
