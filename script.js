@@ -116,8 +116,8 @@ const eventImageMap = {
     'mirage 4 anos': 'assets/mirage4.PNG',
     'festa do fim do mundo': 'assets/discovoador.PNG',
     'deep after':'assets/deepafter.PNG',
-    'plano aberto': 'asssets/planoaberto.PNG',
-    'baile da bateu - pré carnaval': 'assets/bailedabateu2.PNG'
+    'baile da bateu - pré carnaval': 'assets/bailedabateu2.PNG',
+    'plano aberto': 'assets/planoaberto.PNG'
 }
 
 /**
