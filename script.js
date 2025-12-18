@@ -118,7 +118,8 @@ const eventImageMap = {
     'deep after':'assets/deepafter.PNG',
     'baile da bateu - pré carnaval': 'assets/bailedabateu2.PNG',
     'plano aberto': 'assets/planoaberto.PNG',
-    'hypno': 'assets/hypno.PNG'
+    'hypno': 'assets/hypno.PNG',
+    'mare alta': 'assets/marealta2.PNG'
 }
 
 /**
