@@ -117,7 +117,8 @@ const eventImageMap = {
     'festa do fim do mundo': 'assets/discovoador.PNG',
     'deep after':'assets/deepafter.PNG',
     'baile da bateu - pré carnaval': 'assets/bailedabateu2.PNG',
-    'plano aberto': 'assets/planoaberto.PNG'
+    'plano aberto': 'assets/planoaberto.PNG',
+    'hypno': 'assets/hypno.PNG'
 }
 
 /**
