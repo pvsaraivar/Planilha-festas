@@ -454,6 +454,12 @@ function setupSoundCloudSetsFeature() {
             if (!response.ok) throw new Error(`Falha ao carregar sets (Status: ${response.status})`);
             
             const csvText = await response.text();
+            
+            // Verificação de segurança: se o retorno for HTML (página de login), lança erro
+            if (csvText.trim().toLowerCase().startsWith('<!doctype html') || csvText.trim().toLowerCase().startsWith('<html')) {
+                throw new Error('A URL da planilha não retornou um CSV válido. Verifique se a planilha está publicada na web.');
+            }
+
             const setsData = parseCSV(csvText);
             
             if (setsData.length === 0) {
@@ -462,24 +468,21 @@ function setupSoundCloudSetsFeature() {
             }
 
             window.allSoundCloudSets = setsData.map(row => {
-                let setName = getProp(row, 'SetName') || getProp(row, 'Nome') || '';
-                let url = getProp(row, 'SoundCloudURL') || getProp(row, 'Link') || getProp(row, 'URL') || getProp(row, 'SoundCloud');
-                let artist = getProp(row, 'Artist');
+                let setName = getProp(row, 'SetName') || getProp(row, 'Set Name') || getProp(row, 'Nome') || '';
+                let url = getProp(row, 'SoundCloudURL') || getProp(row, 'SoundCloud URL') || getProp(row, 'Link') || getProp(row, 'URL') || getProp(row, 'SoundCloud');
+                let artist = getProp(row, 'Artist') || getProp(row, 'Artista');
                 let produtora = getProp(row, 'Produtora');
 
-                // Correção para colunas trocadas na planilha (SetName com URL, URL com Produtora)
-                if (setName && (setName.includes('http') || setName.includes('soundcloud.com'))) {
-                    const realUrl = setName;
-                    const realProdutora = url; // O valor na coluna URL é a produtora
-                    const realSetName = artist; // Assume-se que o nome do set foi para a coluna Artista
-                    const realArtist = produtora; // Assume-se que o artista foi para a coluna Produtora
-
+                // Correção para colunas trocadas: Artist com URL e SoundCloudURL com Produtora
+                if (artist && (artist.includes('http') || artist.includes('soundcloud.com'))) {
+                    const realUrl = artist;
+                    const realProdutora = url; // O valor na coluna SoundCloudURL é a produtora
+                    
                     url = realUrl;
                     produtora = realProdutora;
-                    setName = realSetName || 'Set SoundCloud';
-                    artist = realArtist;
+                    artist = ''; // Força a extração do artista pelo nome do set
                 }
-                
+
                 // Limpeza e validação da URL para evitar erros no player
                 if (url) {
                     url = url.trim(); // Remove espaços em branco extras
@@ -499,6 +502,18 @@ function setupSoundCloudSetsFeature() {
                     publishedDate: getProp(row, 'PublishedDate') ? new Date(getProp(row, 'PublishedDate')) : null
                 };
             }).filter(set => set.url && set.url.toLowerCase().includes('soundcloud.com')); // Garante que tem URL válida do SoundCloud
+
+            if (window.allSoundCloudSets.length === 0) {
+                const headers = setsData.length > 0 ? Object.keys(setsData[0]).join(', ') : 'Nenhum';
+                // Debug: Mostra a primeira linha para entender o que está vindo
+                const firstRow = setsData.length > 0 ? JSON.stringify(setsData[0], null, 2) : 'Sem dados';
+                
+                grid.innerHTML = `<p class="empty-grid-message">Nenhum set válido encontrado.<br><br>
+                <strong>Colunas identificadas:</strong> ${headers}<br>
+                <strong>Exemplo de dados (1ª linha):</strong> <pre style="text-align: left; background: #222; color: #fff; padding: 10px; border-radius: 5px; overflow: auto; font-size: 12px;">${firstRow}</pre><br>
+                Verifique se a coluna <b>SoundCloudURL</b> contém links válidos (ex: https://soundcloud.com/...).</p>`;
+                return;
+            }
 
             // Embaralha os sets
             for (let i = window.allSoundCloudSets.length - 1; i > 0; i--) {
@@ -520,7 +535,7 @@ function setupSoundCloudSetsFeature() {
 
     function renderSoundCloudSets(sets) {
         if (sets.length === 0) {
-            grid.innerHTML = '<p class="empty-grid-message">Nenhum set encontrado. Verifique se as colunas "SetName" e "SoundCloudURL" existem na planilha.</p>';
+            grid.innerHTML = '<p class="empty-grid-message">Nenhum set encontrado.</p>';
             return;
         }
 
