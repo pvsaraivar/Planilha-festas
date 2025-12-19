@@ -55,6 +55,7 @@
                 <button id="nav-events-btn" class="nav-btn is-active">Eventos</button>
                 <button id="nav-producers-btn" class="nav-btn">Produtoras</button>
                 <button id="nav-sets-btn" class="nav-btn">Sets Youtube</button>
+                <button id="nav-soundcloud-sets-btn" class="nav-btn">Sets SoundCloud</button>
             </nav>
             <div class="filters-wrapper">
                 <div class="search-container">
@@ -98,6 +99,13 @@
                     </div>
                 </div>
             </div>
+            <div id="soundcloud-sets-filters-wrapper" class="filters-wrapper" style="display: none;">
+                <div class="search-container">
+                    <div class="sets-search-container">
+                        <input type="text" id="soundcloud-sets-search-input" class="search-input" placeholder="Buscar por set, produtora ou artista"><button id="clear-soundcloud-sets-search-btn" class="clear-search-btn" hidden>&times;</button>
+                    </div>
+                </div>
+            </div>
         </div>
     </header>
 
@@ -120,6 +128,12 @@
     <section id="producers-section" class="container" style="display: none;">
         <div id="producers-grid" class="event-grid">
             <!-- Os cards das produtoras serão inseridos aqui pelo JavaScript -->
+        </div>
+    </section>
+
+    <section id="soundcloud-sets-section" class="container" style="display: none;">
+        <div id="soundcloud-sets-grid" class="sets-grid">
+            <!-- Os sets do SoundCloud serão inseridos aqui pelo JavaScript -->
         </div>
     </section>
 

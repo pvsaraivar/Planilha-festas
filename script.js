@@ -22,6 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
     setupNavigation(); 
     setupProducersFeature(); // Configura a aba de produtoras
     setupSetsFeature(); // Configura a aba de sets (carregamento e busca)
+    setupSoundCloudSetsFeature(); // Configura a aba de sets do SoundCloud
 });
 
 /**
@@ -177,13 +178,16 @@ function setupNavigation() {
     const navEventsBtn = document.getElementById('nav-events-btn');
     const navSetsBtn = document.getElementById('nav-sets-btn');
     const navProducersBtn = document.getElementById('nav-producers-btn'); // Novo botão
+    const navSoundCloudSetsBtn = document.getElementById('nav-soundcloud-sets-btn'); // Botão SoundCloud
     const eventsContent = document.querySelector('.main-content'); // Container principal dos eventos
     const setsSection = document.getElementById('sets-section');
     const producersSection = document.getElementById('producers-section'); // Nova seção
+    const soundCloudSetsSection = document.getElementById('soundcloud-sets-section'); // Seção SoundCloud
     const weeklySection = document.getElementById('weekly-events-section');
     const filtersWrapper = document.querySelector('.filters-wrapper');
     const setsFiltersWrapper = document.getElementById('sets-filters-wrapper');
     const producersFiltersWrapper = document.getElementById('producers-filters-wrapper'); // Novo filtro
+    const soundCloudSetsFiltersWrapper = document.getElementById('soundcloud-sets-filters-wrapper'); // Filtro SoundCloud
 
     if (!navEventsBtn || !navSetsBtn || !navProducersBtn || !eventsContent || !setsSection || !producersSection || !weeklySection || !filtersWrapper || !setsFiltersWrapper || !producersFiltersWrapper) {
         console.warn('Elementos de navegação ou filtros não encontrados. A troca de abas não funcionará completamente.');
@@ -195,6 +199,7 @@ function setupNavigation() {
         filtersWrapper.style.display = 'flex'; // Mostra os filtros de eventos
         setsFiltersWrapper.style.display = 'none'; // Esconde os filtros de sets
         producersFiltersWrapper.style.display = 'none'; // Esconde os filtros de produtoras
+        if (soundCloudSetsFiltersWrapper) soundCloudSetsFiltersWrapper.style.display = 'none';
 
         // Mostra a seção de eventos da semana apenas se nenhum filtro estiver ativo
         const anyFilterActive = document.getElementById('clear-all-filters-btn').hidden === false;
@@ -203,10 +208,12 @@ function setupNavigation() {
         }
         setsSection.style.display = 'none';
         producersSection.style.display = 'none';
+        if (soundCloudSetsSection) soundCloudSetsSection.style.display = 'none';
         
         navEventsBtn.classList.add('is-active');
         navSetsBtn.classList.remove('is-active');
         navProducersBtn.classList.remove('is-active');
+        if (navSoundCloudSetsBtn) navSoundCloudSetsBtn.classList.remove('is-active');
     });
 
     navSetsBtn.addEventListener('click', () => {
@@ -214,13 +221,16 @@ function setupNavigation() {
         filtersWrapper.style.display = 'none'; // Esconde os filtros de eventos
         setsFiltersWrapper.style.display = 'flex'; // Mostra os filtros de sets
         producersFiltersWrapper.style.display = 'none'; // Esconde os filtros de produtoras
+        if (soundCloudSetsFiltersWrapper) soundCloudSetsFiltersWrapper.style.display = 'none';
         weeklySection.style.display = 'none'; // Oculta os eventos da semana
         setsSection.style.display = 'block';
         producersSection.style.display = 'none';
+        if (soundCloudSetsSection) soundCloudSetsSection.style.display = 'none';
 
         navSetsBtn.classList.add('is-active');
         navEventsBtn.classList.remove('is-active');
         navProducersBtn.classList.remove('is-active');
+        if (navSoundCloudSetsBtn) navSoundCloudSetsBtn.classList.remove('is-active');
 
         // Carrega os sets apenas na primeira vez que a aba é clicada.
         // A verificação `allSets.length === 0` previne recarregamentos desnecessários.
@@ -234,16 +244,44 @@ function setupNavigation() {
         filtersWrapper.style.display = 'none'; // Esconde os filtros de eventos
         setsFiltersWrapper.style.display = 'none'; // Esconde os filtros de sets
         producersFiltersWrapper.style.display = 'flex'; // Mostra os filtros de produtoras
+        if (soundCloudSetsFiltersWrapper) soundCloudSetsFiltersWrapper.style.display = 'none';
         weeklySection.style.display = 'none'; // Oculta os eventos da semana
         setsSection.style.display = 'none';
         producersSection.style.display = 'block';
+        if (soundCloudSetsSection) soundCloudSetsSection.style.display = 'none';
 
         navProducersBtn.classList.add('is-active');
         navEventsBtn.classList.remove('is-active');
         navSetsBtn.classList.remove('is-active');
+        if (navSoundCloudSetsBtn) navSoundCloudSetsBtn.classList.remove('is-active');
 
         // O carregamento das produtoras é disparado em setupProducersFeature
     });
+
+    if (navSoundCloudSetsBtn) {
+        navSoundCloudSetsBtn.addEventListener('click', () => {
+            eventsContent.style.display = 'none';
+            filtersWrapper.style.display = 'none';
+            setsFiltersWrapper.style.display = 'none';
+            producersFiltersWrapper.style.display = 'none';
+            if (soundCloudSetsFiltersWrapper) soundCloudSetsFiltersWrapper.style.display = 'flex';
+
+            weeklySection.style.display = 'none';
+            setsSection.style.display = 'none';
+            producersSection.style.display = 'none';
+            if (soundCloudSetsSection) soundCloudSetsSection.style.display = 'block';
+
+            navSoundCloudSetsBtn.classList.add('is-active');
+            navEventsBtn.classList.remove('is-active');
+            navSetsBtn.classList.remove('is-active');
+            navProducersBtn.classList.remove('is-active');
+
+            // Carrega os sets do SoundCloud apenas na primeira vez
+            if (typeof loadSoundCloudSets === 'function' && window.allSoundCloudSets.length === 0) {
+                loadSoundCloudSets();
+            }
+        });
+    }
 }
 
 /**
@@ -400,6 +438,153 @@ function setupSetsFeature() {
                 iframe.setAttribute('allowfullscreen', 'true');
                 
                 // Substitui o container da thumbnail pelo iframe
+                playerContainer.parentNode.replaceChild(iframe, playerContainer);
+            }
+        }
+    });
+}
+
+/**
+ * Configura a aba de "Sets SoundCloud", incluindo o carregamento dos dados e a funcionalidade de busca.
+ */
+function setupSoundCloudSetsFeature() {
+    // URL da planilha de sets do SoundCloud
+    // Colunas esperadas na Principal: SetName, SoundCloudURL, Artist, Produtora, ImageURL, PublishedDate
+    const soundCloudSetsSheetUrl = ''; // <-- COLE A URL DA ABA "SetsSoundCloud" (CSV) AQUI
+
+    const searchInput = document.getElementById('soundcloud-sets-search-input');
+    const clearBtn = document.getElementById('clear-soundcloud-sets-search-btn');
+    const grid = document.getElementById('soundcloud-sets-grid');
+
+    let debounceTimer;
+
+    // Se os elementos não existirem (ex: HTML ainda não atualizado), sai silenciosamente ou avisa
+    if (!searchInput || !clearBtn || !grid) {
+        return;
+    }
+
+    window.allSoundCloudSets = [];
+    window.loadSoundCloudSets = async function() {
+        if (!soundCloudSetsSheetUrl) {
+            grid.innerHTML = '<p class="empty-grid-message">A URL da planilha de sets do SoundCloud não foi configurada.</p>';
+            return;
+        }
+
+        grid.innerHTML = '<p class="empty-grid-message">Carregando sets do SoundCloud...</p>';
+
+        try {
+            // Carrega apenas a planilha principal, que agora já contém as imagens
+            const response = await fetch(soundCloudSetsSheetUrl);
+            
+            if (!response.ok) throw new Error(`Falha ao carregar sets (Status: ${response.status})`);
+            
+            const csvText = await response.text();
+            const setsData = parseCSV(csvText);
+
+            window.allSoundCloudSets = setsData.map(row => {
+                const setName = getProp(row, 'SetName') || '';
+                const url = getProp(row, 'SoundCloudURL');
+                
+                return {
+                    setName: setName,
+                    artist: getProp(row, 'Artist') || (setName.split(' - ')[0] || 'Artista Desconhecido').trim(),
+                    produtora: getProp(row, 'Produtora'),
+                    url: url,
+                    // Pega a imagem diretamente da planilha principal
+                    imageUrl: getProp(row, 'ImageURL'),
+                    publishedDate: getProp(row, 'PublishedDate') ? new Date(getProp(row, 'PublishedDate')) : null
+                };
+            }).filter(set => set.url); // Garante que tem URL
+
+            // Embaralha os sets
+            for (let i = window.allSoundCloudSets.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [window.allSoundCloudSets[i], window.allSoundCloudSets[j]] = [window.allSoundCloudSets[j], window.allSoundCloudSets[i]];
+            }
+            
+            renderSoundCloudSets(window.allSoundCloudSets);
+
+        } catch (error) {
+            console.error("Falha ao carregar sets do SoundCloud:", error);
+            grid.innerHTML = `<p class="empty-grid-message" style="color: red;">Ocorreu um erro ao carregar os sets.</p>`;
+        }
+    }
+
+    function renderSoundCloudSets(sets) {
+        if (sets.length === 0) {
+            grid.innerHTML = '<p class="empty-grid-message">Nenhum set encontrado.</p>';
+            return;
+        }
+
+        const setsHtml = sets.map(set => {
+            let formattedDate = '';
+            if (set.publishedDate) {
+                formattedDate = set.publishedDate.toLocaleDateString('pt-BR');
+            }
+
+            // Placeholder SVG laranja caso não tenha imagem
+            const placeholderSvg = "data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 300'%3e%3crect width='100%25' height='100%25' fill='%23ff5500'/%3e%3ctext x='50%25' y='50%25' fill='%23ffffff' font-size='30' text-anchor='middle' dominant-baseline='middle'%3eSoundCloud%3c/text%3e%3c/svg%3e";
+            const thumbnailUrl = set.imageUrl || placeholderSvg;
+
+            // Container com thumbnail que vira iframe ao clicar
+            const playerHtml = `
+                <div class="set-player-container soundcloud-player-container" data-soundcloud-url="${set.url}" style="background-image: url('${thumbnailUrl}');">
+                    <button class="set-play-button" aria-label="Play set ${set.setName}"></button>
+                </div>
+            `;
+
+            return `
+                <div class="set-card">
+                    <h3 class="set-card__title">${set.setName}</h3>
+                    <p class="set-card__details">Produtora: ${set.produtora || 'N/A'} &bull; Artista: ${set.artist}${formattedDate ? ` &bull; Publicado em: ${formattedDate}` : ''}</p>
+                    ${playerHtml}
+                </div>
+            `;
+        }).join('');
+
+        grid.innerHTML = setsHtml;
+    }
+
+    function applySoundCloudSetFilter() {
+        const searchTerm = searchInput.value.toLowerCase().trim();
+        clearBtn.hidden = !searchTerm;
+
+        const filteredSets = window.allSoundCloudSets.filter(set => {
+            const setName = set.setName.toLowerCase();
+            const artist = set.artist.toLowerCase();
+            const produtora = (set.produtora || '').toLowerCase();
+            return setName.includes(searchTerm) || artist.includes(searchTerm) || produtora.includes(searchTerm);
+        });
+
+        renderSoundCloudSets(filteredSets);
+    }
+
+    searchInput.addEventListener('input', () => {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(applySoundCloudSetFilter, 300);
+    });
+
+    clearBtn.addEventListener('click', () => {
+        searchInput.value = '';
+        applySoundCloudSetFilter();
+        searchInput.focus();
+    });
+
+    grid.addEventListener('click', (e) => {
+        const playerContainer = e.target.closest('.soundcloud-player-container');
+
+        if (playerContainer) {
+            const url = playerContainer.dataset.soundcloudUrl;
+            if (url) {
+                const iframe = document.createElement('iframe');
+                iframe.className = 'set-video-iframe';
+                // Configuração do embed do SoundCloud com visual=true para ocupar o card
+                const embedUrl = `https://w.soundcloud.com/player/?url=${encodeURIComponent(url)}&color=%23ff5500&auto_play=true&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true&visual=true`;
+                
+                iframe.setAttribute('src', embedUrl);
+                iframe.setAttribute('frameborder', '0');
+                iframe.setAttribute('allow', 'autoplay');
+                
                 playerContainer.parentNode.replaceChild(iframe, playerContainer);
             }
         }
