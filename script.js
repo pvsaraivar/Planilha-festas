@@ -120,7 +120,8 @@ const eventImageMap = {
     'baile da bateu - pré carnaval': 'assets/bailedabateu2.PNG',
     'plano aberto': 'assets/planoaberto.PNG',
     'hypno': 'assets/hypno.PNG',
-    'mare alta': 'assets/marealta2.PNG'
+    'mare alta': 'assets/marealta2.PNG',
+    'festa la em cima 4 anos': 'assets/flec4anos.PNG'
 }
 
 /**
@@ -483,7 +484,16 @@ function setupSoundCloudSetsFeature() {
 
             window.allSoundCloudSets = setsData.map(row => {
                 const setName = getProp(row, 'SetName') || '';
-                const url = getProp(row, 'SoundCloudURL');
+                let url = getProp(row, 'SoundCloudURL');
+                
+                // Limpeza e validação da URL para evitar erros no player
+                if (url) {
+                    url = url.trim(); // Remove espaços em branco extras
+                    // Adiciona https se estiver faltando (comum em cópias manuais)
+                    if (!url.startsWith('http')) {
+                        url = `https://${url}`;
+                    }
+                }
                 
                 return {
                     setName: setName,
@@ -494,7 +504,7 @@ function setupSoundCloudSetsFeature() {
                     imageUrl: getProp(row, 'ImageURL'),
                     publishedDate: getProp(row, 'PublishedDate') ? new Date(getProp(row, 'PublishedDate')) : null
                 };
-            }).filter(set => set.url); // Garante que tem URL
+            }).filter(set => set.url && set.url.includes('soundcloud.com')); // Garante que tem URL válida do SoundCloud
 
             // Embaralha os sets
             for (let i = window.allSoundCloudSets.length - 1; i > 0; i--) {
