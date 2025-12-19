@@ -450,7 +450,7 @@ function setupSetsFeature() {
 function setupSoundCloudSetsFeature() {
     // URL da planilha de sets do SoundCloud
     // Colunas esperadas na Principal: SetName, SoundCloudURL, Artist, Produtora, ImageURL, PublishedDate
-    const soundCloudSetsSheetUrl = ''; // <-- COLE A URL DA ABA "SetsSoundCloud" (CSV) AQUI
+    const soundCloudSetsSheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQSJHdHpGeR9FMMOt1ZwPmxu7bcWZSoxV1igHKduAYtReCgn3VqJeVJwrWkCg9amHWYa3gn1WCGvIup/pub?gid=911654646&single=true&output=csv'; // <-- Substitua pelo link que você copiou
 
     const searchInput = document.getElementById('soundcloud-sets-search-input');
     const clearBtn = document.getElementById('clear-soundcloud-sets-search-btn');
