@@ -121,7 +121,7 @@ const eventImageMap = {
     'plano aberto': 'assets/planoaberto.PNG',
     'hypno': 'assets/hypno.PNG',
     'mare alta': 'assets/marealta2.PNG',
-    'festa la em cima 4 anos': 'assets/flec4anos.PNG'
+    'festa lá em cima 4 anos': 'assets/flec4anos.PNG'
 }
 
 /**
@@ -451,7 +451,7 @@ function setupSetsFeature() {
 function setupSoundCloudSetsFeature() {
     // URL da planilha de sets do SoundCloud
     // Colunas esperadas na Principal: SetName, SoundCloudURL, Artist, Produtora, ImageURL, PublishedDate
-    const soundCloudSetsSheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQSJHdHpGeR9FMMOt1ZwPmxu7bcWZSoxV1igHKduAYtReCgn3VqJeVJwrWkCg9amHWYa3gn1WCGvIup/pub?gid=911654646&single=true&output=csv'; // <-- Substitua pelo link que você copiou
+    const soundCloudSetsSheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQSJHdHpGeR9FMMOt1ZwPmxu7bcWZSoxV1igHKduAYtReCgn3VqJeVJwrWkCg9amHWYa3gn1WCGvIup/pub?gid=911654646&single=true&output=csvhttps://docs.google.com/spreadsheets/d/e/2PACX-1vQSJHdHpGeR9FMMOt1ZwPmxu7bcWZSoxV1igHKduAYtReCgn3VqJeVJwrWkCg9amHWYa3gn1WCGvIup/pub?gid=911654646&single=true&output=csv'; // <-- Substitua pelo link que você copiou
 
     const searchInput = document.getElementById('soundcloud-sets-search-input');
     const clearBtn = document.getElementById('clear-soundcloud-sets-search-btn');
