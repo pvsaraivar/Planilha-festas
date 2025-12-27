@@ -121,7 +121,8 @@ const eventImageMap = {
     'hypno': 'assets/hypno.PNG',
     'maré alta': 'assets/marealta2.PNG',
     'mare alta': 'assets/marealta2.PNG',
-    'festa lá em cima 4 anos': 'assets/flec4anos.PNG'
+    'festa lá em cima 4 anos': 'assets/flec4anos.PNG',
+    'atrita intima - última do ano': 'assets/atritaintima.PNG'
 }
 
 /**
@@ -545,14 +546,12 @@ function setupSoundCloudSetsFeature() {
                 formattedDate = set.publishedDate.toLocaleDateString('pt-BR');
             }
 
-            // Placeholder SVG laranja caso não tenha imagem
-            const placeholderSvg = "data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 300'%3e%3crect width='100%25' height='100%25' fill='%23ff5500'/%3e%3ctext x='50%25' y='50%25' fill='%23ffffff' font-size='30' text-anchor='middle' dominant-baseline='middle'%3eSoundCloud%3c/text%3e%3c/svg%3e";
-            const thumbnailUrl = set.imageUrl || placeholderSvg;
-
-            // Container com thumbnail que vira iframe ao clicar
+            // Renderiza o iframe diretamente para mostrar a pré-visualização do SoundCloud
             const playerHtml = `
-                <div class="set-player-container soundcloud-player-container" data-soundcloud-url="${set.url}" style="background-image: url('${thumbnailUrl}');">
-                    <button class="set-play-button" aria-label="Play set ${set.setName}"></button>
+                <div class="set-player-container soundcloud-player-container" style="background: none; height: auto; padding-bottom: 0;">
+                    <iframe width="100%" height="300" scrolling="no" frameborder="no" allow="autoplay"
+                        src="https://w.soundcloud.com/player/?url=${encodeURIComponent(set.url)}&color=%23ff5500&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true&visual=true">
+                    </iframe>
                 </div>
             `;
 
@@ -591,26 +590,6 @@ function setupSoundCloudSetsFeature() {
         searchInput.value = '';
         applySoundCloudSetFilter();
         searchInput.focus();
-    });
-
-    grid.addEventListener('click', (e) => {
-        const playerContainer = e.target.closest('.soundcloud-player-container');
-
-        if (playerContainer) {
-            const url = playerContainer.dataset.soundcloudUrl;
-            if (url) {
-                const iframe = document.createElement('iframe');
-                iframe.className = 'set-video-iframe';
-                // Configuração do embed do SoundCloud com visual=true para ocupar o card
-                const embedUrl = `https://w.soundcloud.com/player/?url=${encodeURIComponent(url)}&color=%23ff5500&auto_play=true&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true&visual=true`;
-                
-                iframe.setAttribute('src', embedUrl);
-                iframe.setAttribute('frameborder', '0');
-                iframe.setAttribute('allow', 'autoplay');
-                
-                playerContainer.parentNode.replaceChild(iframe, playerContainer);
-            }
-        }
     });
 }
 
