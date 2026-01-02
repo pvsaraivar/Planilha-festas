@@ -111,7 +111,7 @@ const eventImageMap = {
     'papoco batuke kent': 'assets/papocobatuke.PNG',
     'wav sunset': 'assets/wavsunset2.PNG',
     'showcase ignis': 'assets/showcaseignis.PNG',
-    'fritaria parquelândia': 'assets/fritariaparq.PNG',w
+    'fritaria parquelândia': 'assets/fritariaparq.PNG',
     'ovo frito': 'assets/ovofrito2.PNG',
     'mirage 4 anos': 'assets/mirage4.PNG',
     'festa do fim do mundo': 'assets/discovoador.PNG',
@@ -123,7 +123,8 @@ const eventImageMap = {
     'mare alta': 'assets/marealta2.PNG',
     'festa lá em cima 4 anos': 'assets/flec4anos.PNG',
     'atrita intima - última do ano': 'assets/atritaintima.PNG',
-    'radar ft bateu': 'assets/bateuradar2.PNG'
+    'radar ft bateu': 'assets/radarftbateu.PNG',
+    'calunia showcase': 'assets/caluniashowcase.PNG'
 }
 
 /**
