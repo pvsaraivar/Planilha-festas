@@ -124,7 +124,8 @@ const eventImageMap = {
     'festa lá em cima 4 anos': 'assets/flec4anos.PNG',
     'atrita intima - última do ano': 'assets/atritaintima.PNG',
     'radar ft bateu': 'assets/radarftbateu.PNG',
-    'calunia showcase': 'assets/caluniashowcase.PNG'
+    'calunia showcase': 'assets/caluniashowcase.PNG',
+    'festa portal': 'assets/festaportal.PNG'
 }
 
 /**
