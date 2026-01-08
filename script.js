@@ -20,6 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
     setupBackToTopButton();
     setupThemeToggle();
     setupNavigation(); 
+    setupPreCarnavalFeature(); // Configura a aba de Pré Carnaval
     setupSetsFeature(); // Configura a aba de sets (carregamento e busca)
     setupSoundCloudSetsFeature(); // Configura a aba de sets do SoundCloud
 });
@@ -125,7 +126,10 @@ const eventImageMap = {
     'atrita intima - última do ano': 'assets/atritaintima.PNG',
     'radar ft bateu': 'assets/radarftbateu.PNG',
     'calunia showcase': 'assets/caluniashowcase.PNG',
-    'festa portal': 'assets/festaportal.PNG'
+    'festa portal': 'assets/festaportal.PNG',
+    'meu bloco é neon': 'assets/bloconeon1.PNG',
+    'verão 2000 - pré carnaval': 'assets/verao2kpre.PNG',
+    'pra quem gosta é bom': 'assets/pgb.PNG'
 }
 
 /**
@@ -181,13 +185,16 @@ function renderSets(sets) {
 }
 function setupNavigation() {
     const navEventsBtn = document.getElementById('nav-events-btn');
+    const navPreCarnavalBtn = document.getElementById('nav-precarnaval-btn');
     const navSetsBtn = document.getElementById('nav-sets-btn');
     const navSoundCloudSetsBtn = document.getElementById('nav-soundcloud-sets-btn'); // Botão SoundCloud
     const eventsContent = document.querySelector('.main-content'); // Container principal dos eventos
+    const preCarnavalSection = document.getElementById('precarnaval-section');
     const setsSection = document.getElementById('sets-section');
     const soundCloudSetsSection = document.getElementById('soundcloud-sets-section'); // Seção SoundCloud
     const weeklySection = document.getElementById('weekly-events-section');
     const filtersWrapper = document.querySelector('.filters-wrapper');
+    const preCarnavalFiltersWrapper = document.getElementById('precarnaval-filters-wrapper');
     const setsFiltersWrapper = document.getElementById('sets-filters-wrapper');
     const soundCloudSetsFiltersWrapper = document.getElementById('soundcloud-sets-filters-wrapper'); // Filtro SoundCloud
 
@@ -199,6 +206,7 @@ function setupNavigation() {
     navEventsBtn.addEventListener('click', () => {
         eventsContent.style.display = 'block';
         filtersWrapper.style.display = 'flex'; // Mostra os filtros de eventos
+        if (preCarnavalFiltersWrapper) preCarnavalFiltersWrapper.style.display = 'none';
         setsFiltersWrapper.style.display = 'none'; // Esconde os filtros de sets
         if (soundCloudSetsFiltersWrapper) soundCloudSetsFiltersWrapper.style.display = 'none';
 
@@ -207,24 +215,57 @@ function setupNavigation() {
         if (!anyFilterActive) {
             weeklySection.style.display = 'block';
         }
+        renderWeeklyEvents(allEvents); // Restaura os eventos da semana da aba principal
+        if (preCarnavalSection) preCarnavalSection.style.display = 'none';
         setsSection.style.display = 'none';
         if (soundCloudSetsSection) soundCloudSetsSection.style.display = 'none';
         
         navEventsBtn.classList.add('is-active');
+        if (navPreCarnavalBtn) navPreCarnavalBtn.classList.remove('is-active');
         navSetsBtn.classList.remove('is-active');
         if (navSoundCloudSetsBtn) navSoundCloudSetsBtn.classList.remove('is-active');
     });
 
+    if (navPreCarnavalBtn) {
+        navPreCarnavalBtn.addEventListener('click', () => {
+            eventsContent.style.display = 'none';
+            filtersWrapper.style.display = 'none';
+            if (preCarnavalFiltersWrapper) preCarnavalFiltersWrapper.style.display = 'flex';
+            setsFiltersWrapper.style.display = 'none';
+            if (soundCloudSetsFiltersWrapper) soundCloudSetsFiltersWrapper.style.display = 'none';
+
+            weeklySection.style.display = 'block'; // Exibe a seção de eventos da semana
+            if (preCarnavalSection) preCarnavalSection.style.display = 'block';
+            setsSection.style.display = 'none';
+            if (soundCloudSetsSection) soundCloudSetsSection.style.display = 'none';
+
+            navPreCarnavalBtn.classList.add('is-active');
+            navEventsBtn.classList.remove('is-active');
+            navSetsBtn.classList.remove('is-active');
+            if (navSoundCloudSetsBtn) navSoundCloudSetsBtn.classList.remove('is-active');
+
+            if (typeof loadPreCarnavalEvents === 'function' && window.allPreCarnavalEvents.length === 0) {
+                loadPreCarnavalEvents();
+            } else if (window.allPreCarnavalEvents.length > 0) {
+                // Se já estiver carregado, atualiza os eventos da semana para o pré-carnaval
+                renderWeeklyEvents(window.allPreCarnavalEvents);
+            }
+        });
+    }
+
     navSetsBtn.addEventListener('click', () => {
         eventsContent.style.display = 'none';        
         filtersWrapper.style.display = 'none'; // Esconde os filtros de eventos
+        if (preCarnavalFiltersWrapper) preCarnavalFiltersWrapper.style.display = 'none';
         setsFiltersWrapper.style.display = 'flex'; // Mostra os filtros de sets
         if (soundCloudSetsFiltersWrapper) soundCloudSetsFiltersWrapper.style.display = 'none';
         weeklySection.style.display = 'none'; // Oculta os eventos da semana
+        if (preCarnavalSection) preCarnavalSection.style.display = 'none';
         setsSection.style.display = 'block';
         if (soundCloudSetsSection) soundCloudSetsSection.style.display = 'none';
 
         navSetsBtn.classList.add('is-active');
+        if (navPreCarnavalBtn) navPreCarnavalBtn.classList.remove('is-active');
         navEventsBtn.classList.remove('is-active');
         if (navSoundCloudSetsBtn) navSoundCloudSetsBtn.classList.remove('is-active');
 
@@ -239,14 +280,17 @@ function setupNavigation() {
         navSoundCloudSetsBtn.addEventListener('click', () => {
             eventsContent.style.display = 'none';
             filtersWrapper.style.display = 'none';
+            if (preCarnavalFiltersWrapper) preCarnavalFiltersWrapper.style.display = 'none';
             setsFiltersWrapper.style.display = 'none';
             if (soundCloudSetsFiltersWrapper) soundCloudSetsFiltersWrapper.style.display = 'flex';
 
             weeklySection.style.display = 'none';
+            if (preCarnavalSection) preCarnavalSection.style.display = 'none';
             setsSection.style.display = 'none';
             if (soundCloudSetsSection) soundCloudSetsSection.style.display = 'block';
 
             navSoundCloudSetsBtn.classList.add('is-active');
+            if (navPreCarnavalBtn) navPreCarnavalBtn.classList.remove('is-active');
             navEventsBtn.classList.remove('is-active');
             navSetsBtn.classList.remove('is-active');
 
@@ -259,13 +303,128 @@ function setupNavigation() {
 }
 
 /**
+ * Configura a aba de "Pré Carnaval".
+ */
+function setupPreCarnavalFeature() {
+    // URL da planilha de Pré Carnaval. 
+    // Substitua o GID pelo ID da aba correta na sua planilha.
+    const sheetId = '1LAfG4Nt2g_P12HMCx-wEmWpXoX3yp1qAKdw89eLbeWU';
+    const preCarnavalGid = '1076861730'; // <-- ALTERE AQUI PARA O GID DA ABA DE PRÉ CARNAVAL
+    const preCarnavalSheetUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/export?format=csv&gid=${preCarnavalGid}`;
+
+    const searchInput = document.getElementById('precarnaval-search-input');
+    const clearBtn = document.getElementById('clear-precarnaval-search-btn');
+    const grid = document.getElementById('precarnaval-grid');
+
+    let debounceTimer;
+
+    if (!searchInput || !clearBtn || !grid) return;
+
+    window.allPreCarnavalEvents = [];
+    window.loadPreCarnavalEvents = async function() {
+        // Injeta CSS responsivo para garantir layout correto em mobile (2 colunas) e desktop
+        if (!document.getElementById('precarnaval-style')) {
+            const style = document.createElement('style');
+            style.id = 'precarnaval-style';
+            style.textContent = `
+                #precarnaval-grid {
+                    display: grid;
+                    grid-template-columns: repeat(4, 1fr);
+                    gap: 20px;
+                    width: 100%;
+                }
+                @media (max-width: 1200px) {
+                    #precarnaval-grid {
+                        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+                    }
+                }
+                @media (max-width: 768px) {
+                    #precarnaval-grid {
+                        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+                    }
+                }
+            `;
+            document.head.appendChild(style);
+        }
+
+        grid.innerHTML = '<p class="empty-grid-message">Carregando pré-carnavais...</p>';
+
+        try {
+            const response = await fetch(preCarnavalSheetUrl);
+            if (!response.ok) throw new Error(`Falha ao carregar a planilha (Status: ${response.status})`);
+            
+            const csvText = await response.text();
+            const events = parseCSV(csvText);
+
+            // Normaliza os dados para garantir que o layout fique igual ao dos eventos principais,
+            // mapeando colunas com nomes diferentes para o padrão esperado.
+            const normalizedEvents = events.map(event => ({
+                ...event,
+                'Evento': getProp(event, 'Evento') || getProp(event, 'Nome') || getProp(event, 'Nome do Bloco') || getProp(event, 'Bloco'),
+                'Data': getProp(event, 'Data') || getProp(event, 'Date') || getProp(event, 'Dia'),
+                'Local': getProp(event, 'Local') || getProp(event, 'Localização') || getProp(event, 'Localizacao'),
+                'Imagem (URL)': getProp(event, 'Imagem (URL)') || getProp(event, 'Imagem') || getProp(event, 'Foto') || getProp(event, 'Flyer'),
+                'Ingressos (URL)': getProp(event, 'Ingressos (URL)') || getProp(event, 'Ingressos') || getProp(event, 'Link') || getProp(event, 'Valor') || getProp(event, 'Preço') || getProp(event, 'Preco'),
+                'Instagram (URL)': getProp(event, 'Instagram (URL)') || getProp(event, 'Instagram'),
+                'Atrações': getProp(event, 'Atrações') || getProp(event, 'Lineup') || getProp(event, 'Line-up') || getProp(event, 'Atracoes'),
+                'Início': getProp(event, 'Início') || getProp(event, 'Inicio') || getProp(event, 'Horário') || getProp(event, 'Horario') || getProp(event, 'Hora'),
+                'Fim': getProp(event, 'Fim') || getProp(event, 'Término') || getProp(event, 'Termino'),
+                'Gênero': getProp(event, 'Gênero') || getProp(event, 'Estilo') || getProp(event, 'Gêneros') || getProp(event, 'Genero'),
+                'Cupom': getProp(event, 'Cupom') || getProp(event, 'Desconto')
+            }));
+
+            // Filtra eventos ocultos
+            window.allPreCarnavalEvents = normalizedEvents.filter(event => {
+                const oculto = (getProp(event, 'Oculto') || '').toLowerCase();
+                return oculto !== 'sim' && oculto !== 'true';
+            });
+
+            // Ordena por data
+            const sortedEvents = getSortedEvents(window.allPreCarnavalEvents);
+            
+            renderEvents(sortedEvents, grid);
+            renderWeeklyEvents(window.allPreCarnavalEvents); // Atualiza eventos da semana com dados do pré-carnaval
+
+        } catch (error) {
+            console.error("Falha ao carregar pré-carnavais:", error);
+            grid.innerHTML = `<p class="empty-grid-message" style="color: red;">Ocorreu um erro ao carregar os eventos.</p>`;
+        }
+    }
+
+    function applyPreCarnavalFilter() {
+        const searchTerm = searchInput.value.toLowerCase().trim();
+        clearBtn.hidden = !searchTerm;
+
+        const filteredEvents = window.allPreCarnavalEvents.filter(event => {
+            const name = (getProp(event, 'Evento') || getProp(event, 'Nome') || '').toLowerCase();
+            const location = (getProp(event, 'Local') || '').toLowerCase();
+            const attractions = (getProp(event, 'Atrações') || '').toLowerCase();
+            return name.includes(searchTerm) || location.includes(searchTerm) || attractions.includes(searchTerm);
+        });
+
+        renderEvents(getSortedEvents(filteredEvents), grid);
+    }
+
+    searchInput.addEventListener('input', () => {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(applyPreCarnavalFilter, 300);
+    });
+
+    clearBtn.addEventListener('click', () => {
+        searchInput.value = '';
+        applyPreCarnavalFilter();
+        searchInput.focus();
+    });
+}
+
+/**
  * Configura a aba de "Sets Gravados", incluindo o carregamento dos dados e a funcionalidade de busca.
  */
 function setupSetsFeature() {
-    // URL da aba principal de sets ("SetsPublicados")
-    const setsSheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQSJHdHpGeR9FMMOt1ZwPmxu7bcWZSoxV1igHKduAYtReCgn3VqJeVJwrWkCg9amHWYa3gn1WCGvIup/pub?gid=1607121527&single=true&output=csv';
-    // URL da aba de cache de vídeos, que contém a data de publicação ("VideoCache")
-    const videoCacheSheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQSJHdHpGeR9FMMOt1ZwPmxu7bcWZSoxV1igHKduAYtReCgn3VqJeVJwrWkCg9amHWYa3gn1WCGvIup/pub?gid=106685500&single=true&output=csv';
+    // URL da planilha de sets (SetsPublicados)
+    const setsSheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQSJHdHpGeR9FMMOt1ZwPmxu7bcWZSoxV1igHKduAYtReCgn3VqJeVJwrWkCg9amHWYa3gn1WCGvIup/pub?gid=1162863361&single=true&output=csv';
+    // URL da planilha de cache de vídeos (VideoCache)
+    const videoCacheSheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQSJHdHpGeR9FMMOt1ZwPmxu7bcWZSoxV1igHKduAYtReCgn3VqJeVJwrWkCg9amHWYa3gn1WCGvIup/pub?gid=1607121527&single=true&output=csv';
 
     const searchInput = document.getElementById('sets-search-input');
     const clearBtn = document.getElementById('clear-sets-search-btn');
@@ -771,9 +930,10 @@ function parseCSV(text) {
 function renderEvents(events, gridElement) {
     const dateInput = document.getElementById('date-filter');
     const selectedDate = dateInput ? dateInput.value : null;
-    loadFavorites(); // Garante que os favoritos estejam atualizados antes de renderizar
+    
+    loadFavorites(); // Garante que os favoritos estejam atualizados.
+    gridElement.innerHTML = ''; // Limpa os skeletons ou a mensagem anterior.
 
-    gridElement.innerHTML = ''; // Limpa os skeletons ou a mensagem "Carregando..."
     if (events.length === 0) {
         if (selectedDate) {
             gridElement.innerHTML = '<p class="empty-grid-message">Nenhuma festa agendada para esta data.</p>';
@@ -784,49 +944,52 @@ function renderEvents(events, gridElement) {
     }
 
     const fragment = document.createDocumentFragment();
-    events.forEach((event, index) => {
+    events.forEach(event => {
         const card = createEventCardElement(event);
-        card.style.animationDelay = `${index * 75}ms`; // Adiciona um atraso escalonado
         fragment.appendChild(card);
     });
+
     gridElement.appendChild(fragment);
 }
 
 /**
- * Preenche o dropdown de filtro de gênero com base nos gêneros encontrados nos eventos.
- * @param {Array<Object>} events - A lista de todos os eventos.
+ * Preenche o dropdown de filtro de gênero com base nos gêneros.
+ * @param {Array<Object>} events - A lista de eventos.
  */
 function populateGenreFilter(events) {
     const genreFilter = document.getElementById('genre-filter');
     if (!genreFilter) return;
-    
-    // Usamos um Map para garantir que os gêneros sejam únicos, ignorando maiúsculas/minúsculas.
-    // A chave será o gênero em minúsculas, e o valor será o gênero com a capitalização original.
-    const uniqueGenres = new Map();
+
+    // Limpa opções anteriores (exceto a primeira)
+    while (genreFilter.options.length > 1) {
+        genreFilter.remove(1);
+    }
+
+    const uniqueGenres = new Set();
 
     events.forEach(event => {
         const genresString = getProp(event, 'Gênero');
         if (genresString) {
             const genres = genresString.split(',').map(g => g.trim());
             genres.forEach(genre => {
-                if (genre && !uniqueGenres.has(genre.toLowerCase())) {
-                    uniqueGenres.set(genre.toLowerCase(), genre);
+                if (genre) {
+                    uniqueGenres.add(genre.toLowerCase());
                 }
             });
         }
     });
 
-    const sortedGenres = Array.from(uniqueGenres.values()).sort((a, b) => a.localeCompare(b));
+    const sortedGenres = Array.from(uniqueGenres).sort((a, b) => a.localeCompare(b));
+
     sortedGenres.forEach(genre => {
         const option = document.createElement('option');
-        option.value = genre.toLowerCase();
-        option.textContent = genre;
+        option.value = genre;
+        option.textContent = genre.charAt(0).toUpperCase() + genre.slice(1);
         genreFilter.appendChild(option);
     });
 }
 
 /**
- * Renderiza a seção "Eventos da Semana" com os próximos eventos.
  * @param {Array<Object>} allEvents - A lista completa de todos os eventos.
  */
 function renderWeeklyEvents(allEvents) {
@@ -892,6 +1055,8 @@ function renderWeeklyEvents(allEvents) {
                 if (eventToOpen) openModal(eventToOpen);
             });
         });
+    } else {
+        weeklySection.style.display = 'none'; // Oculta a seção se não houver eventos na semana
     }
 }
 /**

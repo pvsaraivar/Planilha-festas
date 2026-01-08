@@ -20,6 +20,9 @@
     <!-- Twitter Card Meta Tags -->
     <meta name="twitter:card" content="summary_large_image">
     
+    <!-- Verificação do Google Search Console (Substitua o conteúdo abaixo pelo código fornecido pelo Google) -->
+    <meta name="google-site-verification" content="COLE_SEU_CODIGO_DO_GOOGLE_AQUI" />
+    
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-QM8ZXS8GPB"></script>
     <script>
@@ -42,9 +45,8 @@
             <div class="header-content">
                 <div class="header-title">
                     <h1>Logistica Clubber</h1>
-                    <h2>O seu guia pelas festas eletrônicas de Fortaleza. 
-                        <p>Confira os eventos, se organize e vamos viver!</p>
-                    </h2>
+                    <h2>O seu guia pelas festas eletrônicas de Fortaleza.</h2>
+                    <p>Confira os eventos, se organize e vamos viver!</p>
                 </div>
                 <button id="theme-toggle-btn" class="theme-toggle-btn" title="Alternar tema">
                     <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
@@ -52,7 +54,8 @@
                 </button>
             </div>
             <nav class="main-nav">
-                <button id="nav-events-btn" class="nav-btn is-active">Eventos</button>
+                <button id="nav-events-btn" class="nav-btn is-active">Eventos Clubber</button>
+                <button id="nav-precarnaval-btn" class="nav-btn">Pré Carnaval</button>
                 <button id="nav-sets-btn" class="nav-btn">Sets Youtube</button>
                 <button id="nav-soundcloud-sets-btn" class="nav-btn">Sets SoundCloud</button>
             </nav>
@@ -91,6 +94,13 @@
                     </div>
                 </div>
             </div>
+            <div id="precarnaval-filters-wrapper" class="filters-wrapper" style="display: none;">
+                <div class="search-container">
+                    <div class="sets-search-container">
+                        <input type="text" id="precarnaval-search-input" class="search-input" placeholder="Buscar festa ou local"><button id="clear-precarnaval-search-btn" class="clear-search-btn" hidden>&times;</button>
+                    </div>
+                </div>
+            </div>
             <div id="soundcloud-sets-filters-wrapper" class="filters-wrapper" style="display: none;">
                 <div class="search-container">
                     <div class="sets-search-container">
@@ -110,6 +120,12 @@
             <p>Carregando festas...</p>
         </main>
     </div>
+
+    <section id="precarnaval-section" class="container" style="display: none;">
+        <div id="precarnaval-grid" class="event-grid">
+            <p>Carregando pré-carnavais...</p>
+        </div>
+    </section>
 
     <section id="sets-section" class="container" style="display: none;">
         <div id="sets-grid" class="sets-grid">
