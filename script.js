@@ -129,7 +129,13 @@ const eventImageMap = {
     'festa portal': 'assets/festaportal.PNG',
     'meu bloco é neon': 'assets/bloconeon1.PNG',
     'verão 2000 - pré carnaval': 'assets/verao2kpre.PNG',
-    'pra quem gosta é bom': 'assets/pgb.PNG'
+    'pra quem gosta é bom': 'assets/pgb.PNG',
+    'bloquinho psy': 'assets/bloquinhopsy.PNG',
+    'voyage e luxxxas': 'assets/voyageluxxas.PNG',
+    'fuga sessions #6': 'assets/fugasessions6.PNG',
+    'kaza convida festa base': 'assets/kazaconvidabase.PNG',
+    'balanço no mormaço': 'assets/balançomormaço.PNG',
+    'house music - clube da prancha': 'assets/clubedaprancha1.PNG'
 }
 
 /**
