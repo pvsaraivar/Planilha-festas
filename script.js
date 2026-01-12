@@ -135,7 +135,16 @@ const eventImageMap = {
     'fuga sessions #6': 'assets/fugasessions6.PNG',
     'kaza convida festa base': 'assets/kazaconvidabase.PNG',
     'balanço no mormaço': 'assets/balançomormaço.PNG',
-    'house music - clube da prancha': 'assets/clubedaprancha1.PNG'
+    'house music - clube da prancha': 'assets/clubedaprancha1.PNG',
+    'longdreams numa tubulosa': 'assets/tubulosalongdreams.PNG',
+    'abertura pré carnaval': 'assets/prefortaleza1601.PNG',
+    'segundo dia pré carnaval': 'assets/prefortaleza1701.PNG',
+    'meu bloco é neon 2': 'assets/bloconeon2.PNG',
+    'bloquinho de verão 2': 'assets/bloquinhodeverao2.PNG',
+    'segundo dia pré carnaval 2': 'assets/prefortaleza1701.PNG',
+    'terceiro dia pré carnaval': 'assets/prefortaleza2401.PNG',
+    'quarto dia pré carnaval': 'assets/prefortaleza3101.PNG',
+    
 }
 
 /**
@@ -379,10 +388,23 @@ function setupPreCarnavalFeature() {
                 'Cupom': getProp(event, 'Cupom') || getProp(event, 'Desconto')
             }));
 
-            // Filtra eventos ocultos
+            const parseDate = (dateString) => {
+                if (!dateString || typeof dateString !== 'string') return null;
+                const parts = dateString.split('/');
+                if (parts.length !== 3) return null;
+                return new Date(parts[2], parts[1] - 1, parts[0]);
+            };
+
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            // Filtra eventos ocultos e passados
             window.allPreCarnavalEvents = normalizedEvents.filter(event => {
                 const oculto = (getProp(event, 'Oculto') || '').toLowerCase();
-                return oculto !== 'sim' && oculto !== 'true';
+                if (oculto === 'sim' || oculto === 'true') return false;
+
+                const eventDate = parseDate(getProp(event, 'Data'));
+                return eventDate && eventDate >= today;
             });
 
             // Ordena por data
