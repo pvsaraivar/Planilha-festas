@@ -1666,10 +1666,11 @@ function setupModal() {
         params.delete('event');
         const newUrl = params.toString() ? `${window.location.pathname}?${params.toString()}` : window.location.pathname;
         window.history.pushState({ path: newUrl }, '', newUrl);
+        document.title = 'Logística Clubber';
     };
 
     // SEO Dinâmico: Restaura o título original da página ao fechar o modal
-    document.title = 'Logística Clubber - A agenda da cena eletrônica de Fortaleza';
+    document.title = 'Logística Clubber';
 
     // Fecha ao clicar no botão
     closeBtn.addEventListener('click', closeModal);
