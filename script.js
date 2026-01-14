@@ -144,6 +144,8 @@ const eventImageMap = {
     'segundo dia pré carnaval 2': 'assets/prefortaleza1701.PNG',
     'terceiro dia pré carnaval': 'assets/prefortaleza2401.PNG',
     'quarto dia pré carnaval': 'assets/prefortaleza3101.PNG',
+    'carnahard': 'assets/carnahard.PNG',
+    'pacific de janeiro': 'assets/pacificdejaneiro.PNG'
     
 }
 
@@ -365,7 +367,8 @@ function setupPreCarnavalFeature() {
         grid.innerHTML = '<p class="empty-grid-message">Carregando pré-carnavais...</p>';
 
         try {
-            const response = await fetch(preCarnavalSheetUrl);
+            // Adiciona timestamp para evitar cache e garantir dados frescos
+            const response = await fetch(preCarnavalSheetUrl + '&_t=' + Date.now());
             if (!response.ok) throw new Error(`Falha ao carregar a planilha (Status: ${response.status})`);
             
             const csvText = await response.text();
@@ -390,9 +393,18 @@ function setupPreCarnavalFeature() {
 
             const parseDate = (dateString) => {
                 if (!dateString || typeof dateString !== 'string') return null;
-                const parts = dateString.split('/');
+                // Remove horários se houver (ex: "15/02/2025 16:00" vira "15/02/2025")
+                const cleanDateStr = dateString.split(' ')[0].trim();
+                const parts = cleanDateStr.split('/');
                 if (parts.length !== 3) return null;
-                return new Date(parts[2], parts[1] - 1, parts[0]);
+                
+                // Usa parseInt para garantir que estamos pegando apenas os números
+                const day = parseInt(parts[0], 10);
+                const month = parseInt(parts[1], 10) - 1;
+                const year = parseInt(parts[2], 10);
+                
+                if (isNaN(day) || isNaN(month) || isNaN(year)) return null;
+                return new Date(year, month, day);
             };
 
             const today = new Date();
