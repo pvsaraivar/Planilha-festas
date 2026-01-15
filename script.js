@@ -145,8 +145,12 @@ const eventImageMap = {
     'terceiro dia pré carnaval': 'assets/prefortaleza2401.PNG',
     'quarto dia pré carnaval': 'assets/prefortaleza3101.PNG',
     'carnahard': 'assets/carnahard.PNG',
-    'pacific de janeiro': 'assets/pacificdejaneiro.PNG'
-    
+    'pacific de janeiro': 'assets/pacificdejaneiro.PNG',
+    'dabysha': 'assets/dabysha.PNG',
+    'longdreams showcase': 'assets/longdreamsshowcase.PNG',
+    'loren party - all black': 'assets/lorendayallblack.PNG',
+    'plano aberto - germinação': 'assets/planoabertogerminasao.PNG',
+    'house music culture 3': 'assets/hmc3.PNG'
 }
 
 /**
