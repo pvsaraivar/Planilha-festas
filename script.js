@@ -148,9 +148,12 @@ const eventImageMap = {
     'pacific de janeiro': 'assets/pacificdejaneiro.PNG',
     'dabysha': 'assets/dabysha.PNG',
     'longdreams showcase': 'assets/longdreamsshowcase.PNG',
-    'loren party - all black': 'assets/lorendayallblack.PNG',
+    'loren party - all black': 'assets/lorendayallblack.PNG'],
     'plano aberto - germinação': 'assets/planoabertogerminasao.PNG',
-    'house music culture 3': 'assets/hmc3.PNG'
+    'house music culture 3': 'assets/hmc3.PNG',
+    'oscvra - impuria': 'assets/oscvraimpuria.PNG',
+    'baile freak 2026': 'assets/blocofreak.PNG',
+    'trance on board': 'assets/tranceonboard.PNG'
 }
 
 /**
