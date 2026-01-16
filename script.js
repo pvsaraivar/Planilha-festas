@@ -153,7 +153,8 @@ const eventImageMap = {
     'house music culture 3': 'assets/hmc3.PNG',
     'oscvra - impuria': 'assets/oscvraimpuria.PNG',
     'baile freak 2026': 'assets/blocofreak.PNG',
-    'trance on board': 'assets/tranceonboard.PNG'
+    'trance on board': 'assets/tranceonboard.PNG',
+    'hibrida': 'assets/hibrida.PNG'
 }
 
 /**
