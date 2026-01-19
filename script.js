@@ -154,7 +154,7 @@ const eventImageMap = {
     'oscvra - impuria': 'assets/oscvraimpuria.PNG',
     'baile freak 2026': 'assets/blocofreak.PNG',
     'trance on board': 'assets/tranceonboard.PNG',
-    'hibrida': 'assets/hibrida.PNG'
+    'hibrida': 'assets/hibrida.PNG',
 }
 
 /**
