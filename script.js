@@ -134,6 +134,8 @@ const eventImageMap = {
     'fuga sessions #6': 'assets/fugasessions6.PNG',
     'kaza convida festa base': 'assets/kazaconvidabase.PNG',
     'papoco batuke kent': 'assets/papoco2.mp4',
+    'papoco - batuke kent': 'assets/papoco2.mp4',
+    'papoco': 'assets/papoco2.mp4',
     'balanço no mormaço': 'assets/balançomormaço.PNG',
     'house music - clube da prancha': 'assets/clubedaprancha1.PNG',
     'longdreams numa tubulosa': 'assets/tubulosalongdreams.PNG',
@@ -1117,7 +1119,7 @@ function renderWeeklyEvents(allEvents) {
 
             const isVideo = imageUrl && /\.(mp4|webm|ogg)($|\?)/i.test(imageUrl);
             const mediaHtml = isVideo 
-                ? `<video src="${imageUrl}" class="weekly-event-card__image" autoplay loop muted playsinline webkit-playsinline preload="auto" oncanplay="this.muted=true; this.play();"></video>`
+                ? `<video src="${imageUrl}" class="weekly-event-card__image" autoplay loop muted playsinline webkit-playsinline preload="auto" oncanplay="this.muted=true; this.play();" onerror='this.outerHTML="<img src=\\"${placeholderSvg}\\" class=\\"weekly-event-card__image\\" loading=\\"lazy\\">"'></video>`
                 : `<img src="${imageUrl || placeholderSvg}" alt="${name}" class="weekly-event-card__image" loading="lazy">`;
 
             return `
@@ -1581,7 +1583,7 @@ function createEventCardElement(event) {
 
     let mediaHtml;
     if (isVideo) {
-        mediaHtml = `<video src="${imageUrl}" class="event-card__image" autoplay loop muted playsinline webkit-playsinline preload="auto" oncontextmenu="return false;" oncanplay="this.muted=true; this.play();"></video>`;
+        mediaHtml = `<video src="${imageUrl}" class="event-card__image" autoplay loop muted playsinline webkit-playsinline preload="auto" oncontextmenu="return false;" oncanplay="this.muted=true; this.play();" onerror='this.outerHTML="<img src=\\"${errorSvg}\\" class=\\"event-card__image\\" loading=\\"lazy\\">"'></video>`;
     } else {
         mediaHtml = `<img src="${imageUrl || placeholderSvg}" alt="${name}" class="event-card__image" loading="lazy" onerror="this.onerror=null;this.src='${errorSvg}';">`;
     }
