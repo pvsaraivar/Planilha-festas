@@ -2250,13 +2250,18 @@ function setupVideoObserver() {
     if ('IntersectionObserver' in window) {
         window.videoObserver = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
+                const video = entry.target;
                 if (entry.isIntersecting) {
-                    const video = entry.target;
-                    video.play().catch(() => {}); // Ignora erros de autoplay (comuns se o usuário não interagiu)
+                    const playPromise = video.play();
+                    if (playPromise !== undefined) {
+                        playPromise.catch(() => {}); // Ignora erros de interrupção
+                    }
                 } else {
-                    entry.target.pause();
+                    if (!video.paused) {
+                        video.pause();
+                    }
                 }
             });
-        }, { rootMargin: '0px 0px 50px 0px' }); // Começa a carregar um pouco antes de aparecer
+        }, { threshold: 0.5 }); // Requer 50% de visibilidade para evitar bugs ao rolar
     }
 }
