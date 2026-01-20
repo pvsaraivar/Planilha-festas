@@ -136,7 +136,7 @@ const eventImageMap = {
     'papoco batuke kent': 'assets/papoco.mp4',
     'balanço no mormaço': 'assets/balançomormaço.PNG',
     'house music - clube da prancha': 'assets/clubedaprancha1.PNG',
-    'longdreams numa tubulosa': 'assets/tubulosalongdreams.PNG',
+    'longdreams numa tubulosa': 'assets/tubulosalongdreams.mp4',
     'abertura pré carnaval': 'assets/prefortaleza1601.PNG',
     'segundo dia pré carnaval': 'assets/prefortaleza1701.PNG',
     'meu bloco é neon 2': 'assets/bloconeon2.PNG',
