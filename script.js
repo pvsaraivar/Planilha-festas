@@ -2258,4 +2258,5 @@ function setupVideoObserver() {
                 }
             });
         }, { rootMargin: '0px 0px 50px 0px' }); // Começa a carregar um pouco antes de aparecer
+    }
 }
