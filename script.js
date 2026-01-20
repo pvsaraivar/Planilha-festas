@@ -144,7 +144,7 @@ const eventImageMap = {
     'segundo dia pré carnaval 2': 'assets/prefortaleza1701.PNG',
     'terceiro dia pré carnaval': 'assets/prefortaleza2401.PNG',
     'quarto dia pré carnaval': 'assets/prefortaleza3101.PNG',
-    'carnahard': 'assets/carnahard.PNG',
+    'carnahard': 'assets/carnahard.mp4',
     'pacific de janeiro': 'assets/pacificdejaneiro.PNG',
     'dabysha': 'assets/dabysha.PNG',
     'longdreams showcase': 'assets/longdreamsshowcase.PNG',
@@ -152,7 +152,7 @@ const eventImageMap = {
     'plano aberto - germinação': 'assets/planoabertogerminasao.PNG',
     'house music culture 3': 'assets/hmc3.PNG',
     'oscvra - impuria': 'assets/oscvraimpuria.PNG',
-    'baile freak 2026': 'assets/blocofreak.PNG',
+    'baile freak 2026': 'assets/blocofreak.mp4',
     'trance on board': 'assets/tranceonboard.PNG',
     'hibrida': 'assets/hibrida.mp4',
 }
