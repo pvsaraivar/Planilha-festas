@@ -1117,7 +1117,7 @@ function renderWeeklyEvents(allEvents) {
 
             const isVideo = imageUrl && /\.(mp4|webm|ogg)($|\?)/i.test(imageUrl);
             const mediaHtml = isVideo 
-                ? `<video src="${imageUrl}" class="weekly-event-card__image" autoplay loop muted playsinline></video>`
+                ? `<video src="${imageUrl}" class="weekly-event-card__image" autoplay loop muted playsinline webkit-playsinline onloadeddata="this.muted=true; this.play();"></video>`
                 : `<img src="${imageUrl || placeholderSvg}" alt="${name}" class="weekly-event-card__image" loading="lazy">`;
 
             return `
@@ -1581,7 +1581,7 @@ function createEventCardElement(event) {
 
     let mediaHtml;
     if (isVideo) {
-        mediaHtml = `<video src="${imageUrl}" class="event-card__image" autoplay loop muted playsinline webkit-playsinline oncontextmenu="return false;"></video>`;
+        mediaHtml = `<video src="${imageUrl}" class="event-card__image" autoplay loop muted playsinline webkit-playsinline oncontextmenu="return false;" onloadeddata="this.muted=true; this.play();"></video>`;
     } else {
         mediaHtml = `<img src="${imageUrl || placeholderSvg}" alt="${name}" class="event-card__image" loading="lazy" onerror="this.onerror=null;this.src='${errorSvg}';">`;
     }
