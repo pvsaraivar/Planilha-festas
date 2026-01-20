@@ -23,6 +23,7 @@ document.addEventListener('DOMContentLoaded', () => {
     setupPreCarnavalFeature(); // Configura a aba de Pré Carnaval
     setupSetsFeature(); // Configura a aba de sets (carregamento e busca)
     setupSoundCloudSetsFeature(); // Configura a aba de sets do SoundCloud
+    setupVideoObserver(); // Configura o observador de vídeos para performance
 });
 
 /**
@@ -1117,7 +1118,7 @@ function renderWeeklyEvents(allEvents) {
 
             const isVideo = imageUrl && /\.(mp4|webm|ogg)($|\?)/i.test(imageUrl);
             const mediaHtml = isVideo 
-                ? `<video src="${imageUrl}" class="weekly-event-card__image" autoplay loop muted playsinline webkit-playsinline preload="auto" oncanplay="this.muted=true; this.play();" onerror='this.outerHTML="<img src=\\"${placeholderSvg}\\" class=\\"weekly-event-card__image\\" loading=\\"lazy\\">"'></video>`
+                ? `<video src="${imageUrl}" class="weekly-event-card__image lazy-video" loop muted playsinline webkit-playsinline preload="metadata" onerror='this.outerHTML="<img src=\\"${placeholderSvg}\\" class=\\"weekly-event-card__image\\" loading=\\"lazy\\">"'></video>`
                 : `<img src="${imageUrl || placeholderSvg}" alt="${name}" class="weekly-event-card__image" loading="lazy">`;
 
             return `
@@ -1135,6 +1136,11 @@ function renderWeeklyEvents(allEvents) {
             <h2 id="weekly-events-title">Eventos da semana</h2>
             <div class="weekly-events-grid">${eventsHtml}</div>
         `;
+
+        // Observa os vídeos para tocar apenas quando visíveis
+        if (window.videoObserver) {
+            weeklySection.querySelectorAll('.lazy-video').forEach(video => window.videoObserver.observe(video));
+        }
 
         // Adiciona listeners para abrir o modal ao clicar nos cards da semana
         weeklySection.querySelectorAll('.weekly-event-card').forEach(card => {
@@ -1581,7 +1587,7 @@ function createEventCardElement(event) {
 
     let mediaHtml;
     if (isVideo) {
-        mediaHtml = `<video src="${imageUrl}" class="event-card__image" autoplay loop muted playsinline webkit-playsinline preload="auto" oncontextmenu="return false;" oncanplay="this.muted=true; this.play();" onerror='this.outerHTML="<img src=\\"${errorSvg}\\" class=\\"event-card__image\\" loading=\\"lazy\\">"'></video>`;
+        mediaHtml = `<video src="${imageUrl}" class="event-card__image lazy-video" loop muted playsinline webkit-playsinline preload="metadata" oncontextmenu="return false;" onerror='this.outerHTML="<img src=\\"${errorSvg}\\" class=\\"event-card__image\\" loading=\\"lazy\\">"'></video>`;
     } else {
         mediaHtml = `<img src="${imageUrl || placeholderSvg}" alt="${name}" class="event-card__image" loading="lazy" onerror="this.onerror=null;this.src='${errorSvg}';">`;
     }
@@ -1616,6 +1622,12 @@ function createEventCardElement(event) {
 
         openModal(event);
     });
+
+    // Adiciona o vídeo ao observador de performance
+    const videoElement = card.querySelector('video');
+    if (videoElement && window.videoObserver) {
+        window.videoObserver.observe(videoElement);
+    }
 
     // Adiciona listener para o botão de favorito
     const favoriteBtn = card.querySelector('.favorite-btn');
@@ -2227,4 +2239,23 @@ function setupBackToTopButton() {
             behavior: 'smooth' // Rolagem suave
         });
     });
+}
+
+/**
+ * Configura o IntersectionObserver para vídeos.
+ * Isso garante que os vídeos só toquem quando estiverem visíveis na tela,
+ * economizando MUITA performance e dados.
+ */
+function setupVideoObserver() {
+    if ('IntersectionObserver' in window) {
+        window.videoObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const video = entry.target;
+                    video.play().catch(() => {}); // Ignora erros de autoplay (comuns se o usuário não interagiu)
+                } else {
+                    entry.target.pause();
+                }
+            });
+        }, { rootMargin: '0px 0px 50px 0px' }); // Começa a carregar um pouco antes de aparecer
 }
