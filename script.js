@@ -154,7 +154,7 @@ const eventImageMap = {
     'baile freak 2026': 'assets/blocofreak.PNG',
     'trance on board': 'assets/tranceonboard.PNG',
     'hibrida': 'assets/hibrida.mp4',
-    'papoco boquete kent': 'assets/papocobqt.PNG',
+    'papoco boquete kent': 'assets/papoco2.PNG'
 }
 
 /**
