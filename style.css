@@ -622,6 +622,50 @@ a {
     margin: 0;
 }
 
+.event-card__image-wrapper {
+    position: relative;
+}
+
+.event-card__header {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.event-card__date-badge {
+    position: static;
+    background-color: transparent;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 6px 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-width: 50px;
+    box-shadow: none;
+    flex-shrink: 0;
+}
+
+.event-card__date-day {
+    font-size: 1.2rem;
+    font-weight: 800;
+    color: var(--text-color);
+    line-height: 1;
+}
+
+.event-card__date-month {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--primary-color);
+    margin-top: 2px;
+    letter-spacing: 0.5px;
+}
+
 .event-card__image {
     width: 100%;
     height: 220px;
@@ -647,16 +691,32 @@ a {
     font-size: 1.2rem;
     font-weight: 700;
     margin: 0; 
-    
+    line-height: 1.3;
 }
 
 .event-card__genres {
-    margin: 0.1rem 0 0 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin: 0.5rem 0 0.75rem 0;
+}
+
+.genre-chip {
     font-size: 0.7rem;
-    font-weight: 500;
-    color: var(--subtle-text);
+    font-weight: 600;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    padding: 4px 8px;
+    border-radius: 6px;
+    background-color: rgba(255, 255, 255, 0.05);
+    color: var(--subtle-text);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.2s;
+}
+
+.event-card:hover .genre-chip {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: var(--text-color);
+    border-color: rgba(255, 255, 255, 0.2);
 }
 
 .event-card__attractions {
@@ -798,6 +858,16 @@ a {
 .light-theme .tickets-btn {
     background-color: var(--text-color);
     color: var(--background-end);
+}
+
+.light-theme .event-card__date-badge {
+    background-color: transparent;
+    border-color: var(--border-color);
+    box-shadow: none;
+}
+
+.light-theme .event-card__date-day {
+    color: var(--text-color);
 }
 
 .site-footer {

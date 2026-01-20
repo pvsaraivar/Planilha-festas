@@ -109,7 +109,7 @@ const eventImageMap = {
     'clandestina': 'assets/clandestina.PNG',
     'mirage djs': 'assets/miragedjs.PNG',
     'boiler fuzz 2': 'assets/boilerfuzz2.PNG',
-    'papoco batuke kent': 'assets/papocobatuke.PNG',
+    'papoco boquete kent': 'assets/papocobqt.PNG',
     'wav sunset': 'assets/wavsunset2.PNG',
     'showcase ignis': 'assets/showcaseignis.PNG',
     'fritaria parquelândia': 'assets/fritariaparq.PNG',
@@ -154,7 +154,7 @@ const eventImageMap = {
     'oscvra - impuria': 'assets/oscvraimpuria.PNG',
     'baile freak 2026': 'assets/blocofreak.PNG',
     'trance on board': 'assets/tranceonboard.PNG',
-    'hibrida': 'assets/hibrida.PNG',
+    'hibrida': 'assets/hibrida.mp4',
 }
 
 /**
@@ -328,6 +328,56 @@ function setupNavigation() {
 }
 
 /**
+ * Verifica se o evento já terminou.
+ * @param {Object} event - O objeto do evento.
+ * @returns {boolean} True se o evento já passou.
+ */
+function isEventOver(event) {
+    let dateStr = getProp(event, 'Data') || getProp(event, 'Date');
+    if (!dateStr) return true;
+
+    // Remove horário se estiver junto da data
+    dateStr = dateStr.split(' ')[0].trim();
+    const parts = dateStr.split('/');
+    if (parts.length !== 3) return true;
+
+    const day = parseInt(parts[0], 10);
+    const month = parseInt(parts[1], 10) - 1;
+    const year = parseInt(parts[2], 10);
+
+    if (isNaN(day) || isNaN(month) || isNaN(year)) return true;
+
+    const eventDate = new Date(year, month, day);
+    const now = new Date();
+
+    const startTime = getProp(event, 'Início');
+    const endTime = getProp(event, 'Fim');
+
+    if (endTime) {
+        const [endHour, endMinute] = endTime.split(':').map(Number);
+        const eventEndDate = new Date(eventDate);
+        eventEndDate.setHours(endHour, endMinute || 0, 0, 0);
+
+        // Se o fim for menor que o início (virada de noite) ou menor que 12h (heurística), adiciona 1 dia
+        if (startTime) {
+            const [startHour] = startTime.split(':').map(Number);
+            if (endHour < startHour) {
+                eventEndDate.setDate(eventEndDate.getDate() + 1);
+            }
+        } else if (endHour < 12) {
+            eventEndDate.setDate(eventEndDate.getDate() + 1);
+        }
+
+        return now > eventEndDate;
+    }
+
+    // Se não tiver fim, considera o final do dia
+    const endOfDay = new Date(eventDate);
+    endOfDay.setHours(23, 59, 59, 999);
+    return now > endOfDay;
+}
+
+/**
  * Configura a aba de "Pré Carnaval".
  */
 function setupPreCarnavalFeature() {
@@ -399,32 +449,12 @@ function setupPreCarnavalFeature() {
                 'Cupom': getProp(event, 'Cupom') || getProp(event, 'Desconto')
             }));
 
-            const parseDate = (dateString) => {
-                if (!dateString || typeof dateString !== 'string') return null;
-                // Remove horários se houver (ex: "15/02/2025 16:00" vira "15/02/2025")
-                const cleanDateStr = dateString.split(' ')[0].trim();
-                const parts = cleanDateStr.split('/');
-                if (parts.length !== 3) return null;
-                
-                // Usa parseInt para garantir que estamos pegando apenas os números
-                const day = parseInt(parts[0], 10);
-                const month = parseInt(parts[1], 10) - 1;
-                const year = parseInt(parts[2], 10);
-                
-                if (isNaN(day) || isNaN(month) || isNaN(year)) return null;
-                return new Date(year, month, day);
-            };
-
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
-
             // Filtra eventos ocultos e passados
             window.allPreCarnavalEvents = normalizedEvents.filter(event => {
                 const oculto = (getProp(event, 'Oculto') || '').toLowerCase();
                 if (oculto === 'sim' || oculto === 'true') return false;
 
-                const eventDate = parseDate(getProp(event, 'Data'));
-                return eventDate && eventDate >= today;
+                return !isEventOver(event);
             });
 
             // Ordena por data
@@ -827,19 +857,8 @@ async function loadAndDisplayEvents(csvPath) {
     
     renderWeeklyEvents(allEvents);
 
-    const parseDate = (dateString) => {
-      if (!dateString || typeof dateString !== 'string') return null;
-      const parts = dateString.split('/');
-      if (parts.length !== 3) return null;
-      return new Date(parts[2], parts[1] - 1, parts[0]);
-    };
-
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-
     const futureEvents = allEvents.filter(event => {
-      const eventDate = parseDate(getProp(event, 'Data') || getProp(event, 'Date'));
-      return eventDate && eventDate >= today;
+      return !isEventOver(event);
     });
 
     renderEvents(getSortedEvents(futureEvents), grid);
@@ -1065,7 +1084,7 @@ function renderWeeklyEvents(allEvents) {
     if (upcomingEvents.length > 0) {
         weeklySection.style.display = 'block'; // Mostra a seção
         
-        const eventsHtml = upcomingEvents.map(event => {
+        const eventsHtml = upcomingEvents.map((event, index) => {
             const name = getProp(event, 'Evento') || getProp(event, 'Nome') || 'Evento';
             const date = getProp(event, 'Data') || getProp(event, 'Date');
             const location = getProp(event, 'Local') || 'Local a confirmar';
@@ -1078,9 +1097,14 @@ function renderWeeklyEvents(allEvents) {
 
             const placeholderSvg = "data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3e%3crect width='100%25' height='100%25' fill='%23333'/%3e%3c/svg%3e";
 
+            const isVideo = imageUrl && /\.(mp4|webm|ogg)($|\?)/i.test(imageUrl);
+            const mediaHtml = isVideo 
+                ? `<video src="${imageUrl}" class="weekly-event-card__image" autoplay loop muted playsinline></video>`
+                : `<img src="${imageUrl || placeholderSvg}" alt="${name}" class="weekly-event-card__image" loading="lazy">`;
+
             return `
-                <a href="#" class="weekly-event-card" data-event-slug="${createEventSlug(name)}">
-                    <img src="${imageUrl || placeholderSvg}" alt="${name}" class="weekly-event-card__image" loading="lazy">
+                <a href="#" class="weekly-event-card" data-event-slug="${createEventSlug(name)}" style="animation-delay: ${index * 0.1}s">
+                    ${mediaHtml}
                     <div class="weekly-event-card__info">
                         <h3>${name}</h3>
                         <p>${date} &bull; ${location}</p>
@@ -1231,17 +1255,8 @@ function setupFilters() {
         } else {
 
             // Por padrão, mostra apenas eventos futuros.
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
-            const parseDateForFilter = (dateString) => {
-                if (!dateString || typeof dateString !== 'string') return null;
-                const parts = dateString.split('/');
-                if (parts.length !== 3) return null;
-                return new Date(parts[2], parts[1] - 1, parts[0]);
-            };
             filteredEvents = allEvents.filter(event => {
-                const eventDate = parseDateForFilter(getProp(event, 'Data') || getProp(event, 'Date'));
-                return eventDate && eventDate >= today;
+                return !isEventOver(event);
             });
         }
 
@@ -1459,6 +1474,8 @@ function createEventCardElement(event) {
     if (eventImageMap[eventNameLower]) {
         imageUrl = eventImageMap[eventNameLower];
     }
+    
+    const isVideo = imageUrl && /\.(mp4|webm|ogg)($|\?)/i.test(imageUrl);
 
     // Formata a string de horário
     const timeString = formatTimeString(startTime, endTime);
@@ -1467,12 +1484,31 @@ function createEventCardElement(event) {
 
     const instagramIconSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>`;
 
+    // Lógica para o Badge de Data
+    let dateBadgeHtml = '';
+    if (date && date.includes('/')) {
+        const parts = date.split('/');
+        if (parts.length === 3) {
+            const day = parts[0];
+            const monthIndex = parseInt(parts[1], 10) - 1;
+            const months = ['JAN', 'FEV', 'MAR', 'ABR', 'MAI', 'JUN', 'JUL', 'AGO', 'SET', 'OUT', 'NOV', 'DEZ'];
+            const monthName = months[monthIndex] || '';
+            
+            dateBadgeHtml = `
+                <div class="event-card__date-badge">
+                    <span class="event-card__date-day">${day}</span>
+                    <span class="event-card__date-month">${monthName}</span>
+                </div>
+            `;
+        }
+    }
+
     let genreTagsHtml = '';
     if (genres) {
         const genreList = genres.split(',').map(g => g.trim());
-        // Junta os gêneros em uma única string, separados por um ponto.
-        const genreText = genreList.join(' &bull; ');
-        genreTagsHtml = `<p class="event-card__genres">${genreText}</p>`;
+        // Cria chips para cada gênero
+        const genreChips = genreList.map(g => `<span class="genre-chip">${g}</span>`).join('');
+        genreTagsHtml = `<div class="event-card__genres">${genreChips}</div>`;
     }
 
     // Helper para converter "DD/MM/YYYY" para um objeto Date
@@ -1511,17 +1547,29 @@ function createEventCardElement(event) {
         ticketHtml = `<div class="event-card__footer"><span class="event-card__tickets-btn event-card__tickets-btn--free">Vendas não divulgadas</span></div>`;
     }
 
+    let mediaHtml;
+    if (isVideo) {
+        mediaHtml = `<video src="${imageUrl}" class="event-card__image" autoplay loop muted playsinline webkit-playsinline oncontextmenu="return false;"></video>`;
+    } else {
+        mediaHtml = `<img src="${imageUrl || placeholderSvg}" alt="${name}" class="event-card__image" loading="lazy" onerror="this.onerror=null;this.src='${errorSvg}';">`;
+    }
+
     card.innerHTML = `
-        <img src="${imageUrl || placeholderSvg}" alt="${name}" class="event-card__image" loading="lazy" onerror="this.onerror=null;this.src='${errorSvg}';">
+        <div class="event-card__image-wrapper">
+            ${mediaHtml}
+            ${favoriteButtonHtml}
+        </div>
         <div class="event-card__info">
-            <h2 class="event-card__name">${name}</h2>
+            <div class="event-card__header">
+                ${dateBadgeHtml}
+                <h2 class="event-card__name">${name}</h2>
+            </div>
             ${genreTagsHtml}
             <p class="event-card__details">${dateTimeString}</p>
             ${attractions ? `<p class="event-card__attractions">${attractions}</p>` : ''}
             ${instagramUrl ? `<p class="event-card__instagram"><a href="${instagramUrl}" target="_blank" rel="noopener noreferrer" onclick="trackGAEvent('click_instagram', { event_name: '${name.replace(/'/g, "\\'")}', source: 'card' }); event.stopPropagation();">${instagramIconSvg} Instagram</a></p>` : ''}
             <p class="event-card__location">${location}</p>
         </div>
-        ${favoriteButtonHtml}
         ${ticketHtml}
     `;
 
@@ -2039,6 +2087,12 @@ async function createStorySticker(event) {
     const endTime = getProp(event, 'Fim');
     const attractions = getProp(event, 'Atrações') || '';
     let imageUrl = eventImageMap[name.toLowerCase()] || getProp(event, 'Imagem (URL)') || '';
+
+    // Se for vídeo, usa um placeholder transparente ou imagem padrão, pois html2canvas não suporta vídeo bem
+    if (imageUrl && /\.(mp4|webm|ogg)($|\?)/i.test(imageUrl)) {
+        // Fallback: usa uma imagem transparente de 1px para não quebrar o fetch
+        imageUrl = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
+    }
 
     // Se a imagem for uma URL externa (começa com http), usa um proxy de imagem para evitar problemas de CORS.
     // Isso garante que o html2canvas consiga renderizar a imagem.
