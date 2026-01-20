@@ -109,7 +109,6 @@ const eventImageMap = {
     'clandestina': 'assets/clandestina.PNG',
     'mirage djs': 'assets/miragedjs.PNG',
     'boiler fuzz 2': 'assets/boilerfuzz2.PNG',
-    'papoco boquete kent': 'assets/papocobqt.PNG',
     'wav sunset': 'assets/wavsunset2.PNG',
     'showcase ignis': 'assets/showcaseignis.PNG',
     'fritaria parquelândia': 'assets/fritariaparq.PNG',
@@ -155,6 +154,7 @@ const eventImageMap = {
     'baile freak 2026': 'assets/blocofreak.PNG',
     'trance on board': 'assets/tranceonboard.PNG',
     'hibrida': 'assets/hibrida.mp4',
+    'papoco boquete kent': 'assets/papocobqt.PNG',
 }
 
 /**
