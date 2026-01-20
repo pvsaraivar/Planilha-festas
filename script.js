@@ -403,19 +403,14 @@ function setupPreCarnavalFeature() {
             style.id = 'precarnaval-style';
             style.textContent = `
                 #precarnaval-grid {
-                    display: grid;
-                    grid-template-columns: repeat(4, 1fr);
+                    display: flex;
                     gap: 20px;
+                    align-items: flex-start;
                     width: 100%;
                 }
-                @media (max-width: 1200px) {
+                @media (max-width: 600px) {
                     #precarnaval-grid {
-                        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-                    }
-                }
-                @media (max-width: 768px) {
-                    #precarnaval-grid {
-                        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+                        gap: 1rem;
                     }
                 }
             `;
@@ -482,6 +477,12 @@ function setupPreCarnavalFeature() {
 
         renderEvents(getSortedEvents(filteredEvents), grid);
     }
+
+    // Re-aplica o filtro ao redimensionar a tela para ajustar o número de colunas
+    window.addEventListener('resize', () => {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(applyPreCarnavalFilter, 300);
+    });
 
     searchInput.addEventListener('input', () => {
         clearTimeout(debounceTimer);
@@ -1010,13 +1011,26 @@ function renderEvents(events, gridElement) {
         return;
     }
 
-    const fragment = document.createDocumentFragment();
-    events.forEach(event => {
-        const card = createEventCardElement(event);
-        fragment.appendChild(card);
-    });
+    // Determina o número de colunas com base na largura da tela
+    const width = window.innerWidth;
+    let numCols = 4;
+    if (width < 600) numCols = 2;
+    else if (width < 900) numCols = 3;
 
-    gridElement.appendChild(fragment);
+    // Cria as colunas
+    const columns = [];
+    for (let i = 0; i < numCols; i++) {
+        const col = document.createElement('div');
+        col.className = 'masonry-column';
+        columns.push(col);
+        gridElement.appendChild(col);
+    }
+
+    // Distribui os cards nas colunas (Round-Robin: 1 na col 1, 2 na col 2, etc.)
+    events.forEach((event, index) => {
+        const card = createEventCardElement(event);
+        columns[index % numCols].appendChild(card);
+    });
 }
 
 /**
@@ -1065,9 +1079,13 @@ function renderWeeklyEvents(allEvents) {
 
     const parseDate = (dateString) => {
         if (!dateString || typeof dateString !== 'string') return null;
-        const parts = dateString.split('/');
+        const cleanDateStr = dateString.split(' ')[0].trim();
+        const parts = cleanDateStr.split('/');
         if (parts.length !== 3) return null;
-        return new Date(parts[2], parts[1] - 1, parts[0]);
+        const day = parseInt(parts[0], 10);
+        const month = parseInt(parts[1], 10) - 1;
+        const year = parseInt(parts[2], 10);
+        return (isNaN(day) || isNaN(month) || isNaN(year)) ? null : new Date(year, month, day);
     };
 
     const today = new Date();
@@ -1144,10 +1162,14 @@ function getSortedEvents(events) {
     const parseDate = (dateString) => {
         // Adiciona uma verificação para garantir que dateString é um texto válido
         if (!dateString || typeof dateString !== 'string') return null;
-        const parts = dateString.split('/');
+        const cleanDateStr = dateString.split(' ')[0].trim();
+        const parts = cleanDateStr.split('/');
         if (parts.length !== 3) return null;
+        const day = parseInt(parts[0], 10);
+        const month = parseInt(parts[1], 10) - 1;
+        const year = parseInt(parts[2], 10);
         // Formato: new Date(ano, mês - 1, dia)
-        return new Date(parts[2], parts[1] - 1, parts[0]);
+        return (isNaN(day) || isNaN(month) || isNaN(year)) ? null : new Date(year, month, day);
     };
 
     // Ordena os eventos pela data, do mais antigo para o mais recente
@@ -1293,6 +1315,12 @@ function setupFilters() {
 
         renderEvents(getSortedEvents(filteredEvents), grid);
     };
+
+    // Re-aplica o filtro ao redimensionar a tela para ajustar o número de colunas
+    window.addEventListener('resize', () => {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(applyFilters, 300);
+    });
 
     // Adiciona listeners
     searchInput.addEventListener('input', () => {
@@ -1514,9 +1542,13 @@ function createEventCardElement(event) {
     // Helper para converter "DD/MM/YYYY" para um objeto Date
     const parseDate = (dateString) => {
         if (!dateString || typeof dateString !== 'string') return null;
-        const parts = dateString.split('/');
+        const cleanDateStr = dateString.split(' ')[0].trim();
+        const parts = cleanDateStr.split('/');
         if (parts.length !== 3) return null;
-        return new Date(parts[2], parts[1] - 1, parts[0]);
+        const day = parseInt(parts[0], 10);
+        const month = parseInt(parts[1], 10) - 1;
+        const year = parseInt(parts[2], 10);
+        return (isNaN(day) || isNaN(month) || isNaN(year)) ? null : new Date(year, month, day);
     };
 
     const today = new Date();

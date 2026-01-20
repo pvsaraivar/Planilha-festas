@@ -158,7 +158,6 @@ a {
     flex-wrap: wrap;
     gap: 1rem;
     margin-top: 1.5rem;
-    margin-bottom: -1rem; 
 }
 
 .search-container {
@@ -409,7 +408,9 @@ a {
 #event-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    display: flex;
     gap: 1.5rem;
+    align-items: flex-start;
     padding-top: 2rem;
     padding-bottom: 2rem;
     isolation: isolate;
@@ -418,6 +419,14 @@ a {
 
 .event-grid--filtering {
     opacity: 0;
+}
+
+.masonry-column {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    flex: 1;
+    min-width: 0;
 }
 
 .empty-grid-message {
@@ -566,7 +575,7 @@ a {
 
 /* --- Seção Eventos da Semana --- */
 #weekly-events-section {
-    padding-top: 1rem;
+    padding-top: 0;
     padding-bottom: 1rem;
     border-bottom: 1px solid var(--border-color);
     display: none; /* Começa escondido, o JS mostra se houver eventos */
@@ -576,6 +585,7 @@ a {
     font-size: 1.5rem;
     font-weight: 700;
     margin-bottom: 1.5rem;
+    margin-top: 0;
     color: var(--text-color);
 }
 
@@ -624,6 +634,7 @@ a {
 
 .event-card__image-wrapper {
     position: relative;
+    overflow: hidden;
 }
 
 .event-card__header {
@@ -668,9 +679,13 @@ a {
 
 .event-card__image {
     width: 100%;
-    height: 220px;
-    object-fit: cover;
-    object-position: center;
+    height: auto;
+    display: block;
+    transition: transform 0.5s ease;
+}
+
+.event-card:hover .event-card__image {
+    transform: scale(1.05);
 }
 
 .event-card__info {
@@ -1361,15 +1376,20 @@ a {
 
     .weekly-events-grid {
         grid-template-columns: 1fr; /* Uma coluna em telas pequenas */
+        grid-template-columns: repeat(2, 1fr);
+        grid-template-columns: 1fr;
     }
 
     #event-grid {
-        grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-        gap: 1rem; 
+        gap: 1rem;
+    }
+
+    .masonry-column {
+        gap: 1rem;
     }
 
     .event-card__image {
-        height: 120px; 
+        height: auto;
     }
 
     .event-card__info {
