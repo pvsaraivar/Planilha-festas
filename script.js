@@ -134,7 +134,6 @@ const eventImageMap = {
     'fuga sessions #6': 'assets/fugasessions6.PNG',
     'kaza convida festa base': 'assets/kazaconvidabase.PNG',
     'balanço no mormaço': 'assets/balançomormaço.PNG',
-    'papoco batuke kent': 'assets/papoco2.mp4',
     'house music - clube da prancha': 'assets/clubedaprancha1.PNG',
     'longdreams numa tubulosa': 'assets/tubulosalongdreams.PNG',
     'abertura pré carnaval': 'assets/prefortaleza1601.PNG',
@@ -154,7 +153,8 @@ const eventImageMap = {
     'oscvra - impuria': 'assets/oscvraimpuria.PNG',
     'baile freak 2026': 'assets/blocofreak.PNG',
     'trance on board': 'assets/tranceonboard.PNG',
-    'hibrida': 'assets/hibrida.mp4',
+    'hibrida': 'assets/hibrida.mp4',    
+    'papoco batuke kent': 'assets/papoco2.mp4',
 }
 
 /**
