@@ -133,7 +133,7 @@ const eventImageMap = {
     'voyage e luxxxas': 'assets/voyageluxxas.PNG',
     'fuga sessions #6': 'assets/fugasessions6.PNG',
     'kaza convida festa base': 'assets/kazaconvidabase.PNG',
-    'papoco batuke kent': 'assets/papoco2.mp4',
+    'papoco batuke kent': 'assets/papoco.mp4',
     'balanço no mormaço': 'assets/balançomormaço.PNG',
     'house music - clube da prancha': 'assets/clubedaprancha1.PNG',
     'longdreams numa tubulosa': 'assets/tubulosalongdreams.PNG',
