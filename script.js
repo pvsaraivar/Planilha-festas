@@ -1118,7 +1118,7 @@ function renderWeeklyEvents(allEvents) {
 
             const isVideo = imageUrl && /\.(mp4|webm|ogg)($|\?)/i.test(imageUrl);
             const mediaHtml = isVideo 
-                ? `<video src="${imageUrl}" poster="${placeholderSvg}" class="weekly-event-card__image lazy-video" loop muted playsinline webkit-playsinline preload="metadata" onerror='this.outerHTML="<img src=\\"${placeholderSvg}\\" class=\\"weekly-event-card__image\\" loading=\\"lazy\\">"'></video>`
+                ? `<video src="${imageUrl}#t=0.1" class="weekly-event-card__image lazy-video" loop muted playsinline webkit-playsinline preload="metadata" onerror='this.outerHTML="<img src=\\"${placeholderSvg}\\" class=\\"weekly-event-card__image\\" loading=\\"lazy\\">"'></video>`
                 : `<img src="${imageUrl || placeholderSvg}" alt="${name}" class="weekly-event-card__image" loading="lazy">`;
 
             return `
@@ -1586,8 +1586,12 @@ function createEventCardElement(event) {
     }
 
     let mediaHtml;
+    let playButtonHtml = '';
+
     if (isVideo) {
-        mediaHtml = `<video src="${imageUrl}" poster="${placeholderSvg}" class="event-card__image lazy-video" loop muted playsinline webkit-playsinline preload="metadata" oncontextmenu="return false;" onerror='this.outerHTML="<img src=\\"${errorSvg}\\" class=\\"event-card__image\\" loading=\\"lazy\\">"'></video>`;
+        mediaHtml = `<video src="${imageUrl}#t=0.1" class="event-card__image" loop muted playsinline webkit-playsinline preload="metadata" oncontextmenu="return false;" onerror='this.outerHTML="<img src=\\"${errorSvg}\\" class=\\"event-card__image\\" loading=\\"lazy\\">"'></video>`;
+        const playIconSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="white" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>`;
+        playButtonHtml = `<div class="video-play-button">${playIconSvg}</div>`;
     } else {
         mediaHtml = `<img src="${imageUrl || placeholderSvg}" alt="${name}" class="event-card__image" loading="lazy" onerror="this.onerror=null;this.src='${errorSvg}';">`;
     }
@@ -1595,6 +1599,7 @@ function createEventCardElement(event) {
     card.innerHTML = `
         <div class="event-card__image-wrapper">
             ${mediaHtml}
+            ${playButtonHtml}
             ${favoriteButtonHtml}
         </div>
         <div class="event-card__info">
@@ -1623,10 +1628,33 @@ function createEventCardElement(event) {
         openModal(event);
     });
 
-    // Adiciona o vídeo ao observador de performance
-    const videoElement = card.querySelector('video');
-    if (videoElement && window.videoObserver) {
-        window.videoObserver.observe(videoElement);
+    // Lógica para tocar o vídeo ao clicar na imagem/botão (sem abrir o modal)
+    if (isVideo) {
+        const videoEl = card.querySelector('video');
+        const playBtn = card.querySelector('.video-play-button');
+
+        const togglePlay = (e) => {
+            e.preventDefault();
+            e.stopPropagation(); // Impede abrir o modal
+            
+            if (videoEl.paused) {
+                videoEl.play().then(() => {
+                    if (playBtn) {
+                        playBtn.style.opacity = '0';
+                        playBtn.style.pointerEvents = 'none';
+                    }
+                }).catch(err => console.error("Erro ao reproduzir vídeo:", err));
+            } else {
+                videoEl.pause();
+                if (playBtn) {
+                    playBtn.style.opacity = '1';
+                    playBtn.style.pointerEvents = 'auto';
+                }
+            }
+        };
+
+        if (videoEl) videoEl.addEventListener('click', togglePlay);
+        if (playBtn) playBtn.addEventListener('click', togglePlay);
     }
 
     // Adiciona listener para o botão de favorito
