@@ -1118,7 +1118,7 @@ function renderWeeklyEvents(allEvents) {
 
             const isVideo = imageUrl && /\.(mp4|webm|ogg)($|\?)/i.test(imageUrl);
             const mediaHtml = isVideo 
-                ? `<video src="${imageUrl}" class="weekly-event-card__image lazy-video" loop muted playsinline webkit-playsinline preload="metadata" onerror='this.outerHTML="<img src=\\"${placeholderSvg}\\" class=\\"weekly-event-card__image\\" loading=\\"lazy\\">"'></video>`
+                ? `<video src="${imageUrl}" poster="${placeholderSvg}" class="weekly-event-card__image lazy-video" loop muted playsinline webkit-playsinline preload="metadata" onerror='this.outerHTML="<img src=\\"${placeholderSvg}\\" class=\\"weekly-event-card__image\\" loading=\\"lazy\\">"'></video>`
                 : `<img src="${imageUrl || placeholderSvg}" alt="${name}" class="weekly-event-card__image" loading="lazy">`;
 
             return `
@@ -1587,7 +1587,7 @@ function createEventCardElement(event) {
 
     let mediaHtml;
     if (isVideo) {
-        mediaHtml = `<video src="${imageUrl}" class="event-card__image lazy-video" loop muted playsinline webkit-playsinline preload="metadata" oncontextmenu="return false;" onerror='this.outerHTML="<img src=\\"${errorSvg}\\" class=\\"event-card__image\\" loading=\\"lazy\\">"'></video>`;
+        mediaHtml = `<video src="${imageUrl}" poster="${placeholderSvg}" class="event-card__image lazy-video" loop muted playsinline webkit-playsinline preload="metadata" oncontextmenu="return false;" onerror='this.outerHTML="<img src=\\"${errorSvg}\\" class=\\"event-card__image\\" loading=\\"lazy\\">"'></video>`;
     } else {
         mediaHtml = `<img src="${imageUrl || placeholderSvg}" alt="${name}" class="event-card__image" loading="lazy" onerror="this.onerror=null;this.src='${errorSvg}';">`;
     }
