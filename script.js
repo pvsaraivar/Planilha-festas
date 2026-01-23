@@ -159,7 +159,9 @@ const eventImageMap = {
     'melange no arrumação': 'assets/melange2.PNG',
     'kaliente': 'assets/kaliente.PNG',
     'kaza sessions - ebony e duquesa': 'assets/kazasessionsnandi.PNG',
-    'splash party': 'assets/splashparty.PNG'
+    'splash party': 'assets/splashparty.PNG',
+    'boate fantasma': 'assets/boatefantasma.PNG',
+    'radio nix - ram': 'assets/radionixram.PNG'
 }
 
 /**
