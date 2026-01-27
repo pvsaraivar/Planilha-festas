@@ -1357,6 +1357,37 @@ a {
     box-shadow: 0 2px 8px rgba(0,0,0,0.2);
 }
 
+.floating-clear-filters-btn {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background-color: var(--primary-color);
+    color: var(--background-start);
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 50px;
+    font-weight: 700;
+    font-family: inherit;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    cursor: pointer;
+    z-index: 998;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+
+.floating-clear-filters-btn.visible {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) translateY(0);
+}
+
+.floating-clear-filters-btn:hover {
+    transform: translateX(-50%) scale(1.05);
+    box-shadow: 0 6px 16px rgba(0,0,0,0.4);
+}
+
 /* Mobile */
 
 @media (max-width: 600px) {

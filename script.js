@@ -144,7 +144,6 @@ const eventImageMap = {
     'bloquinho de verão 2': 'assets/bloquinhodeverao2.PNG',
     'segundo dia pré carnaval 2': 'assets/prefortaleza1701.PNG',
     'terceiro dia pré carnaval': 'assets/prefortaleza2401.PNG',
-    'quarto dia pré carnaval': 'assets/prefortaleza3101.PNG',
     'carnahard': 'assets/carnahard.mp4',
     'pacific de janeiro': 'assets/pacificdejaneiro.PNG',
     'dabysha': 'assets/dabysha.PNG',
@@ -161,7 +160,22 @@ const eventImageMap = {
     'kaza sessions - ebony e duquesa': 'assets/kazasessionsnandi.PNG',
     'splash party': 'assets/splashparty.PNG',
     'boate fantasma': 'assets/boatefantasma.PNG',
-    'radio nix - ram': 'assets/radionixram.PNG'
+    'radio nix - ram': 'assets/radionixram.PNG',
+    'pre carnaval fortaleza - 30/01 - mercado': 'assets/prefortaleza3001.PNG',
+    'pre carnaval fortaleza - 30/01 - praça dos leões': 'assets/prefortaleza30012.PNG',
+    'pre carnaval fortaleza - 30/01 - aerolândia': 'assets/prefortaleza30013.PNG',
+    'pre carnaval fortaleza - 30/01 - centro cultural belchior': 'assets/prefortaleza30014.PNG',
+    'pre carnaval fortaleza - 31/01 - mocinha': 'assets/prefortaleza3101.PNG',
+    'pre carnaval fortaleza - 31/01 - mercado': 'assets/prefortaleza31012.PNG',
+    'pre carnaval fortaleza - 31/01 - aterro da praia de iracema': 'assets/prefortaleza31013.PNG',
+    'pre carnaval fortaleza - 31/01 - aterrinho da praia de iracema': 'assets/prefortaleza31014.PNG',
+    'pre carnaval fortaleza - 31/01 - gentilândia': 'assets/prefortaleza31015.PNG',
+    'pre carnaval fortaleza - 31/01 - praça rachel de queiroz': 'assets/prefortaleza31016.PNG',
+    'pre carnaval fortaleza - 31/01 - praça das flores': 'assets/prefortaleza31017.PNG',
+    'pre carnaval fortaleza - 31/01 - bom jardim': 'assets/prefortaleza31018.PNG',
+    'pre carnaval fortaleza - 31/01 - henrique jorge': 'assets/prefortaleza31019.PNG',
+    'pre carnaval fortaleza - 01/02 - benfica': 'assets/prefortaleza0102.PNG',
+    'pre carnaval fortaleza - 01/02 - raimundo dos queijos': 'assets/prefortaleza01022.PNG',
 }
 
 /**
@@ -242,6 +256,8 @@ function setupNavigation() {
         setsFiltersWrapper.style.display = 'none'; // Esconde os filtros de sets
         if (soundCloudSetsFiltersWrapper) soundCloudSetsFiltersWrapper.style.display = 'none';
 
+        weeklySection.classList.remove('precarnaval-mode');
+
         // Mostra a seção de eventos da semana apenas se nenhum filtro estiver ativo
         const anyFilterActive = document.getElementById('clear-all-filters-btn').hidden === false;
         if (!anyFilterActive) {
@@ -266,7 +282,7 @@ function setupNavigation() {
             setsFiltersWrapper.style.display = 'none';
             if (soundCloudSetsFiltersWrapper) soundCloudSetsFiltersWrapper.style.display = 'none';
 
-            weeklySection.style.display = 'block'; // Exibe a seção de eventos da semana
+            weeklySection.style.display = 'none';
             if (preCarnavalSection) preCarnavalSection.style.display = 'block';
             setsSection.style.display = 'none';
             if (soundCloudSetsSection) soundCloudSetsSection.style.display = 'none';
@@ -278,9 +294,6 @@ function setupNavigation() {
 
             if (typeof loadPreCarnavalEvents === 'function' && window.allPreCarnavalEvents.length === 0) {
                 loadPreCarnavalEvents();
-            } else if (window.allPreCarnavalEvents.length > 0) {
-                // Se já estiver carregado, atualiza os eventos da semana para o pré-carnaval
-                renderWeeklyEvents(window.allPreCarnavalEvents);
             }
         });
     }
@@ -415,6 +428,9 @@ function setupPreCarnavalFeature() {
                     align-items: flex-start;
                     width: 100%;
                 }
+                #precarnaval-grid .event-card__image {
+                    min-height: 0;
+                }
                 @media (max-width: 600px) {
                     #precarnaval-grid {
                         gap: 1rem;
@@ -463,7 +479,6 @@ function setupPreCarnavalFeature() {
             const sortedEvents = getSortedEvents(window.allPreCarnavalEvents);
             
             renderEvents(sortedEvents, grid);
-            renderWeeklyEvents(window.allPreCarnavalEvents); // Atualiza eventos da semana com dados do pré-carnaval
 
         } catch (error) {
             console.error("Falha ao carregar pré-carnavais:", error);
@@ -865,12 +880,22 @@ async function loadAndDisplayEvents(csvPath) {
     
     renderWeeklyEvents(allEvents);
 
-    const futureEvents = allEvents.filter(event => {
-      return !isEventOver(event);
-    });
-
-    renderEvents(getSortedEvents(futureEvents), grid);
     populateGenreFilter(allEvents);
+
+    // Verifica se há filtros ativos para reaplicá-los após o carregamento
+    const searchInput = document.getElementById('search-input');
+    const dateInput = document.getElementById('date-filter');
+    const genreFilter = document.getElementById('genre-filter');
+    const favoritesBtn = document.getElementById('favorites-filter-btn');
+    
+    const hasActiveFilters = (searchInput && searchInput.value) || (dateInput && dateInput.value) || (genreFilter && genreFilter.value) || (favoritesBtn && favoritesBtn.classList.contains('is-active'));
+
+    if (hasActiveFilters && genreFilter) {
+        genreFilter.dispatchEvent(new Event('change'));
+    } else {
+        const futureEvents = allEvents.filter(event => !isEventOver(event));
+        renderEvents(getSortedEvents(futureEvents), grid);
+    }
 
     if (eventSlugFromUrl) {
       const eventToOpen = allEvents.find(e => createEventSlug(getProp(e, 'Evento') || getProp(e, 'Nome')) === eventSlugFromUrl);
@@ -1021,8 +1046,15 @@ function renderEvents(events, gridElement) {
     // Determina o número de colunas com base na largura da tela
     const width = window.innerWidth;
     let numCols = 4;
-    if (width < 600) numCols = 2;
-    else if (width < 900) numCols = 3;
+
+    if (gridElement.id === 'precarnaval-grid') {
+        if (width < 600) numCols = 1;
+        else if (width < 900) numCols = 2;
+        else numCols = 3;
+    } else {
+        if (width < 600) numCols = 2;
+        else if (width < 900) numCols = 3;
+    }
 
     // Cria as colunas
     const columns = [];
@@ -1047,6 +1079,7 @@ function renderEvents(events, gridElement) {
 function populateGenreFilter(events) {
     const genreFilter = document.getElementById('genre-filter');
     if (!genreFilter) return;
+    const currentValue = genreFilter.value;
 
     // Limpa opções anteriores (exceto a primeira)
     while (genreFilter.options.length > 1) {
@@ -1075,6 +1108,10 @@ function populateGenreFilter(events) {
         option.textContent = genre.charAt(0).toUpperCase() + genre.slice(1);
         genreFilter.appendChild(option);
     });
+
+    if (currentValue) {
+        genreFilter.value = currentValue;
+    }
 }
 
 /**
@@ -1217,6 +1254,7 @@ function setupFilters() {
     const shareFiltersBtn = document.getElementById('share-filters-btn');
     const searchLoader = document.getElementById('search-loader');
     const grid = document.getElementById('event-grid');
+    const floatingClearBtn = document.getElementById('floating-clear-filters-btn');
 
     const applyFilters = () => {
         const searchTerm = searchInput.value.toLowerCase();
@@ -1236,6 +1274,16 @@ function setupFilters() {
         const anyFilterActive = !!searchTerm || !!selectedDate || (!!selectedGenre && selectedGenre !== '') || favoritesOnly;
         clearAllBtn.hidden = !anyFilterActive;
         shareFiltersBtn.hidden = !anyFilterActive;
+
+        // Atualiza a visibilidade do botão flutuante
+        if (floatingClearBtn) {
+            const isScrolled = window.scrollY > 200;
+            if (anyFilterActive && isScrolled) {
+                floatingClearBtn.classList.add('visible');
+            } else {
+                floatingClearBtn.classList.remove('visible');
+            }
+        }
 
         // Oculta a seção "Eventos da semana" se qualquer filtro estiver ativo
         const weeklySection = document.getElementById('weekly-events-section');
@@ -1279,12 +1327,18 @@ function setupFilters() {
         if (selectedDate) {
             // Se uma data for selecionada, a busca é feita em TODOS os eventos.
             const [year, month, day] = selectedDate.split('-'); // 'YYYY', 'MM', 'DD'
-            // Remove o zero à esquerda do dia e do mês para corresponder ao formato da planilha (ex: '1/11/2024' em vez de '01/11/2024')
-            const formattedDate = `${parseInt(day, 10)}/${parseInt(month, 10)}/${year}`;
+            
+            const targetDay = parseInt(day, 10);
+            const targetMonth = parseInt(month, 10);
+            const targetYear = parseInt(year, 10);
             
             filteredEvents = allEvents.filter(event => {
                 const eventDate = getProp(event, 'Data') || getProp(event, 'Date');
-                return eventDate === formattedDate;
+                if (!eventDate) return false;
+                const parts = eventDate.split('/');
+                if (parts.length !== 3) return false;
+                
+                return parseInt(parts[0], 10) === targetDay && parseInt(parts[1], 10) === targetMonth && parseInt(parts[2], 10) === targetYear;
             });
         } else {
 
@@ -1386,6 +1440,23 @@ function setupFilters() {
         favoritesFilterBtn.classList.remove('is-active');
         applyFilters();
     });
+
+    // Listeners para o botão flutuante
+    if (floatingClearBtn) {
+        floatingClearBtn.addEventListener('click', () => {
+            clearAllBtn.click(); // Reutiliza a lógica do botão principal
+        });
+
+        window.addEventListener('scroll', () => {
+            const anyFilterActive = !clearAllBtn.hidden;
+            const isScrolled = window.scrollY > 200;
+            if (anyFilterActive && isScrolled) {
+                floatingClearBtn.classList.add('visible');
+            } else {
+                floatingClearBtn.classList.remove('visible');
+            }
+        });
+    }
 
     // Chama applyFilters uma vez na inicialização para definir o estado dos botões com base nos parâmetros da URL
     applyFilters();
