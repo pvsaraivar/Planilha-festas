@@ -154,7 +154,7 @@ const eventImageMap = {
     'oscvra - impuria': 'assets/oscvraimpuria.PNG',
     'baile freak 2026': 'assets/blocofreak.mp4',
     'trance on board': 'assets/tranceonboard.PNG',
-    'hibrida': 'assets/hibrida.PNG',
+    'hibrida': 'assets/hibrida.mp4',
     'melange no arrumação': 'assets/melange2.PNG',
     'kaliente': 'assets/kaliente.PNG',
     'kaza sessions - ebony e duquesa': 'assets/kazasessionsnandi.PNG',
