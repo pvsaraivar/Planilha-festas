@@ -177,6 +177,7 @@ const eventImageMap = {
     'pre carnaval fortaleza - 01/02 - benfica': 'assets/prefortaleza0102.PNG',
     'pre carnaval fortaleza - 01/02 - raimundo dos queijos': 'assets/prefortaleza01022.PNG',
     'calúnia - delírio tropical': 'assets/calunia3.PNG',
+    'jackwav bday': 'assets/jackwav.PNG'
 }
 
 /**
