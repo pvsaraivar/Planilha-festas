@@ -179,7 +179,14 @@ const eventImageMap = {
     'calúnia - delírio tropical': 'assets/calunia3.PNG',
     'jackwav bday': 'assets/jackwav.PNG',
     'festa base': 'assets/clubedaprancha2.PNG',
-    'bateu long set - lucas bmr': 'assets/bmrlongset.PNG'
+    'bateu long set - lucas bmr': 'assets/bmrlongset.PNG',
+    'baile do radar - carlos do complexo': 'assets/baileradarcdc.MP4',
+    'bunker 7': 'assets/bunker7.MP4',
+    'isaknaja y convidados': 'assets/isaknaja.PNG',
+    'bloco é sal': 'assets/blocoesal.PNG',
+    'fuzuê bar - 04/02': 'assets/fuzue0402.PNG',
+    'budega dos pinhões - 05/02': 'assets/budega0502.PNG'
+    
 }
 
 /**
