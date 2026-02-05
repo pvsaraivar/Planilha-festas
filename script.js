@@ -2294,6 +2294,7 @@ function renderEventDetailPage(event, container, allEvents = []) {
     const ticketUrl = getProp(event, 'Ingressos (URL)');
     const instagramUrl = getProp(event, 'Instagram (URL)');
     const coupon = getProp(event, 'Cupom');
+    const producer = getProp(event, 'Produtora');
     
     let imageUrl = getProp(event, 'Imagem (URL)');
     const eventNameLower = name.trim().toLowerCase();
@@ -2324,8 +2325,45 @@ function renderEventDetailPage(event, container, allEvents = []) {
         instagramHtml = `<a href="${instagramUrl}" target="_blank" class="share-btn"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg> Instagram</a>`;
     }
 
+    let producerHtml = '';
+    if (producer) {
+        producerHtml = `
+            <div class="detail-section producer-section">
+                <h3>Organizado por</h3>
+                <div class="producer-info">
+                    <span class="producer-name">${producer}</span>
+                    <a href="index.html?search=${encodeURIComponent(producer)}" class="producer-link">
+                        Ver mais eventos
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                    </a>
+                </div>
+            </div>
+        `;
+    }
+
     let mapHtml = '';
     const mapQuery = address ? `${location}, ${address}` : location;
+
+    let directionsHtml = '';
+    if (location && location !== 'Localização não divulgada') {
+        const encodedQuery = encodeURIComponent(mapQuery);
+        directionsHtml = `
+            <div class="directions-buttons">
+                <a href="https://www.google.com/maps/search/?api=1&query=${encodedQuery}" target="_blank" class="direction-btn google-maps-btn" title="Abrir no Google Maps">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon><line x1="8" y1="2" x2="8" y2="18"></line><line x1="16" y1="6" x2="16" y2="22"></line></svg>
+                    Maps
+                </a>
+                <a href="https://waze.com/ul?q=${encodedQuery}&navigate=yes" target="_blank" class="direction-btn waze-btn" title="Abrir no Waze">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-2.7 8.5c-.2.7.3 1.4 1 1.4H2c.6 0 1-.4 1-1v-1c0-.9.7-1.7 1.5-1.9.1-.2.3-.4.5-.6V16c0 .6.4 1 1 1h1c.6 0 1-.4 1-1v-1h6v1c0 .6.4 1 1 1h1c.6 0 1-.4 1-1v-1h1v1c0 .6.4 1 1 1z"></path></svg>
+                    Waze
+                </a>
+                <a href="https://m.uber.com/ul/?action=setPickup&pickup=my_location&dropoff[formatted_address]=${encodedQuery}" target="_blank" class="direction-btn uber-btn" title="Solicitar Uber">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><rect x="9" y="9" width="6" height="6"></rect></svg>
+                    Uber
+                </a>
+            </div>
+        `;
+    }
 
     if (location && location !== 'Localização não divulgada') {
         mapHtml = `
@@ -2352,6 +2390,7 @@ function renderEventDetailPage(event, container, allEvents = []) {
                         <span class="detail-label">Local</span>
                         <span class="detail-value">${location}</span>
                         ${address ? `<span class="detail-address">${address}</span>` : ''}
+                        ${directionsHtml}
                     </div>
                 </div>
                 
@@ -2359,6 +2398,8 @@ function renderEventDetailPage(event, container, allEvents = []) {
                     <h3>Atrações</h3>
                     <p>${attractions}</p>
                 </div>
+
+                ${producerHtml}
 
                 ${coupon ? `<div class="detail-coupon-box"><strong>Cupom:</strong> <span>${coupon}</span></div>` : ''}
 
