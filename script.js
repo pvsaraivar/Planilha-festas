@@ -185,7 +185,8 @@ const eventImageMap = {
     'isaknaja y convidados': 'assets/isaknaja.PNG',
     'bloco é sal': 'assets/blocoesal.PNG',
     'fuzuê bar - 04/02': 'assets/fuzue0402.PNG',
-    'budega dos pinhões - 05/02': 'assets/budega0502.PNG'
+    'budega dos pinhões - 05/02': 'assets/budega0502.PNG',
+    'pré delas no clube da prancha': 'assets/clubedaprancha3.PNG'
     
 }
 
@@ -1586,6 +1587,12 @@ function createEventCardElement(event) {
     const instagramUrl = getProp(event, 'Instagram (URL)');
     const coupon = getProp(event, 'Cupom');
 
+    let couponBadgeHtml = '';
+    if (coupon) {
+        const tagIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 4px;"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7.01" y2="7"></line></svg>`;
+        couponBadgeHtml = `<div class="coupon-badge">${tagIcon} Cupom</div>`;
+    }
+
     // Usando Data URI para o placeholder, garantindo que funcione offline.
     // ... (código do placeholder)
     const placeholderSvg = "data:image/svg+xml,%3csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 400 300%27%3e%3crect width=%27100%25%27 height=%27100%25%27 fill=%27%23e9ecef%27/%3e%3ctext x=%2750%25%27 y=%2750%25%27 fill=%27%236c757d%27 font-size=%2720%27 text-anchor=%27middle%27 dominant-baseline=%27middle%27%3eEvento%3c/text%3e%3c/svg%3e";
@@ -1689,6 +1696,7 @@ function createEventCardElement(event) {
             ${mediaHtml}
             ${playButtonHtml}
             ${favoriteButtonHtml}
+            ${couponBadgeHtml}
         </div>
         <div class="event-card__info">
             <div class="event-card__header">
@@ -1978,6 +1986,17 @@ function openModal(event) {
     const instagramUrl = getProp(event, 'Instagram (URL)');
     const coupon = getProp(event, 'Cupom');
 
+    // Lógica da imagem (copiada de createEventCardElement)
+    let imageUrl = getProp(event, 'Imagem (URL)');
+    const eventNameLower = name.trim().toLowerCase();
+    if (eventImageMap[eventNameLower]) {
+        imageUrl = eventImageMap[eventNameLower];
+    }
+    const isVideo = imageUrl && /\.(mp4|webm|ogg)($|\?)/i.test(imageUrl);
+    const placeholderSvg = "data:image/svg+xml,%3csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 400 300%27%3e%3crect width=%27100%25%27 height=%27100%25%27 fill=%27%231a1a1a%27/%3e%3ctext x=%2750%25%27 y=%2750%25%27 fill=%27%23333%27 font-size=%2720%27 text-anchor=%27middle%27 dominant-baseline=%27middle%27%3eSem Imagem%3c/text%3e%3c/svg%3e";
+
+    const mediaHtml = isVideo ? `<video src="${imageUrl}" class="modal-image" controls autoplay loop muted playsinline></video>` : `<img src="${imageUrl || placeholderSvg}" alt="${name}" class="modal-image" onerror="this.src='${placeholderSvg}'">`;
+
     let locationHtml = `<span>${location}</span>`;
 
     const mapPinIconSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>`;
@@ -2056,37 +2075,42 @@ function openModal(event) {
     }
 
     modalContent.innerHTML = `
-        <button class="favorite-btn modal-favorite-btn ${isEventFavorited ? 'favorited' : ''}" data-event-slug="${eventSlug}" title="${isEventFavorited ? 'Remover dos favoritos' : 'Adicionar aos favoritos'}">
-            ${getHeartIcon(isEventFavorited)}
-        </button>
-
-        <h2>${name}</h2>
-        <div class="modal-details-grid">
-            <div class="modal-detail-item">
-                <span class="modal-detail-label">Data</span>
-                <span class="modal-detail-value">${date}</span>
-            </div>
-            ${timeString ? `
-            <div class="modal-detail-item">
-                <span class="modal-detail-label">Horário</span>
-                <span class="modal-detail-value">${timeString}</span>
-            </div>` : ''}
-            <div class="modal-detail-item">
-                <span class="modal-detail-label">Local</span>
-                <span class="modal-detail-value location-container">${locationHtml}</span>
-            </div>
-            <div class="modal-detail-item">
-                <span class="modal-detail-label">Atrações</span>
-                <span class="modal-detail-value">${attractions}</span>
-            </div>
-            ${instagramDetailHtml}
-            ${couponDetailHtml}
+        <div class="modal-image-wrapper">
+            ${mediaHtml}
+            <button class="favorite-btn modal-favorite-btn ${isEventFavorited ? 'favorited' : ''}" data-event-slug="${eventSlug}" title="${isEventFavorited ? 'Remover dos favoritos' : 'Adicionar aos favoritos'}">
+                ${getHeartIcon(isEventFavorited)}
+            </button>
         </div>
 
-        <hr class="modal-separator">
-        <div class="modal-actions">
-            ${ticketActionHtml}
-            <button class="share-btn copy-link-btn">${copyLinkIconSvg} Copiar link</button>
+        <div class="modal-body">
+            <h2>${name}</h2>
+            <div class="modal-details-grid">
+                <div class="modal-detail-item">
+                    <span class="modal-detail-label">Data</span>
+                    <span class="modal-detail-value">${date}</span>
+                </div>
+                ${timeString ? `
+                <div class="modal-detail-item">
+                    <span class="modal-detail-label">Horário</span>
+                    <span class="modal-detail-value">${timeString}</span>
+                </div>` : ''}
+                <div class="modal-detail-item">
+                    <span class="modal-detail-label">Local</span>
+                    <span class="modal-detail-value location-container">${locationHtml}</span>
+                </div>
+                <div class="modal-detail-item">
+                    <span class="modal-detail-label">Atrações</span>
+                    <span class="modal-detail-value">${attractions}</span>
+                </div>
+                ${instagramDetailHtml}
+                ${couponDetailHtml}
+            </div>
+
+            <hr class="modal-separator">
+            <div class="modal-actions">
+                ${ticketActionHtml}
+                <button class="share-btn copy-link-btn">${copyLinkIconSvg} Copiar link</button>
+            </div>
         </div>
     `;
 

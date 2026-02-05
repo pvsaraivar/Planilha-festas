@@ -862,6 +862,28 @@ a {
     100% { transform: scale(1); }
 }
 
+.coupon-badge {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    background-color: rgba(46, 204, 113, 0.9);
+    color: #fff;
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 6px 10px;
+    border-radius: 6px;
+    z-index: 5;
+    text-transform: uppercase;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    letter-spacing: 0.5px;
+    display: flex;
+    align-items: center;
+    pointer-events: none;
+}
+
 .video-play-button {
     position: absolute;
     top: 50%;
@@ -888,8 +910,9 @@ a {
 }
 
 .modal-favorite-btn {
-    top: 1.25rem;
-    right: 3.5rem; /* Posição ajustada para não sobrepor o botão de fechar */
+    top: 1rem;
+    right: 4rem;
+    z-index: 20;
 }
 
 /* Modo claro */
@@ -1002,7 +1025,7 @@ a {
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.8);
+    background-color: rgba(0, 0, 0, 0.6);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1018,9 +1041,13 @@ a {
 }
 
 .modal {
-    background-color: var(--card-background);
+    background-color: rgba(20, 20, 20, 0.6);
+    backdrop-filter: blur(24px) saturate(180%);
+    -webkit-backdrop-filter: blur(24px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
     border-radius: var(--border-radius);
-    padding: 2rem;
+    padding: 0;
     width: 90%;
     max-width: 600px;
     position: relative;
@@ -1030,8 +1057,9 @@ a {
     transition: transform 0.3s ease;
 }
 .light-theme .modal {
-    border: 1px solid var(--border-color);
-    box-shadow: var(--shadow);
+    background-color: rgba(255, 255, 255, 0.65);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
 }
 
 .modal-overlay.is-visible .modal {
@@ -1040,15 +1068,51 @@ a {
 
 .modal-close-btn {
     position: absolute;
-    top: 0.75rem;
-    right: 0.75rem;
-    background: none;
-    border: none;
-    font-size: 2rem;
-    color: var(--subtle-text);
+    top: 1rem;
+    right: 1rem;
+    background-color: rgba(0, 0, 0, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    color: #fff;
     cursor: pointer;
-    line-height: 1;
     padding: 0;
+    z-index: 20;
+    transition: background-color 0.2s;
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+}
+
+.modal-close-btn:hover {
+    background-color: rgba(0, 0, 0, 0.8);
+}
+
+.modal-image-wrapper {
+    position: relative;
+    width: 100%;
+    height: 300px;
+    background-color: var(--background-start);
+    overflow: hidden;
+    opacity: 0;
+    animation: modalImageFade 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+.modal-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.modal-body {
+    padding: 2rem;
+    opacity: 0;
+    animation: modalContentSlide 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) 0.2s forwards;
 }
 
 .modal-content h2 {
@@ -1491,7 +1555,6 @@ a {
 
     .modal {
         width: calc(100% - 2rem); 
-        padding: 1rem; 
         max-height: 80vh; 
         overflow-y: auto;
     }
@@ -1510,7 +1573,15 @@ a {
 
     .modal-content h2 {
         font-size: 1.2rem;
-        padding-right: 4rem; /* Adiciona espaço para os botões de fechar e favorito */
+        padding-right: 0;
+    }
+
+    .modal-body {
+        padding: 1.25rem;
+    }
+
+    .modal-image-wrapper {
+        height: 200px;
     }
 
     .modal-actions {
@@ -1542,5 +1613,26 @@ a {
     .sets-grid {
         grid-template-columns: 1fr;
     }
+}
 
+@keyframes modalImageFade {
+    from {
+        opacity: 0;
+        transform: scale(1.05);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes modalContentSlide {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
