@@ -10,20 +10,28 @@ document.addEventListener('DOMContentLoaded', () => {
     // A URL agora aponta especificamente para a aba de eventos usando o GID.
     const googleSheetUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/export?format=csv&gid=${eventsGid}`;
     
-    // Primeiro, lê os parâmetros da URL para saber se um evento específico deve ser aberto.
-    applyFiltersFromURL();
-    loadFavorites(); // Carrega os favoritos do localStorage antes de exibir os eventos
-    loadAndDisplayEvents(googleSheetUrl);
-    setupFilters();
-    setupModal();
-    setupContactModal();
-    setupBackToTopButton();
     setupThemeToggle();
-    setupNavigation(); 
-    setupPreCarnavalFeature(); // Configura a aba de Pré Carnaval
-    setupSetsFeature(); // Configura a aba de sets (carregamento e busca)
-    setupSoundCloudSetsFeature(); // Configura a aba de sets do SoundCloud
-    setupVideoObserver(); // Configura o observador de vídeos para performance
+
+    // Verifica se estamos na página de detalhes
+    const detailContainer = document.getElementById('event-detail-container');
+    if (detailContainer) {
+        loadEventDetails(googleSheetUrl);
+        setupFloatingBackButton();
+    } else {
+        // Estamos na página inicial (index.html)
+        applyFiltersFromURL();
+        loadFavorites(); 
+        loadAndDisplayEvents(googleSheetUrl);
+        setupFilters();
+        setupModal();
+        setupContactModal();
+        setupBackToTopButton();
+        setupNavigation(); 
+        setupPreCarnavalFeature(); 
+        setupSetsFeature(); 
+        setupSoundCloudSetsFeature(); 
+        setupVideoObserver(); 
+    }
 });
 
 /**
@@ -1199,10 +1207,10 @@ function renderWeeklyEvents(allEvents) {
         // Adiciona listeners para abrir o modal ao clicar nos cards da semana
         weeklySection.querySelectorAll('.weekly-event-card').forEach(card => {
             card.addEventListener('click', (e) => {
-                e.preventDefault();
+                // e.preventDefault(); // Removemos o preventDefault para permitir o link normal se fosse um <a>, mas aqui vamos redirecionar via JS
                 const slug = card.dataset.eventSlug;
-                const eventToOpen = allEvents.find(ev => createEventSlug(getProp(ev, 'Evento') || getProp(ev, 'Nome')) === slug);
-                if (eventToOpen) openModal(eventToOpen);
+                // Redireciona para a página de detalhes
+                window.location.href = `detalhes.html?event=${slug}`;
             });
         });
     } else {
@@ -1500,6 +1508,8 @@ function setupFilters() {
  */
 function setupThemeToggle() {
     const themeToggleBtn = document.getElementById('theme-toggle-btn');
+    if (!themeToggleBtn) return;
+
     const body = document.body;
     const sunIcon = themeToggleBtn.querySelector('.sun-icon');
     const moonIcon = themeToggleBtn.querySelector('.moon-icon');
@@ -1713,14 +1723,8 @@ function createEventCardElement(event) {
 
     card.addEventListener('click', () => {
         const eventSlug = createEventSlug(name);
-        const params = new URLSearchParams(window.location.search);
-        params.set('event', eventSlug);
-        const newUrl = `${window.location.pathname}?${params.toString()}`;
-
-        // Atualiza a URL sem recarregar a página
-        window.history.pushState({ path: newUrl }, '', newUrl);
-
-        openModal(event);
+        // Redireciona para a página de detalhes
+        window.location.href = `detalhes.html?event=${eventSlug}`;
     });
 
     // Lógica para tocar o vídeo ao clicar na imagem/botão (sem abrir o modal)
@@ -2193,6 +2197,23 @@ function setupBackToTopButton() {
 }
 
 /**
+ * Configura o botão flutuante de voltar na página de detalhes.
+ */
+function setupFloatingBackButton() {
+    const backBtn = document.getElementById('floating-back-btn');
+    if (!backBtn) return;
+
+    // Mostra o botão apenas quando rolar a página, pois o header já tem um botão de voltar
+    window.addEventListener('scroll', () => {
+        if (window.scrollY > 150) {
+            backBtn.classList.add('visible');
+        } else {
+            backBtn.classList.remove('visible');
+        }
+    });
+}
+
+/**
  * Configura o IntersectionObserver para vídeos.
  * Isso garante que os vídeos só toquem quando estiverem visíveis na tela,
  * economizando MUITA performance e dados.
@@ -2214,5 +2235,178 @@ function setupVideoObserver() {
                 }
             });
         }, { threshold: 0.5 }); // Requer 50% de visibilidade para evitar bugs ao rolar
+    }
+}
+
+/**
+ * Carrega e exibe os detalhes do evento na página detalhes.html
+ */
+async function loadEventDetails(csvPath) {
+    const params = new URLSearchParams(window.location.search);
+    const slug = params.get('event');
+    const container = document.getElementById('event-detail-container');
+
+    if (!slug) {
+        container.innerHTML = '<p class="empty-grid-message">Evento não especificado.</p>';
+        return;
+    }
+
+    try {
+        // Tenta usar cache se disponível (mesma lógica da home)
+        const cacheKey = 'events_cache';
+        let csvText = sessionStorage.getItem(cacheKey);
+
+        if (!csvText) {
+            const response = await fetch(csvPath);
+            if (!response.ok) throw new Error('Falha ao carregar dados');
+            csvText = await response.text();
+            sessionStorage.setItem(cacheKey, csvText);
+        }
+
+        const events = parseCSV(csvText);
+        const event = events.find(e => createEventSlug(getProp(e, 'Evento') || getProp(e, 'Nome')) === slug);
+
+        if (!event) {
+            container.innerHTML = '<p class="empty-grid-message">Evento não encontrado.</p>';
+            return;
+        }
+
+        // Renderiza o conteúdo (reutilizando lógica visual do modal, mas adaptada para página)
+        renderEventDetailPage(event, container, events);
+        
+        // Atualiza título da página
+        document.title = `${getProp(event, 'Evento') || getProp(event, 'Nome')} | Logística Clubber`;
+
+    } catch (error) {
+        console.error(error);
+        container.innerHTML = '<p class="empty-grid-message">Erro ao carregar evento.</p>';
+    }
+}
+
+function renderEventDetailPage(event, container, allEvents = []) {
+    const name = getProp(event, 'Evento') || getProp(event, 'Nome');
+    const date = getProp(event, 'Data') || getProp(event, 'Date');
+    const location = getProp(event, 'Local');
+    const address = getProp(event, 'Endereço') || getProp(event, 'Endereco') || getProp(event, 'Address');
+    const attractions = getProp(event, 'Atrações') || 'Não informado';
+    const startTime = getProp(event, 'Início');
+    const endTime = getProp(event, 'Fim');
+    const ticketUrl = getProp(event, 'Ingressos (URL)');
+    const instagramUrl = getProp(event, 'Instagram (URL)');
+    const coupon = getProp(event, 'Cupom');
+    
+    let imageUrl = getProp(event, 'Imagem (URL)');
+    const eventNameLower = name.trim().toLowerCase();
+    if (eventImageMap[eventNameLower]) imageUrl = eventImageMap[eventNameLower];
+    
+    const isVideo = imageUrl && /\.(mp4|webm|ogg)($|\?)/i.test(imageUrl);
+    const placeholderSvg = "data:image/svg+xml,%3csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 400 300%27%3e%3crect width=%27100%25%27 height=%27100%25%27 fill=%27%231a1a1a%27/%3e%3ctext x=%2750%25%27 y=%2750%25%27 fill=%27%23333%27 font-size=%2720%27 text-anchor=%27middle%27 dominant-baseline=%27middle%27%3eSem Imagem%3c/text%3e%3c/svg%3e";
+
+    const mediaHtml = isVideo 
+        ? `<video src="${imageUrl}" class="detail-page-image" controls autoplay loop muted playsinline></video>` 
+        : `<img src="${imageUrl || placeholderSvg}" alt="${name}" class="detail-page-image" onerror="this.src='${placeholderSvg}'">`;
+
+    const timeString = formatTimeString(startTime, endTime);
+    
+    // Reutilizando lógica de botões e links
+    let ticketActionHtml = '';
+    if (ticketUrl) {
+        const ticketInfo = ticketUrl.toLowerCase().trim();
+        if (ticketInfo === 'gratuito' || ticketInfo === 'couvert') {
+            ticketActionHtml = `<span class="share-btn tickets-btn tickets-btn--free">${ticketInfo === 'gratuito' ? 'Gratuito' : 'Couvert no local'}</span>`;
+        } else {
+            ticketActionHtml = `<a href="${ticketUrl}" target="_blank" class="share-btn tickets-btn">Comprar Ingresso</a>`;
+        }
+    }
+
+    let instagramHtml = '';
+    if (instagramUrl) {
+        instagramHtml = `<a href="${instagramUrl}" target="_blank" class="share-btn"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg> Instagram</a>`;
+    }
+
+    let mapHtml = '';
+    const mapQuery = address ? `${location}, ${address}` : location;
+
+    if (location && location !== 'Localização não divulgada') {
+        mapHtml = `
+            <div class="detail-map">
+                <h3>Localização</h3>
+                <iframe class="map-iframe" src="https://maps.google.com/maps?q=${encodeURIComponent(mapQuery)}&t=&z=15&ie=UTF8&iwloc=&output=embed" allowfullscreen></iframe>
+            </div>
+        `;
+    }
+
+    container.innerHTML = `
+        <div class="detail-content-wrapper">
+            <div class="detail-media-column">
+                ${mediaHtml}
+            </div>
+            <div class="detail-info-column">
+                <h1 class="detail-title">${name}</h1>
+                <div class="detail-meta">
+                    <div class="detail-meta-item">
+                        <span class="detail-label">Data e Hora</span>
+                        <span class="detail-value">${date} ${timeString ? `• ${timeString}` : ''}</span>
+                    </div>
+                    <div class="detail-meta-item">
+                        <span class="detail-label">Local</span>
+                        <span class="detail-value">${location}</span>
+                        ${address ? `<span class="detail-address">${address}</span>` : ''}
+                    </div>
+                </div>
+                
+                <div class="detail-section">
+                    <h3>Atrações</h3>
+                    <p>${attractions}</p>
+                </div>
+
+                ${coupon ? `<div class="detail-coupon-box"><strong>Cupom:</strong> <span>${coupon}</span></div>` : ''}
+
+                <div class="detail-actions">
+                    ${ticketActionHtml}
+                    ${instagramHtml}
+                </div>
+                ${mapHtml}
+            </div>
+        </div>
+        <div id="related-events-section" class="related-events-section">
+            <h2>Eventos Relacionados</h2>
+            <div class="related-events-grid" id="related-events-grid"></div>
+        </div>
+    `;
+
+    // Lógica para Eventos Relacionados
+    if (allEvents && allEvents.length > 0) {
+        const currentGenres = (getProp(event, 'Gênero') || '').toLowerCase().split(',').map(g => g.trim()).filter(g => g);
+        const currentSlug = createEventSlug(name);
+
+        // Filtra eventos: não ocultos, futuros, não é o atual, e tem gênero em comum
+        let related = allEvents.filter(e => {
+            const oculto = (getProp(e, 'Oculto') || '').toLowerCase();
+            if (oculto === 'sim' || oculto === 'true') return false;
+            
+            if (isEventOver(e)) return false;
+
+            const eSlug = createEventSlug(getProp(e, 'Evento') || getProp(e, 'Nome'));
+            if (eSlug === currentSlug) return false;
+
+            const eGenres = (getProp(e, 'Gênero') || '').toLowerCase().split(',').map(g => g.trim());
+            return currentGenres.some(g => eGenres.includes(g));
+        });
+
+        if (related.length > 0) {
+            // Ordena por data e pega os 3 primeiros
+            related = getSortedEvents(related).slice(0, 3);
+            
+            const relatedGrid = document.getElementById('related-events-grid');
+            related.forEach(e => {
+                const card = createEventCardElement(e);
+                relatedGrid.appendChild(card);
+            });
+        } else {
+            document.getElementById('related-events-section').style.display = 'none';
+        }
+    } else {
+        document.getElementById('related-events-section').style.display = 'none';
     }
 }
