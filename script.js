@@ -197,7 +197,6 @@ const eventImageMap = {
     'fuzuê bar - 04/02': 'assets/fuzue0402.PNG',
     'budega dos pinhões - 05/02': 'assets/budega0502.PNG',
     'pré delas no clube da prancha': 'assets/clubedaprancha3.PNG'
-
 }
 
 /**
@@ -1513,7 +1512,7 @@ function setupFilters() {
  * Configura o vídeo especial de domingo.
  * Verifica se é domingo (dia 0). Se for, mostra o vídeo e configura o redirecionamento.
  */
-function setupSundayVideo() {
+async function setupSundayVideo() {
     const wrapper = document.getElementById('sunday-video-wrapper');
     const video = document.getElementById('sunday-video');
     
@@ -1562,12 +1561,10 @@ function setupSundayVideo() {
         // Mensagem de aviso
         const message = document.createElement('div');
         message.className = 'rotate-message';
+        // Estado inicial: Carregando
         message.innerHTML = `
-            <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="rotate-icon">
-                <rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect>
-                <path d="M12 18h.01"></path>
-            </svg>
-            <span>Vire a tela</span>
+            <div class="video-loader"></div>
+            <span id="loading-progress-text">Carregando experiência... 0%</span>
         `;
         wrapper.appendChild(message);
 
@@ -1578,7 +1575,57 @@ function setupSundayVideo() {
         video.style.borderRadius = '0';
         video.style.boxShadow = 'none';
         video.style.objectFit = 'contain';
-        video.muted = false;
+        
+        // Lógica de Carregamento do Blob (Cache Local)
+        const videoUrl = 'assets/tubulosalongdreams.mp4';
+        try {
+            let blob = await getBlob(videoUrl);
+            if (!blob) {
+                // Download com progresso usando XMLHttpRequest para feedback visual
+                blob = await new Promise((resolve, reject) => {
+                    const xhr = new XMLHttpRequest();
+                    xhr.open('GET', videoUrl, true);
+                    xhr.responseType = 'blob';
+
+                    xhr.onprogress = (event) => {
+                        if (event.lengthComputable) {
+                            const percent = Math.floor((event.loaded / event.total) * 100);
+                            const progressText = document.getElementById('loading-progress-text');
+                            if (progressText) progressText.textContent = `Carregando experiência... ${percent}%`;
+                        }
+                    };
+
+                    xhr.onload = () => {
+                        if (xhr.status === 200) resolve(xhr.response);
+                        else reject(new Error(`Erro no download: ${xhr.status}`));
+                    };
+
+                    xhr.onerror = () => reject(new Error('Erro de rede'));
+                    xhr.send();
+                });
+
+                // Salva em background para próximos acessos
+                saveBlob(videoUrl, blob).catch(console.warn);
+            } else {
+                const progressText = document.getElementById('loading-progress-text');
+                if (progressText) progressText.textContent = `Carregando experiência... 100%`;
+            }
+            video.src = URL.createObjectURL(blob);
+        } catch (e) {
+            console.error('Erro ao carregar vídeo via blob, usando fallback:', e);
+            video.src = videoUrl;
+        }
+
+        // Atualiza para a mensagem de "Vire a tela" após o carregamento
+        message.innerHTML = `
+            <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="rotate-icon">
+                <rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect>
+                <path d="M12 18h.01"></path>
+            </svg>
+            <span>Vire a tela</span>
+        `;
+
+        video.muted = false; 
         video.style.opacity = '0';
 
         setTimeout(() => {
@@ -2286,6 +2333,42 @@ function setupBackToTopButton() {
             top: 0,
             behavior: 'smooth' // Rolagem suave
         });
+    });
+}
+
+// --- Funções Auxiliares para IndexedDB (Cache de Vídeo) ---
+const DB_NAME = 'LogisticaClubberDB';
+const STORE_NAME = 'assets';
+
+function openDB() {
+    return new Promise((resolve, reject) => {
+        const request = indexedDB.open(DB_NAME, 1);
+        request.onupgradeneeded = (event) => {
+            const db = event.target.result;
+            if (!db.objectStoreNames.contains(STORE_NAME)) {
+                db.createObjectStore(STORE_NAME);
+            }
+        };
+        request.onsuccess = (event) => resolve(event.target.result);
+        request.onerror = (event) => reject(event.target.error);
+    });
+}
+
+async function getBlob(key) {
+    const db = await openDB();
+    return new Promise((resolve, reject) => {
+        const request = db.transaction(STORE_NAME, 'readonly').objectStore(STORE_NAME).get(key);
+        request.onsuccess = () => resolve(request.result);
+        request.onerror = () => reject(request.error);
+    });
+}
+
+async function saveBlob(key, blob) {
+    const db = await openDB();
+    return new Promise((resolve, reject) => {
+        const request = db.transaction(STORE_NAME, 'readwrite').objectStore(STORE_NAME).put(blob, key);
+        request.onsuccess = () => resolve();
+        request.onerror = () => reject(request.error);
     });
 }
 
