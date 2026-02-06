@@ -688,11 +688,16 @@ a {
     min-height: 250px;
     background-color: var(--card-background);
     display: block;
+    object-fit: cover;
     transition: transform 0.5s ease;
 }
 
 .event-card:hover .event-card__image {
     transform: scale(1.05);
+}
+
+video.event-card__image {
+    object-fit: contain;
 }
 
 .event-card__info {
@@ -1107,6 +1112,10 @@ a {
     height: 100%;
     object-fit: cover;
     display: block;
+}
+
+video.modal-image {
+    object-fit: contain;
 }
 
 .modal-body {
@@ -1917,4 +1926,52 @@ body:not(.light-theme) .map-iframe {
 .uber-btn:hover {
     color: var(--text-color);
     border-color: var(--text-color);
+}
+
+/* Vídeo Especial de Domingo */
+.sunday-video-wrapper {
+    display: none; /* Oculto por padrão, o JS mostra no domingo */
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+@keyframes pulse-message {
+    0% { opacity: 0.5; transform: scale(0.95); }
+    50% { opacity: 1; transform: scale(1.05); }
+    100% { opacity: 0.5; transform: scale(0.95); }
+}
+
+@keyframes rotate-phone {
+    0%, 10% { transform: rotate(0deg); }
+    40%, 60% { transform: rotate(90deg); }
+    90%, 100% { transform: rotate(0deg); }
+}
+
+.rotate-message {
+    color: #fff;
+    z-index: 10000;
+    position: absolute;
+    animation: pulse-message 2s infinite ease-in-out;
+    margin: 0;
+    text-align: center;
+    width: 100%;
+    top: 0;
+    left: 0;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.rotate-message span {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-top: 1.5rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.rotate-icon {
+    animation: rotate-phone 2s infinite ease-in-out;
 }

@@ -31,6 +31,8 @@ document.addEventListener('DOMContentLoaded', () => {
         setupSetsFeature(); 
         setupSoundCloudSetsFeature(); 
         setupVideoObserver(); 
+        setupVideoRedirects();
+        setupSundayVideo();
     }
 });
 
@@ -195,6 +197,7 @@ const eventImageMap = {
     'fuzuê bar - 04/02': 'assets/fuzue0402.PNG',
     'budega dos pinhões - 05/02': 'assets/budega0502.PNG',
     'pré delas no clube da prancha': 'assets/clubedaprancha3.PNG'
+
 }
 
 /**
@@ -1140,6 +1143,9 @@ function renderWeeklyEvents(allEvents) {
     const weeklySection = document.getElementById('weekly-events-section');
     if (!weeklySection) return;
 
+    // Se estiver no modo domingo, não exibe a seção semanal
+    if (document.body.classList.contains('sunday-mode')) return;
+
     const parseDate = (dateString) => {
         if (!dateString || typeof dateString !== 'string') return null;
         const cleanDateStr = dateString.split(' ')[0].trim();
@@ -1501,6 +1507,93 @@ function setupFilters() {
             alert('Não foi possível copiar o link.');
         });
     });
+}
+
+/**
+ * Configura o vídeo especial de domingo.
+ * Verifica se é domingo (dia 0). Se for, mostra o vídeo e configura o redirecionamento.
+ */
+function setupSundayVideo() {
+    const wrapper = document.getElementById('sunday-video-wrapper');
+    const video = document.getElementById('sunday-video');
+    
+    if (!wrapper || !video) return;
+
+    const today = new Date().getDay();
+    
+    // 0 representa Domingo no JavaScript
+    // Verificação ajustada para teste imediato (true)
+    if (true || today === 0 || window.location.search.includes('teste')) {
+        document.body.classList.add('sunday-mode');
+        wrapper.style.display = 'block';
+        
+        // Esconde os demais elementos da página para foco total no vídeo
+        const elementsToHide = [
+            '.site-header',
+            '.main-nav', 
+            '.filters-wrapper', 
+            '#weekly-events-section', 
+            '#event-grid',
+            '.site-footer',
+            '#back-to-top-btn',
+            '#floating-clear-filters-btn'
+        ];
+
+        elementsToHide.forEach(selector => {
+            const el = document.querySelector(selector);
+            if (el) el.style.setProperty('display', 'none', 'important');
+        });
+
+        // Estilização para centralizar o vídeo como uma "Splash Screen"
+        wrapper.style.position = 'fixed';
+        wrapper.style.top = '0';
+        wrapper.style.left = '0';
+        wrapper.style.width = '100%';
+        wrapper.style.height = '100%';
+        wrapper.style.maxWidth = 'none';
+        wrapper.style.padding = '0';
+        wrapper.style.margin = '0';
+        wrapper.style.display = 'flex';
+        wrapper.style.alignItems = 'center';
+        wrapper.style.justifyContent = 'center';
+        wrapper.style.zIndex = '9999';
+        wrapper.style.backgroundColor = '#000';
+
+        // Mensagem de aviso
+        const message = document.createElement('div');
+        message.className = 'rotate-message';
+        message.innerHTML = `
+            <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="rotate-icon">
+                <rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect>
+                <path d="M12 18h.01"></path>
+            </svg>
+            <span>Vire a tela</span>
+        `;
+        wrapper.appendChild(message);
+
+        // Ajustes para o vídeo cobrir a tela inteira e remover autoplay
+        video.style.width = '100%';
+        video.style.height = '100%';
+        video.style.maxWidth = 'none';
+        video.style.borderRadius = '0';
+        video.style.boxShadow = 'none';
+        video.style.objectFit = 'contain';
+        video.muted = false;
+        video.style.opacity = '0';
+
+        setTimeout(() => {
+            message.style.display = 'none';
+            video.style.opacity = '1';
+            video.play().catch(() => {
+                video.muted = true;
+                video.play();
+            });
+        }, 5000);
+
+        video.addEventListener('ended', () => {
+            window.location.href = 'https://www.stratussounds.com/';
+        });
+    }
 }
 
 /**
@@ -2450,4 +2543,21 @@ function renderEventDetailPage(event, container, allEvents = []) {
     } else {
         document.getElementById('related-events-section').style.display = 'none';
     }
+}
+
+/**
+ * Configura redirecionamento automático ao fim de vídeos específicos.
+ * Procura por vídeos com o atributo 'data-redirect-url'.
+ */
+function setupVideoRedirects() {
+    const videos = document.querySelectorAll('video[data-redirect-url]');
+    
+    videos.forEach(video => {
+        video.addEventListener('ended', () => {
+            const url = video.getAttribute('data-redirect-url');
+            if (url) {
+                window.location.href = url;
+            }
+        });
+    });
 }
