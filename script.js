@@ -2387,7 +2387,6 @@ function setupMaintenanceMode() {
 
     wrapper.innerHTML = `
         <h1 style="font-size: 2rem; margin-bottom: 1rem; font-weight: 700;">Site em manutenção</h1>
-        <p style="font-size: 1.2rem; color: #ccc; margin-bottom: 1.5rem;">Retornaremos na segunda-feira às 18h.</p>
         <p style="font-size: 1.2rem; color: #ccc; margin-bottom: 1.5rem;">Retornaremos na segunda-feira às 12h.</p>
         <div id="maintenance-countdown" style="font-size: 1.5rem; font-family: monospace; font-weight: 700; color: #FDF5E6;"></div>
     `;
@@ -2400,8 +2399,6 @@ function setupMaintenanceMode() {
     const day = now.getDay(); // 0 = Domingo, 1 = Segunda...
     let daysUntilMonday = (1 + 7 - day) % 7;
     
-    // Se for segunda e já passou das 18h, conta para a próxima semana
-    if (day === 1 && now.getHours() >= 18) {
     // Se for segunda e já passou das 12h, conta para a próxima semana
     if (day === 1 && now.getHours() >= 12) {
         daysUntilMonday = 7;
@@ -2409,7 +2406,6 @@ function setupMaintenanceMode() {
 
     const targetDate = new Date(now);
     targetDate.setDate(now.getDate() + daysUntilMonday);
-    targetDate.setHours(18, 0, 0, 0);
     targetDate.setHours(12, 0, 0, 0);
 
     const countdownEl = document.getElementById('maintenance-countdown');
