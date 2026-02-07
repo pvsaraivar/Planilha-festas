@@ -19,20 +19,22 @@ document.addEventListener('DOMContentLoaded', () => {
         setupFloatingBackButton();
     } else {
         // Estamos na página inicial (index.html)
-        applyFiltersFromURL();
-        loadFavorites(); 
-        loadAndDisplayEvents(googleSheetUrl);
-        setupFilters();
-        setupModal();
-        setupContactModal();
-        setupBackToTopButton();
-        setupNavigation(); 
-        setupPreCarnavalFeature(); 
-        setupSetsFeature(); 
-        setupSoundCloudSetsFeature(); 
-        setupVideoObserver(); 
-        setupVideoRedirects();
-        setupSundayVideo();
+        setupMaintenanceMode();
+        
+        // applyFiltersFromURL();
+        // loadFavorites(); 
+        // loadAndDisplayEvents(googleSheetUrl);
+        // setupFilters();
+        // setupModal();
+        // setupContactModal();
+        // setupBackToTopButton();
+        // setupNavigation(); 
+        // setupPreCarnavalFeature(); 
+        // setupSetsFeature(); 
+        // setupSoundCloudSetsFeature(); 
+        // setupVideoObserver(); 
+        // setupVideoRedirects();
+        // setupSundayVideo();
     }
 });
 
@@ -2361,6 +2363,84 @@ async function getBlob(key) {
         request.onsuccess = () => resolve(request.result);
         request.onerror = () => reject(request.error);
     });
+}
+
+/**
+ * Configura a tela de manutenção.
+ */
+function setupMaintenanceMode() {
+    const wrapper = document.createElement('div');
+    wrapper.style.position = 'fixed';
+    wrapper.style.top = '0';
+    wrapper.style.left = '0';
+    wrapper.style.width = '100%';
+    wrapper.style.height = '100%';
+    wrapper.style.backgroundColor = '#000';
+    wrapper.style.zIndex = '99999';
+    wrapper.style.display = 'flex';
+    wrapper.style.flexDirection = 'column';
+    wrapper.style.alignItems = 'center';
+    wrapper.style.justifyContent = 'center';
+    wrapper.style.color = '#fff';
+    wrapper.style.textAlign = 'center';
+    wrapper.style.padding = '2rem';
+
+    wrapper.innerHTML = `
+        <h1 style="font-size: 2rem; margin-bottom: 1rem; font-weight: 700;">Site em manutenção</h1>
+        <p style="font-size: 1.2rem; color: #ccc; margin-bottom: 1.5rem;">Retornaremos na segunda-feira às 18h.</p>
+        <p style="font-size: 1.2rem; color: #ccc; margin-bottom: 1.5rem;">Retornaremos na segunda-feira às 12h.</p>
+        <div id="maintenance-countdown" style="font-size: 1.5rem; font-family: monospace; font-weight: 700; color: #FDF5E6;"></div>
+    `;
+
+    document.body.appendChild(wrapper);
+    document.body.style.overflow = 'hidden';
+
+    // Lógica da contagem regressiva
+    const now = new Date();
+    const day = now.getDay(); // 0 = Domingo, 1 = Segunda...
+    let daysUntilMonday = (1 + 7 - day) % 7;
+    
+    // Se for segunda e já passou das 18h, conta para a próxima semana
+    if (day === 1 && now.getHours() >= 18) {
+    // Se for segunda e já passou das 12h, conta para a próxima semana
+    if (day === 1 && now.getHours() >= 12) {
+        daysUntilMonday = 7;
+    }
+
+    const targetDate = new Date(now);
+    targetDate.setDate(now.getDate() + daysUntilMonday);
+    targetDate.setHours(18, 0, 0, 0);
+    targetDate.setHours(12, 0, 0, 0);
+
+    const countdownEl = document.getElementById('maintenance-countdown');
+
+    function updateCountdown() {
+        const currentTime = new Date();
+        const diff = targetDate - currentTime;
+
+        if (diff <= 0) {
+            countdownEl.textContent = "Em instantes...";
+            return;
+        }
+
+        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+        const h = hours.toString().padStart(2, '0');
+        const m = minutes.toString().padStart(2, '0');
+        const s = seconds.toString().padStart(2, '0');
+
+        let text = '';
+        if (days > 0) text += `${days}d `;
+        text += `${h}h ${m}m ${s}s`;
+
+        countdownEl.textContent = text;
+    }
+
+    updateCountdown();
+    setInterval(updateCountdown, 1000);
 }
 
 async function saveBlob(key, blob) {
