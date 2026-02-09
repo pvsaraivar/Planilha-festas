@@ -19,20 +19,22 @@ document.addEventListener('DOMContentLoaded', () => {
         setupFloatingBackButton();
     } else {
         // Estamos na página inicial (index.html)
-        applyFiltersFromURL();
-        loadFavorites(); 
-        loadAndDisplayEvents(googleSheetUrl);
-        setupFilters();
-        setupModal();
-        setupContactModal();
-        setupBackToTopButton();
-        setupNavigation(); 
-        setupPreCarnavalFeature(); 
-        setupSetsFeature(); 
-        setupSoundCloudSetsFeature(); 
-        setupVideoObserver(); 
-        setupVideoRedirects();
-        setupSundayVideo();
+        setupMaintenanceMode();
+        
+        // applyFiltersFromURL();
+        // loadFavorites(); 
+        // loadAndDisplayEvents(googleSheetUrl);
+        // setupFilters();
+        // setupModal();
+        // setupContactModal();
+        // setupBackToTopButton();
+        // setupNavigation(); 
+        // setupPreCarnavalFeature(); 
+        // setupSetsFeature(); 
+        // setupSoundCloudSetsFeature(); 
+        // setupVideoObserver(); 
+        // setupVideoRedirects();
+        // setupSundayVideo();
     }
 });
 
@@ -1522,7 +1524,7 @@ async function setupSundayVideo() {
     
     // 0 representa Domingo no JavaScript
     // Verificação ajustada para teste imediato (true)
-    if (true || today === 0 || window.location.search.includes('teste')) {
+    if (today === 0 || window.location.search.includes('teste')) {
         document.body.classList.add('sunday-mode');
         wrapper.style.display = 'block';
         
