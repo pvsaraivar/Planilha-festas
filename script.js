@@ -19,22 +19,20 @@ document.addEventListener('DOMContentLoaded', () => {
         setupFloatingBackButton();
     } else {
         // Estamos na página inicial (index.html)
-        setupMaintenanceMode();
-        
-        // applyFiltersFromURL();
-        // loadFavorites(); 
-        // loadAndDisplayEvents(googleSheetUrl);
-        // setupFilters();
-        // setupModal();
-        // setupContactModal();
-        // setupBackToTopButton();
-        // setupNavigation(); 
-        // setupPreCarnavalFeature(); 
-        // setupSetsFeature(); 
-        // setupSoundCloudSetsFeature(); 
-        // setupVideoObserver(); 
-        // setupVideoRedirects();
-        // setupSundayVideo();
+        applyFiltersFromURL();
+        loadFavorites(); 
+        loadAndDisplayEvents(googleSheetUrl);
+        setupFilters();
+        setupModal();
+        setupContactModal();
+        setupBackToTopButton();
+        setupNavigation(); 
+        setupPreCarnavalFeature(); 
+        setupSetsFeature(); 
+        setupSoundCloudSetsFeature(); 
+        setupVideoObserver(); 
+        setupVideoRedirects();
+        setupSundayVideo();
     }
 });
 
@@ -1579,7 +1577,7 @@ async function setupSundayVideo() {
         video.style.objectFit = 'contain';
         
         // Lógica de Carregamento do Blob (Cache Local)
-        const videoUrl = 'assets/tubulosalongdreams.mp4';
+        const videoUrl = 'assets/clubmetal.mp4';
         try {
             let blob = await getBlob(videoUrl);
             if (!blob) {
@@ -1630,17 +1628,40 @@ async function setupSundayVideo() {
         video.muted = false; 
         video.style.opacity = '0';
 
-        setTimeout(() => {
+        let hasStarted = false;
+
+        const startVideo = () => {
+            if (hasStarted) return;
+            hasStarted = true;
             message.style.display = 'none';
             video.style.opacity = '1';
-            video.play().catch(() => {
-                video.muted = true;
-                video.play();
-            });
-        }, 5000);
+            video.muted = false;
+            video.volume = 1.0;
+            video.play().catch(e => console.warn("Autoplay com som bloqueado:", e));
+        };
+
+        // Timer de segurança (5 segundos) caso o usuário não vire a tela
+        const timer = setTimeout(startVideo, 5000);
+
+        // Detecta a rotação da tela para iniciar o vídeo imediatamente
+        const handleOrientationChange = () => {
+            if (window.innerWidth > window.innerHeight) {
+                clearTimeout(timer);
+                startVideo();
+                window.removeEventListener('resize', handleOrientationChange);
+            }
+        };
+
+        window.addEventListener('resize', handleOrientationChange);
+
+        // Se já estiver em landscape, inicia mais rápido
+        if (window.innerWidth > window.innerHeight) {
+            clearTimeout(timer);
+            setTimeout(startVideo, 1500); // Pequeno delay para leitura
+        }
 
         video.addEventListener('ended', () => {
-            window.location.href = 'https://www.stratussounds.com/';
+            window.location.href = 'https://stratussounds.com/tubulosa-club-metal';
         });
     }
 }
