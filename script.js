@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
         setupFloatingBackButton();
     } else {
         // Estamos na página inicial (index.html)
-        setupMaintenanceMode();
+        // setupMaintenanceMode();
         
         // applyFiltersFromURL();
         // loadFavorites(); 
@@ -32,9 +32,9 @@ document.addEventListener('DOMContentLoaded', () => {
         // setupPreCarnavalFeature(); 
         // setupSetsFeature(); 
         // setupSoundCloudSetsFeature(); 
-        // setupVideoObserver(); 
-        // setupVideoRedirects();
-        // setupSundayVideo();
+        setupVideoObserver(); 
+        setupVideoRedirects();
+        setupSundayVideo();
     }
 });
 
@@ -1524,7 +1524,7 @@ async function setupSundayVideo() {
     
     // 0 representa Domingo no JavaScript
     // Verificação ajustada para teste imediato (true)
-    if (today === 0 || window.location.search.includes('teste')) {
+    if (true) {
         document.body.classList.add('sunday-mode');
         wrapper.style.display = 'block';
         
