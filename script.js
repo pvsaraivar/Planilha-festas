@@ -1185,6 +1185,8 @@ function renderWeeklyEvents(allEvents) {
                 imageUrl = eventImageMap[eventNameLower];
             }
 
+            const featuredClass = eventNameLower.includes('tubulosa club metal') ? 'weekly-event-card--featured' : '';
+
             const placeholderSvg = "data:image/svg+xml,%3csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3e%3crect width=%27100%25%27 height=%27100%25%27 fill=%27%23333%27/%3e%3c/svg%3e";
 
             const isVideo = imageUrl && /\.(mp4|webm|ogg)($|\?)/i.test(imageUrl);
@@ -1193,7 +1195,7 @@ function renderWeeklyEvents(allEvents) {
                 : `<img src="${imageUrl || placeholderSvg}" alt="${name}" class="weekly-event-card__image" loading="lazy">`;
 
             return `
-                <a href="#" class="weekly-event-card" data-event-slug="${createEventSlug(name)}" style="animation-delay: ${index * 0.1}s">
+                <a href="#" class="weekly-event-card ${featuredClass}" data-event-slug="${createEventSlug(name)}" style="animation-delay: ${index * 0.1}s">
                     ${mediaHtml}
                     <div class="weekly-event-card__info">
                         <h3>${name}</h3>
@@ -1747,6 +1749,11 @@ function createEventCardElement(event) {
     card.className = 'event-card';
 
     const eventName = getProp(event, 'Evento') || getProp(event, 'Nome') || 'Evento sem nome';
+
+    if (eventName.toLowerCase().includes('tubulosa club metal')) {
+        card.classList.add('event-card--featured');
+    }
+
     const eventSlug = createEventSlug(eventName);
     const isEventFavorited = isFavorited(eventSlug);
 

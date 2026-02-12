@@ -460,6 +460,18 @@ a {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
 }
 
+.event-card--featured,
+.weekly-event-card--featured {
+    border: 1px solid var(--primary-color);
+    box-shadow: 0 0 20px rgba(253, 245, 230, 0.15);
+}
+
+.event-card--featured:hover,
+.weekly-event-card--featured:hover {
+    box-shadow: 0 0 30px rgba(253, 245, 230, 0.3);
+    border-color: var(--primary-color);
+}
+
 .favorites-filter-btn {
     height: 50px;
     padding: 0 1.5rem;
