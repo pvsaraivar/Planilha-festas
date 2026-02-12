@@ -192,7 +192,7 @@ const eventImageMap = {
     'jackwav bday': 'assets/jackwav.PNG',
     'festa base': 'assets/clubedaprancha2.PNG',
     'bateu long set - lucas bmr': 'assets/longsetbmr.PNG',
-    'baile do radar - carlos do complexo': 'assets/baileradarcdc.mp4',
+    'baile do radar - carlos do complexo': 'assets/radarcdc.mp4',
     'bunker 7': 'assets/bunker7.mp4',
     'isaknaja y convidados': 'assets/isaknaja.PNG',
     'bloco é sal': 'assets/blocoesal.PNG',
