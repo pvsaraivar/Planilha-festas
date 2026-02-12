@@ -21,20 +21,20 @@ document.addEventListener('DOMContentLoaded', () => {
         // Estamos na página inicial (index.html)
         // setupMaintenanceMode();
         
-        // applyFiltersFromURL();
-        // loadFavorites(); 
-        // loadAndDisplayEvents(googleSheetUrl);
-        // setupFilters();
-        // setupModal();
-        // setupContactModal();
-        // setupBackToTopButton();
-        // setupNavigation(); 
-        // setupPreCarnavalFeature(); 
-        // setupSetsFeature(); 
-        // setupSoundCloudSetsFeature(); 
+        applyFiltersFromURL();
+        loadFavorites(); 
+        loadAndDisplayEvents(googleSheetUrl);
+        setupFilters();
+        setupModal();
+        setupContactModal();
+        setupBackToTopButton();
+        setupNavigation(); 
+        setupPreCarnavalFeature(); 
+        setupSetsFeature(); 
+        setupSoundCloudSetsFeature(); 
         setupVideoObserver(); 
         setupVideoRedirects();
-        setupSundayVideo();
+        // setupSundayVideo();
     }
 });
 
@@ -156,7 +156,7 @@ const eventImageMap = {
     'bloquinho de verão 2': 'assets/bloquinhodeverao2.PNG',
     'segundo dia pré carnaval 2': 'assets/prefortaleza1701.PNG',
     'terceiro dia pré carnaval': 'assets/prefortaleza2401.PNG',
-    'carnahard': 'assets/carnahard.mp4',
+    'carnahard': 'assets/carnahard.PNG',
     'pacific de janeiro': 'assets/pacificdejaneiro.PNG',
     'dabysha': 'assets/dabysha.PNG',
     'longdreams showcase': 'assets/longdreamsshowcase.PNG',
@@ -198,7 +198,9 @@ const eventImageMap = {
     'bloco é sal': 'assets/blocoesal.PNG',
     'fuzuê bar - 04/02': 'assets/fuzue0402.PNG',
     'budega dos pinhões - 05/02': 'assets/budega0502.PNG',
-    'pré delas no clube da prancha': 'assets/clubedaprancha3.PNG'
+    'pré delas no clube da prancha': 'assets/clubedaprancha3.PNG',
+    'tubulosa club metal': 'assets/clubmetal.PNG',
+    'atrita surpresinha de carnaval': 'assets/atritasurpcarn.mp4'
 }
 
 /**
@@ -1524,7 +1526,7 @@ async function setupSundayVideo() {
     
     // 0 representa Domingo no JavaScript
     // Verificação ajustada para teste imediato (true)
-    if (true) {
+    if (today === 0 || window.location.search.includes('teste')) {
         document.body.classList.add('sunday-mode');
         wrapper.style.display = 'block';
         
@@ -2592,6 +2594,7 @@ function renderEventDetailPage(event, container, allEvents = []) {
             ticketActionHtml = `<span class="share-btn tickets-btn tickets-btn--free">${ticketInfo === 'gratuito' ? 'Gratuito' : 'Couvert no local'}</span>`;
         } else {
             ticketActionHtml = `<a href="${ticketUrl}" target="_blank" class="share-btn tickets-btn">Comprar Ingresso</a>`;
+            ticketActionHtml = `<a href="${ticketUrl}" target="_blank" class="share-btn tickets-btn" onclick="trackGAEvent('click_ticket', { event_name: '${name.replace(/'/g, "\\'")}', source: 'detail_page' })">Comprar Ingresso</a>`;
         }
     }
 
