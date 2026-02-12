@@ -466,6 +466,11 @@ a {
     box-shadow: 0 0 20px rgba(253, 245, 230, 0.15);
 }
 
+.event-card--featured .event-card__image {
+    min-height: 0;
+    object-fit: cover;
+}
+
 .event-card--featured:hover,
 .weekly-event-card--featured:hover {
     box-shadow: 0 0 30px rgba(253, 245, 230, 0.3);
