@@ -199,7 +199,7 @@ const eventImageMap = {
     'fuzuê bar - 04/02': 'assets/fuzue0402.PNG',
     'budega dos pinhões - 05/02': 'assets/budega0502.PNG',
     'pré delas no clube da prancha': 'assets/clubedaprancha3.PNG',
-    'tubulosa club metal': 'assets/clubmetal.PNG',
+    'tubulosa club metal': 'assets/clubmetal.mp4',
     'atrita surpresinha de carnaval': 'assets/atritasurpcarn.mp4'
 }
 
