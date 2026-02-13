@@ -196,7 +196,25 @@ const eventImageMap = {
     'budega dos pinhões - 05/02': 'assets/budega0502.PNG',
     'pré delas no clube da prancha': 'assets/clubedaprancha3.PNG',
     'tubulosa club metal': 'assets/clubmetal.mp4',
-    'atrita surpresinha de carnaval': 'assets/atritasurpcarn.mp4'
+    'atrita surpresinha de carnaval': 'assets/atritasurpcarn.mp4',
+    'esquenta carnahard': 'assets/esquentacarnahard.jpeg',
+    'kaza - tem que ter house': 'assets/kazatemqterhouse.jpeg',
+    'cibum festival': 'assets/cibumfestival.jpeg',
+    'bateu showcase monstra': 'assets/bateushowcasemonstra.jpeg',
+    'wav e friends carnaside': 'assets/wavfriendscarnaside.jpeg',
+    'after fuzuê - family tree': 'assets/afterfuzuefamilytree.jpeg',
+    'carna dream': 'assets/carnadream.jpeg',
+    'verão 2000 no brisa': 'assets/verao2000brisa.jpeg',
+    'bloquinho psy vila formosa': 'assets/bloqpsyvila.jpeg',
+    'after fuzuê - funk + eletro': 'assets/fuzueaftermatusa.PNG',
+    'brisa noir': 'assets/brisanoir.PNG',
+    'djs festa lá em cima no orbita blue': 'assets/flecorbitablue.PNG',
+    'carnaval na praia - clube da prancha': 'assets/clubedaprancha4.PNG',
+    'carna lola': 'assets/carnalola.jpeg',
+    'na pista 8': 'assets/napistahalfcab.jpeg',
+    'gop tun vs festa lá em cima': 'assets/goptunlaemcima.jpeg',
+    'baile green go': 'assets/bailegreengo.PNG'
+
 }
 
 /**
