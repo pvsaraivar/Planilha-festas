@@ -52,12 +52,6 @@
                     <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
                 </button>
             </div>
-            <nav class="main-nav">
-                <button id="nav-events-btn" class="nav-btn is-active">Eventos Clubber</button>
-                <button id="nav-precarnaval-btn" class="nav-btn">Pré Carnaval</button>
-                <button id="nav-sets-btn" class="nav-btn">Sets Youtube</button>
-                <button id="nav-soundcloud-sets-btn" class="nav-btn">Sets SoundCloud</button>
-            </nav>
             <div class="filters-wrapper">
                 <div class="search-container">
                     <input type="text" id="search-input" placeholder="Buscar por festa, local ou atração"><span id="search-loader" class="search-loader" hidden></span><button id="clear-search-btn" class="clear-search-btn" hidden>&times;</button>
@@ -86,27 +80,6 @@
                     <span>Copiar link</span>
                 </button>
             </div>
-            <div id="sets-filters-wrapper" class="filters-wrapper" style="display: none;">
-                <div class="search-container">
-                    <div class="sets-search-container">
-                        <input type="text" id="sets-search-input" class="search-input" placeholder="Buscar por set, produtora ou artista"><span id="sets-search-loader" class="search-loader" hidden></span><button id="clear-sets-search-btn" class="clear-search-btn" hidden>&times;</button>
-                    </div>
-                </div>
-            </div>
-            <div id="precarnaval-filters-wrapper" class="filters-wrapper" style="display: none;">
-                <div class="search-container">
-                    <div class="sets-search-container">
-                        <input type="text" id="precarnaval-search-input" class="search-input" placeholder="Buscar festa ou local"><button id="clear-precarnaval-search-btn" class="clear-search-btn" hidden>&times;</button>
-                    </div>
-                </div>
-            </div>
-            <div id="soundcloud-sets-filters-wrapper" class="filters-wrapper" style="display: none;">
-                <div class="search-container">
-                    <div class="sets-search-container">
-                        <input type="text" id="soundcloud-sets-search-input" class="search-input" placeholder="Buscar por set, produtora ou artista"><button id="clear-soundcloud-sets-search-btn" class="clear-search-btn" hidden>&times;</button>
-                    </div>
-                </div>
-            </div>
         </div>
     </header>
 
@@ -119,24 +92,6 @@
             <p>Carregando festas...</p>
         </main>
     </div>
-
-    <section id="precarnaval-section" class="container" style="display: none;">
-        <div id="precarnaval-grid" class="event-grid">
-            <p>Carregando pré-carnavais...</p>
-        </div>
-    </section>
-
-    <section id="sets-section" class="container" style="display: none;">
-        <div id="sets-grid" class="sets-grid">
-            <!-- Os sets serão inseridos aqui pelo JavaScript -->
-        </div>
-    </section>
-
-    <section id="soundcloud-sets-section" class="container" style="display: none;">
-        <div id="soundcloud-sets-grid" class="sets-grid">
-            <!-- Os sets do SoundCloud serão inseridos aqui pelo JavaScript -->
-        </div>
-    </section>
 
     <div id="modal-overlay" class="modal-overlay">
         <div id="modal" class="modal">
