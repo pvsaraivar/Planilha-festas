@@ -213,7 +213,8 @@ const eventImageMap = {
     'carna lola': 'assets/carnalola.jpeg',
     'na pista 8': 'assets/napistahalfcab.jpeg',
     'gop tun vs festa lá em cima': 'assets/goptunlaemcima.jpeg',
-    'baile green go': 'assets/bailegreengo.PNG'
+    'baile green go': 'assets/bailegreengo.PNG',
+    'baile da oakley': 'assets/bailedaoakley.PNG'
 
 }
 
