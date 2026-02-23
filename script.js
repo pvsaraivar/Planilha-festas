@@ -215,6 +215,7 @@ const eventImageMap = {
     'gop tun vs festa lá em cima': 'assets/goptunlaemcima.jpeg',
     'baile green go': 'assets/bailegreengo.PNG',
     'baile da oakley': 'assets/bailedaoakley.PNG',
+    'budega dos pinhões - 23/02': 'assets/budega2302.PNG',
 
 }
 
