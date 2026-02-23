@@ -214,7 +214,7 @@ const eventImageMap = {
     'na pista 8': 'assets/napistahalfcab.jpeg',
     'gop tun vs festa lá em cima': 'assets/goptunlaemcima.jpeg',
     'baile green go': 'assets/bailegreengo.PNG',
-    'baile da oakley': 'assets/bailedaoakley.PNG'
+    'baile da oakley': 'assets/bailedaoakley.PNG',
 
 }
 
@@ -1258,7 +1258,7 @@ function createEventCardElement(event) {
         const playIconSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="white" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>`;
         playButtonHtml = `<div class="video-play-button">${playIconSvg}</div>`;
     } else {
-        mediaHtml = `<img src="${imageUrl || placeholderSvg}" alt="${name}" class="event-card__image" loading="lazy" onerror="this.onerror=null;this.src='${errorSvg}';">`;
+        mediaHtml = `<img src="${imageUrl || placeholderSvg}" alt="${name}" class="event-card__image" loading="lazy" onerror="this.src='${errorSvg}';">`;
     }
 
     card.innerHTML = `

@@ -702,7 +702,6 @@ a {
 .event-card__image {
     width: 100%;
     height: auto;
-    min-height: 250px;
     background-color: var(--card-background);
     display: block;
     object-fit: cover;
