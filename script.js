@@ -195,7 +195,7 @@ const eventImageMap = {
     'fuzuê bar - 04/02': 'assets/fuzue0402.PNG',
     'budega dos pinhões - 05/02': 'assets/budega0502.PNG',
     'pré delas no clube da prancha': 'assets/clubedaprancha3.PNG',
-    'tubulosa club metal': 'assets/clubmetal.mp4',
+    'tubulosa club metal': 'assets/clubmetal.png',
     'atrita surpresinha de carnaval': 'assets/atritasurpcarn.mp4',
     'esquenta carnahard': 'assets/esquentacarnahard.jpeg',
     'kaza - tem que ter house': 'assets/kazatemqterhouse.jpeg',
@@ -216,7 +216,7 @@ const eventImageMap = {
     'baile green go': 'assets/bailegreengo.PNG',
     'baile da oakley': 'assets/bailedaoakley.PNG',
     'budega dos pinhões - 23/02': 'assets/budega2302.PNG',
-
+    'aira & vênus long set': 'assets/airavenuskaza.jpeg'
 }
 
 /**
