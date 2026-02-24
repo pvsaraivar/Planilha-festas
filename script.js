@@ -184,7 +184,7 @@ const eventImageMap = {
     'pre carnaval fortaleza - 31/01 - henrique jorge': 'assets/prefortaleza31019.PNG',
     'pre carnaval fortaleza - 01/02 - benfica': 'assets/prefortaleza0102.PNG',
     'pre carnaval fortaleza - 01/02 - raimundo dos queijos': 'assets/prefortaleza01022.PNG',
-    'calúnia - delírio tropical': 'assets/calunia3.PNG',
+    'calúnia - delírio tropical': 'assets/caluniaradar.jpeg',
     'jackwav bday': 'assets/jackwav.PNG',
     'festa base': 'assets/clubedaprancha2.PNG',
     'bateu long set - lucas bmr': 'assets/longsetbmr.PNG',
