@@ -216,7 +216,8 @@ const eventImageMap = {
     'baile green go': 'assets/bailegreengo.PNG',
     'baile da oakley': 'assets/bailedaoakley.PNG',
     'budega dos pinhões - 23/02': 'assets/budega2302.PNG',
-    'aira & vênus long set': 'assets/airavenuskaza.jpeg'
+    'aira & vênus long set': 'assets/airavenuskaza.jpeg',
+    'gravação live set - crisa': 'assets/crisaliveset.jpeg'
 }
 
 /**
