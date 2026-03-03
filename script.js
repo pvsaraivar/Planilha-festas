@@ -227,7 +227,8 @@ const eventImageMap = {
     'ressonância astrologic': 'assets/ressonancia.mp4',
     'progressyve 2 anos': 'assets/progressive2anos.mp4',
     'baile pink': 'assets/bailepink.jpeg',
-    'domingão hot': 'assets/gravacaonandairarub.PNG'
+    'domingão hot': 'assets/gravacaonandairarub.PNG',
+    'fritaria showcase': 'assets/fritariashowcase.jpeg'
 }
 
 /**
