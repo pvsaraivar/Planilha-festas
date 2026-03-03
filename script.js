@@ -226,7 +226,8 @@ const eventImageMap = {
     'trance beneficiente pelo breno cruz': 'assets/benef1.jpg, assets/benef2.jpg, assets/benef3.jpg, assets/benef4.mp4, assets/benef5.mp4, assets/benef6.jpg',
     'ressonância astrologic': 'assets/ressonancia.mp4',
     'progressive 2 anos': 'assets/progressive2anos.mp4',
-    'baile pink': 'assets/bailepink.jpeg'
+    'baile pink': 'assets/bailepink.jpeg',
+    'domingão hot': 'assets/gravacaonandairarub.PNG'
 }
 
 /**
