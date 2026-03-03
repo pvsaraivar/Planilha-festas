@@ -1116,9 +1116,10 @@ video.event-card__image {
 .modal-image-wrapper {
     position: relative;
     width: 100%;
-    height: 300px;
+    height: 500px;
     background-color: var(--background-start);
     overflow: hidden;
+    display: flex; /* Para o carrossel */
     opacity: 0;
     animation: modalImageFade 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
 }
@@ -1132,6 +1133,88 @@ video.event-card__image {
 
 video.modal-image {
     object-fit: contain;
+}
+
+/* --- Estilos do Carrossel --- */
+.carousel-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+.carousel-track {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    transition: transform 0.3s ease-in-out;
+}
+
+.carousel-slide {
+    min-width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #000;
+}
+
+.carousel-slide img,
+.carousel-slide video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.carousel-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+    border: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s;
+    backdrop-filter: blur(4px);
+}
+
+.carousel-btn:hover {
+    background-color: rgba(0, 0, 0, 0.8);
+}
+
+.carousel-btn.prev { left: 10px; }
+.carousel-btn.next { right: 10px; }
+
+.carousel-dots {
+    position: absolute;
+    bottom: 15px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 8px;
+    z-index: 10;
+}
+
+.carousel-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.5);
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.carousel-dot.active {
+    background-color: var(--primary-color);
+    transform: scale(1.2);
 }
 
 .modal-body {
@@ -1606,7 +1689,7 @@ video.modal-image {
     }
 
     .modal-image-wrapper {
-        height: 200px;
+        height: 400px;
     }
 
     .modal-actions {
@@ -1698,6 +1781,15 @@ video.modal-image {
     border-radius: 16px;
     box-shadow: 0 20px 40px rgba(0,0,0,0.3);
     height: auto;
+}
+
+.detail-media-column .carousel-container {
+    border-radius: 0;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+    aspect-ratio: 4 / 5;
+    background-color: #000;
+    overflow: hidden; /* Garante que os slides com bordas arredondadas não vazem */
+    width: 100%;
 }
 
 .detail-title {

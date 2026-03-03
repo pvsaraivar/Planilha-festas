@@ -53,6 +53,7 @@ function trackGAEvent(action, params) {
  * As chaves devem estar em minúsculas para corresponder à verificação.
  */
 const eventImageMap = {
+    // Para carrossel, separe os caminhos por vírgula. Ex: 'evento x': 'assets/foto1.jpg, assets/video.mp4',
     'na pista': 'assets/napista.PNG',
     'beije': 'assets/beije.PNG',
     'wav & friends': 'assets/wav.PNG',
@@ -218,7 +219,14 @@ const eventImageMap = {
     'budega dos pinhões - 23/02': 'assets/budega2302.PNG',
     'aira & vênus long set': 'assets/airavenuskaza.jpeg',
     'gravação live set - crisa': 'assets/crisaliveset.jpeg',
-    'dale duro': 'assets/daleduro1.jpeg'
+    'dale duro': 'assets/daleduro1.jpeg',
+    'wow - 5 anos': 'assets/wow5.jpeg',
+    'festa onda 1 ano': 'assets/onda1ano.mp4',
+    'baile groovado': 'assets/bailegroovado.jpeg',
+    'trance beneficiente pelo breno cruz': 'assets/benef1.jpg, assets/benef2.jpg, assets/benef3.jpg, assets/benef4.mp4, assets/benef5.mp4, assets/benef6.jpg',
+    'ressonância astrologic': 'assets/ressonancia.mp4',
+    'progressive 2 anos': 'assets/progressive2anos.mp4',
+    'baile pink': 'assets/bailepink.jpeg'
 }
 
 /**
@@ -313,7 +321,8 @@ async function loadAndDisplayEvents(csvPath) {
     }
 
     if (eventSlugFromUrl) {
-      const eventToOpen = allEvents.find(e => createEventSlug(getProp(e, 'Evento') || getProp(e, 'Nome')) === eventSlugFromUrl);
+      const eventToOpen = allEvents
+.find(e => createEventSlug(getProp(e, 'Evento') || getProp(e, 'Nome')) === eventSlugFromUrl);
       if (eventToOpen) openModal(eventToOpen);
     }
   };
@@ -575,6 +584,11 @@ function renderWeeklyEvents(allEvents) {
                 imageUrl = eventImageMap[eventNameLower];
             }
 
+            // Se houver múltiplas imagens (carrossel), pega apenas a primeira para exibir no card da semana
+            if (imageUrl && imageUrl.includes(',')) {
+                imageUrl = imageUrl.split(',')[0].trim();
+            }
+
             const featuredClass = eventNameLower.includes('tubulosa club metal') ? 'weekly-event-card--featured' : '';
 
             const placeholderSvg = "data:image/svg+xml,%3csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3e%3crect width=%27100%25%27 height=%27100%25%27 fill=%27%23333%27/%3e%3c/svg%3e";
@@ -761,11 +775,7 @@ function setupFilters() {
                 return parseInt(parts[0], 10) === targetDay && parseInt(parts[1], 10) === targetMonth && parseInt(parts[2], 10) === targetYear;
             });
         } else {
-
-            // Por padrão, mostra apenas eventos futuros.
-            filteredEvents = allEvents.filter(event => {
-                return !isEventOver(event);
-            });
+            filteredEvents = allEvents.filter(event => !isEventOver(event));
         }
 
         // 2. Filtra por termo de busca (sobre o resultado do filtro de data)
@@ -1177,6 +1187,11 @@ function createEventCardElement(event) {
         imageUrl = eventImageMap[eventNameLower];
     }
     
+    // Se houver múltiplas imagens (carrossel), pega apenas a primeira para exibir no card principal
+    if (imageUrl && imageUrl.includes(',')) {
+        imageUrl = imageUrl.split(',')[0].trim();
+    }
+
     const isVideo = imageUrl && /\.(mp4|webm|ogg)($|\?)/i.test(imageUrl);
 
     // Formata a string de horário
@@ -1247,7 +1262,16 @@ function createEventCardElement(event) {
         } else if (ticketInfo === 'couvert') {
             ticketHtml = `<div class="event-card__footer"><span class="event-card__tickets-btn event-card__tickets-btn--free">Couvert no local</span></div>`;
         } else {
-            ticketHtml = `<div class="event-card__footer"><a href="${ticketUrl}" target="_blank" rel="noopener noreferrer" class="event-card__tickets-btn" onclick="trackGAEvent('click_ticket', { event_name: '${name.replace(/'/g, "\\'")}', source: 'card' }); event.stopPropagation();">Comprar Ingresso</a></div>`;
+            // Verifica se é um número de telefone (WhatsApp)
+            const cleanNumber = ticketInfo.replace(/\D/g, '');
+            const isPhoneNumber = /^[\d\s\-\(\)\+]+$/.test(ticketInfo) && cleanNumber.length >= 8;
+
+            if (isPhoneNumber) {
+                const waUrl = `https://wa.me/55${cleanNumber}`;
+                ticketHtml = `<div class="event-card__footer"><a href="${waUrl}" target="_blank" rel="noopener noreferrer" class="event-card__tickets-btn whatsapp-btn" onclick="trackGAEvent('click_ticket', { event_name: '${name.replace(/'/g, "\\'")}', source: 'card_whatsapp' }); event.stopPropagation();">Comprar via WhatsApp</a></div>`;
+            } else {
+                ticketHtml = `<div class="event-card__footer"><a href="${ticketUrl}" target="_blank" rel="noopener noreferrer" class="event-card__tickets-btn" onclick="trackGAEvent('click_ticket', { event_name: '${name.replace(/'/g, "\\'")}', source: 'card' }); event.stopPropagation();">Comprar Ingresso</a></div>`;
+            }
         }
     } else {
         ticketHtml = `<div class="event-card__footer"><span class="event-card__tickets-btn event-card__tickets-btn--free">Vendas não divulgadas</span></div>`;
@@ -1553,16 +1577,44 @@ function openModal(event) {
     const instagramUrl = getProp(event, 'Instagram (URL)');
     const coupon = getProp(event, 'Cupom');
 
-    // Lógica da imagem (copiada de createEventCardElement)
-    let imageUrl = getProp(event, 'Imagem (URL)');
+    // Lógica de Mídia (com suporte a carrossel)
+    let imageUrlsString = getProp(event, 'Imagem (URL)') || '';
     const eventNameLower = name.trim().toLowerCase();
     if (eventImageMap[eventNameLower]) {
-        imageUrl = eventImageMap[eventNameLower];
+        imageUrlsString = eventImageMap[eventNameLower];
     }
-    const isVideo = imageUrl && /\.(mp4|webm|ogg)($|\?)/i.test(imageUrl);
+
+    const mediaUrls = imageUrlsString.split(',').map(url => url.trim()).filter(url => url);
+
     const placeholderSvg = "data:image/svg+xml,%3csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 400 300%27%3e%3crect width=%27100%25%27 height=%27100%25%27 fill=%27%231a1a1a%27/%3e%3ctext x=%2750%25%27 y=%2750%25%27 fill=%27%23333%27 font-size=%2720%27 text-anchor=%27middle%27 dominant-baseline=%27middle%27%3eSem Imagem%3c/text%3e%3c/svg%3e";
 
-    const mediaHtml = isVideo ? `<video src="${imageUrl}" class="modal-image" controls autoplay loop muted playsinline></video>` : `<img src="${imageUrl || placeholderSvg}" alt="${name}" class="modal-image" onerror="this.src='${placeholderSvg}'">`;
+    let mediaHtml = '';
+    if (mediaUrls.length > 1) {
+        const slides = mediaUrls.map(url => {
+            const isVideo = /\.(mp4|webm|ogg)($|\?)/i.test(url);
+            const mediaTag = isVideo
+                ? `<video src="${url}" loop muted playsinline oncontextmenu="return false;"></video>`
+                : `<img src="${url}" alt="${name}" onerror="this.src='${placeholderSvg}'">`;
+            return `<div class="carousel-slide">${mediaTag}</div>`;
+        }).join('');
+
+        const dots = mediaUrls.map((_, i) => `<div class="carousel-dot ${i === 0 ? 'active' : ''}" data-slide="${i}"></div>`).join('');
+
+        mediaHtml = `
+            <div class="carousel-container">
+                <div class="carousel-track">${slides}</div>
+                <button class="carousel-btn prev" title="Anterior">&#10094;</button>
+                <button class="carousel-btn next" title="Próximo">&#10095;</button>
+                <div class="carousel-dots">${dots}</div>
+            </div>
+        `;
+    } else if (mediaUrls.length === 1) {
+        const url = mediaUrls[0];
+        const isVideo = /\.(mp4|webm|ogg)($|\?)/i.test(url);
+        mediaHtml = isVideo ? `<video src="${url}" class="modal-image" controls autoplay loop muted playsinline></video>` : `<img src="${url || placeholderSvg}" alt="${name}" class="modal-image" onerror="this.src='${placeholderSvg}'">`;
+    } else {
+        mediaHtml = `<img src="${placeholderSvg}" alt="${name}" class="modal-image">`;
+    }
 
     let locationHtml = `<span>${location}</span>`;
 
@@ -1635,7 +1687,16 @@ function openModal(event) {
         } else if (ticketInfo === 'couvert') {
             ticketActionHtml = `<span class="share-btn tickets-btn tickets-btn--free">Couvert no local</span>`;
         } else {
-            ticketActionHtml = `<a href="${ticketUrl}" target="_blank" rel="noopener noreferrer" class="share-btn tickets-btn" onclick="trackGAEvent('click_ticket', { event_name: '${name.replace(/'/g, "\\'")}', source: 'modal' })">Comprar Ingresso</a>`;
+            // Verifica se é um número de telefone (WhatsApp)
+            const cleanNumber = ticketInfo.replace(/\D/g, '');
+            const isPhoneNumber = /^[\d\s\-\(\)\+]+$/.test(ticketInfo) && cleanNumber.length >= 8;
+
+            if (isPhoneNumber) {
+                const waUrl = `https://wa.me/55${cleanNumber}`;
+                ticketActionHtml = `<a href="${waUrl}" target="_blank" rel="noopener noreferrer" class="share-btn tickets-btn whatsapp-btn" onclick="trackGAEvent('click_ticket', { event_name: '${name.replace(/'/g, "\\'")}', source: 'modal_whatsapp' })">Comprar via WhatsApp</a>`;
+            } else {
+                ticketActionHtml = `<a href="${ticketUrl}" target="_blank" rel="noopener noreferrer" class="share-btn tickets-btn" onclick="trackGAEvent('click_ticket', { event_name: '${name.replace(/'/g, "\\'")}', source: 'modal' })">Comprar Ingresso</a>`;
+            }
         }
     } else {
         ticketActionHtml = `<span class="share-btn tickets-btn tickets-btn--free">Vendas não divulgadas</span>`;
@@ -1683,6 +1744,12 @@ function openModal(event) {
 
     overlay.classList.add('is-visible');
     document.body.style.overflow = 'hidden';
+
+    // Inicia o carrossel se ele existir no modal
+    const carouselContainer = modalContent.querySelector('.carousel-container');
+    if (carouselContainer) {
+        setupCarousel(carouselContainer);
+    }
 
     /* Copiar link */
     const copyLinkBtn = modalContent.querySelector('.copy-link-btn');
@@ -1758,6 +1825,64 @@ function setupBackToTopButton() {
             behavior: 'smooth' // Rolagem suave
         });
     });
+}
+
+/**
+ * Configura a funcionalidade de um carrossel.
+ * @param {HTMLElement} carouselContainer - O elemento container do carrossel.
+ */
+function setupCarousel(carouselContainer) {
+    const track = carouselContainer.querySelector('.carousel-track');
+    const slides = Array.from(track.children);
+    const nextButton = carouselContainer.querySelector('.carousel-btn.next');
+    const prevButton = carouselContainer.querySelector('.carousel-btn.prev');
+    const dotsNav = carouselContainer.querySelector('.carousel-dots');
+    const dots = dotsNav ? Array.from(dotsNav.children) : [];
+
+    if (!track || slides.length <= 1) {
+        if(nextButton) nextButton.style.display = 'none';
+        if(prevButton) prevButton.style.display = 'none';
+        if(dotsNav) dotsNav.style.display = 'none';
+        return;
+    }
+
+    let currentIndex = 0;
+
+    const moveToSlide = (targetIndex) => {
+        // Para de tocar o vídeo que está saindo
+        const departingSlide = slides[currentIndex];
+        const departingVideo = departingSlide.querySelector('video');
+        if (departingVideo) {
+            departingVideo.pause();
+        }
+
+        // Move o carrossel
+        track.style.transform = 'translateX(-' + targetIndex * 100 + '%)';
+        
+        // Toca o vídeo do novo slide (se houver)
+        const arrivingSlide = slides[targetIndex];
+        const arrivingVideo = arrivingSlide.querySelector('video');
+        if (arrivingVideo) {
+            arrivingVideo.muted = true; 
+            arrivingVideo.play().catch(() => {});
+        }
+
+        if (dots.length > 0) {
+            dots.forEach(dot => dot.classList.remove('active'));
+            dots[targetIndex].classList.add('active');
+        }
+
+        currentIndex = targetIndex;
+    };
+
+    nextButton.addEventListener('click', () => moveToSlide((currentIndex + 1) % slides.length));
+    prevButton.addEventListener('click', () => moveToSlide((currentIndex - 1 + slides.length) % slides.length));
+
+    if (dots.length > 0) {
+        dots.forEach(dot => {
+            dot.addEventListener('click', e => moveToSlide(parseInt(e.target.dataset.slide, 10)));
+        });
+    }
 }
 
 // --- Funções Auxiliares para IndexedDB (Cache de Vídeo) ---
@@ -1970,16 +2095,41 @@ function renderEventDetailPage(event, container, allEvents = []) {
     const coupon = getProp(event, 'Cupom');
     const producer = getProp(event, 'Produtora');
     
-    let imageUrl = getProp(event, 'Imagem (URL)');
+    let imageUrlsString = getProp(event, 'Imagem (URL)') || '';
     const eventNameLower = name.trim().toLowerCase();
-    if (eventImageMap[eventNameLower]) imageUrl = eventImageMap[eventNameLower];
-    
-    const isVideo = imageUrl && /\.(mp4|webm|ogg)($|\?)/i.test(imageUrl);
+    if (eventImageMap[eventNameLower]) imageUrlsString = eventImageMap[eventNameLower];
+
+    const mediaUrls = imageUrlsString.split(',').map(url => url.trim()).filter(url => url);
+
     const placeholderSvg = "data:image/svg+xml,%3csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 400 300%27%3e%3crect width=%27100%25%27 height=%27100%25%27 fill=%27%231a1a1a%27/%3e%3ctext x=%2750%25%27 y=%2750%25%27 fill=%27%23333%27 font-size=%2720%27 text-anchor=%27middle%27 dominant-baseline=%27middle%27%3eSem Imagem%3c/text%3e%3c/svg%3e";
 
-    const mediaHtml = isVideo 
-        ? `<video src="${imageUrl}" class="detail-page-image" controls autoplay loop muted playsinline></video>` 
-        : `<img src="${imageUrl || placeholderSvg}" alt="${name}" class="detail-page-image" onerror="this.src='${placeholderSvg}'">`;
+    let mediaHtml = '';
+    if (mediaUrls.length > 1) {
+        const slides = mediaUrls.map(url => {
+            const isVideo = /\.(mp4|webm|ogg)($|\?)/i.test(url);
+            const mediaTag = isVideo
+                ? `<video src="${url}" loop muted playsinline oncontextmenu="return false;"></video>`
+                : `<img src="${url}" alt="${name}" onerror="this.src='${placeholderSvg}'">`;
+            return `<div class="carousel-slide">${mediaTag}</div>`;
+        }).join('');
+
+        const dots = mediaUrls.map((_, i) => `<div class="carousel-dot ${i === 0 ? 'active' : ''}" data-slide="${i}"></div>`).join('');
+
+        mediaHtml = `
+            <div class="carousel-container">
+                <div class="carousel-track">${slides}</div>
+                <button class="carousel-btn prev" title="Anterior">&#10094;</button>
+                <button class="carousel-btn next" title="Próximo">&#10095;</button>
+                <div class="carousel-dots">${dots}</div>
+            </div>
+        `;
+    } else if (mediaUrls.length === 1) {
+        const url = mediaUrls[0];
+        const isVideo = /\.(mp4|webm|ogg)($|\?)/i.test(url);
+        mediaHtml = isVideo ? `<video src="${url}" class="detail-page-image" controls autoplay loop muted playsinline></video>` : `<img src="${url || placeholderSvg}" alt="${name}" class="detail-page-image" onerror="this.src='${placeholderSvg}'">`;
+    } else {
+        mediaHtml = `<img src="${placeholderSvg}" alt="${name}" class="detail-page-image">`;
+    }
 
     const timeString = formatTimeString(startTime, endTime);
     
@@ -1990,8 +2140,16 @@ function renderEventDetailPage(event, container, allEvents = []) {
         if (ticketInfo === 'gratuito' || ticketInfo === 'couvert') {
             ticketActionHtml = `<span class="share-btn tickets-btn tickets-btn--free">${ticketInfo === 'gratuito' ? 'Gratuito' : 'Couvert no local'}</span>`;
         } else {
-            ticketActionHtml = `<a href="${ticketUrl}" target="_blank" class="share-btn tickets-btn">Comprar Ingresso</a>`;
-            ticketActionHtml = `<a href="${ticketUrl}" target="_blank" class="share-btn tickets-btn" onclick="trackGAEvent('click_ticket', { event_name: '${name.replace(/'/g, "\\'")}', source: 'detail_page' })">Comprar Ingresso</a>`;
+            // Verifica se é um número de telefone (WhatsApp)
+            const cleanNumber = ticketInfo.replace(/\D/g, '');
+            const isPhoneNumber = /^[\d\s\-\(\)\+]+$/.test(ticketInfo) && cleanNumber.length >= 8;
+
+            if (isPhoneNumber) {
+                const waUrl = `https://wa.me/55${cleanNumber}`;
+                ticketActionHtml = `<a href="${waUrl}" target="_blank" class="share-btn tickets-btn whatsapp-btn" onclick="trackGAEvent('click_ticket', { event_name: '${name.replace(/'/g, "\\'")}', source: 'detail_page_whatsapp' })">Comprar via WhatsApp</a>`;
+            } else {
+                ticketActionHtml = `<a href="${ticketUrl}" target="_blank" class="share-btn tickets-btn" onclick="trackGAEvent('click_ticket', { event_name: '${name.replace(/'/g, "\\'")}', source: 'detail_page' })">Comprar Ingresso</a>`;
+            }
         }
     }
 
@@ -2090,6 +2248,12 @@ function renderEventDetailPage(event, container, allEvents = []) {
             <div class="related-events-grid" id="related-events-grid"></div>
         </div>
     `;
+
+    // Inicia o carrossel se ele existir na página
+    const carouselContainer = container.querySelector('.carousel-container');
+    if (carouselContainer) {
+        setupCarousel(carouselContainer);
+    }
 
     // Lógica para Eventos Relacionados
     if (allEvents && allEvents.length > 0) {
