@@ -228,7 +228,10 @@ const eventImageMap = {
     'progressyve 2 anos': 'assets/progressive2anos.mp4',
     'baile pink': 'assets/bailepink.jpeg',
     'domingão hot': 'assets/gravacaonandairarub.PNG',
-    'fritaria showcase': 'assets/fritariashowcase.jpeg'
+    'fritaria showcase': 'assets/fritariashowcase.jpeg',
+    'abyssal deep': 'assets/abyssaldeep.jpeg',
+    'psy club new era': 'assets/psyclubnew.mp4',
+    'drop open air - 5 anos': 'assets/dropopenair.jpg'
 }
 
 /**
