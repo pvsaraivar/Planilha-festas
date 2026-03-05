@@ -196,7 +196,7 @@ const eventImageMap = {
     'fuzuê bar - 04/02': 'assets/fuzue0402.PNG',
     'budega dos pinhões - 05/02': 'assets/budega0502.PNG',
     'pré delas no clube da prancha': 'assets/clubedaprancha3.PNG',
-    'tubulosa club metal': 'assets/clubmetal.png, asssets/tubulosaline.jpg',
+    'tubulosa club metal': 'assets/clubmetal.png, assets/tubulosaline.jpg',
     'atrita surpresinha de carnaval': 'assets/atritasurpcarn.mp4',
     'esquenta carnahard': 'assets/esquentacarnahard.jpeg',
     'kaza - tem que ter house': 'assets/kazatemqterhouse.jpeg',
@@ -1942,7 +1942,7 @@ async function handleStoryShare(event, button) {
 
     } catch (error) {
         console.error('Erro ao gerar ou compartilhar o sticker:', error);
-        alert('Ocorreu um erro ao gerar o sticker. Tente novamente.');
+        alert('Erro ao gerar sticker: ' + error);
     } finally {
         // Restore button state
         button.innerHTML = originalButtonHtml;
@@ -1958,8 +1958,11 @@ async function handleStoryShare(event, button) {
 function generateStorySticker(event) {
     return new Promise(async (resolve, reject) => {
         const wrapper = document.getElementById('story-sticker-container-wrapper');
-        if (!wrapper || typeof html2canvas === 'undefined') {
-            return reject('Container do sticker ou biblioteca html2canvas não encontrados.');
+        if (!wrapper) {
+            return reject('Container "story-sticker-container-wrapper" não encontrado no HTML.');
+        }
+        if (typeof html2canvas === 'undefined') {
+            return reject('A biblioteca html2canvas não foi carregada corretamente.');
         }
 
         const name = getProp(event, 'Evento') || getProp(event, 'Nome');
@@ -1987,16 +1990,22 @@ function generateStorySticker(event) {
 
         const stickerElement = document.getElementById('story-sticker-to-render');
         const imgElement = stickerElement.querySelector('img');
-        imgElement.crossOrigin = "anonymous";
+        
+        // Removido crossOrigin="anonymous" pois pode bloquear imagens locais/relativas.
+        // O html2canvas com useCORS:true já lida com isso.
 
         const onImageLoad = () => {
             html2canvas(stickerElement, { useCORS: true, allowTaint: true, backgroundColor: '#121212', width: 1080, height: 1920, scale: 1 })
                 .then(canvas => canvas.toBlob(blob => blob ? resolve(blob) : reject('Falha ao criar blob'), 'image/png'))
-                .catch(reject);
+                .catch(err => reject('Erro interno do html2canvas: ' + err));
         };
 
         imgElement.onload = onImageLoad;
-        imgElement.onerror = () => reject('Falha ao carregar a imagem do sticker.');
+        // Se a imagem falhar, gera o sticker mesmo assim para não travar o usuário
+        imgElement.onerror = () => {
+            console.warn('Imagem do sticker não carregou. Gerando sem imagem.');
+            onImageLoad();
+        };
         
         // If image is cached, onload might not fire.
         if (imgElement.complete) {
