@@ -196,7 +196,7 @@ const eventImageMap = {
     'fuzuê bar - 04/02': 'assets/fuzue0402.PNG',
     'budega dos pinhões - 05/02': 'assets/budega0502.PNG',
     'pré delas no clube da prancha': 'assets/clubedaprancha3.PNG',
-    'tubulosa club metal': 'assets/clubmetal.png',
+    'tubulosa club metal': 'assets/clubmetal.png, asssets/tubulosaline.jpg',
     'atrita surpresinha de carnaval': 'assets/atritasurpcarn.mp4',
     'esquenta carnahard': 'assets/esquentacarnahard.jpeg',
     'kaza - tem que ter house': 'assets/kazatemqterhouse.jpeg',
@@ -1742,6 +1742,10 @@ function openModal(event) {
             <hr class="modal-separator">
             <div class="modal-actions">
                 ${ticketActionHtml}
+                <button class="share-btn instagram-story-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+                    <span>Story</span>
+                </button>
                 <button class="share-btn copy-link-btn">${copyLinkIconSvg} Copiar link</button>
             </div>
         </div>
@@ -1754,6 +1758,14 @@ function openModal(event) {
     const carouselContainer = modalContent.querySelector('.carousel-container');
     if (carouselContainer) {
         setupCarousel(carouselContainer);
+    }
+
+    // Adiciona listener para o botão de compartilhar story
+    const storyBtn = modalContent.querySelector('.instagram-story-btn');
+    if (storyBtn) {
+        storyBtn.addEventListener('click', function() {
+            handleStoryShare(event, this);
+        });
     }
 
     /* Copiar link */
@@ -1888,6 +1900,109 @@ function setupCarousel(carouselContainer) {
             dot.addEventListener('click', e => moveToSlide(parseInt(e.target.dataset.slide, 10)));
         });
     }
+}
+
+/**
+ * Handles the logic for creating and sharing an Instagram story sticker.
+ * @param {Object} event - The event object.
+ * @param {HTMLElement} button - The button that was clicked.
+ */
+async function handleStoryShare(event, button) {
+    const originalButtonHtml = button.innerHTML;
+    button.innerHTML = 'Gerando...';
+    button.disabled = true;
+
+    try {
+        // 1. Get the sticker as a Blob
+        const stickerBlob = await generateStorySticker(event);
+
+        // 2. Create a file from the blob
+        const fileName = `story-${createEventSlug(getProp(event, 'Evento') || getProp(event, 'Nome'))}.png`;
+        const file = new File([stickerBlob], fileName, { type: 'image/png' });
+
+        // 3. Check if Web Share API is available and can share files
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+            // Use Web Share API on mobile
+            await navigator.share({
+                files: [file],
+                title: `Story do evento: ${getProp(event, 'Evento') || getProp(event, 'Nome')}`,
+            });
+            trackGAEvent('share', { method: 'Web Share API', content_type: 'story_sticker', item_id: getProp(event, 'Evento') || getProp(event, 'Nome') });
+        } else {
+            // Fallback for desktop: download the image
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(stickerBlob);
+            link.download = fileName;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            alert('Sticker baixado! Agora é só postar nos seus stories.');
+            trackGAEvent('download_story_sticker', { event_name: getProp(event, 'Evento') || getProp(event, 'Nome') });
+        }
+
+    } catch (error) {
+        console.error('Erro ao gerar ou compartilhar o sticker:', error);
+        alert('Ocorreu um erro ao gerar o sticker. Tente novamente.');
+    } finally {
+        // Restore button state
+        button.innerHTML = originalButtonHtml;
+        button.disabled = false;
+    }
+}
+
+/**
+ * Generates an image blob from an HTML sticker for a given event.
+ * @param {Object} event - The event object.
+ * @returns {Promise<Blob>} A promise that resolves with the image Blob.
+ */
+function generateStorySticker(event) {
+    return new Promise(async (resolve, reject) => {
+        const wrapper = document.getElementById('story-sticker-container-wrapper');
+        if (!wrapper || typeof html2canvas === 'undefined') {
+            return reject('Container do sticker ou biblioteca html2canvas não encontrados.');
+        }
+
+        const name = getProp(event, 'Evento') || getProp(event, 'Nome');
+        const date = getProp(event, 'Data') || getProp(event, 'Date');
+        const location = getProp(event, 'Local');
+        
+        let imageUrlsString = getProp(event, 'Imagem (URL)') || '';
+        if (eventImageMap[name.trim().toLowerCase()]) {
+            imageUrlsString = eventImageMap[name.trim().toLowerCase()];
+        }
+        const imageUrl = imageUrlsString.split(',')[0].trim();
+
+        wrapper.innerHTML = `
+            <div class="story-sticker-container" id="story-sticker-to-render" style="background-image: url('${imageUrl}')">
+                <div class="story-sticker__content">
+                    <img src="${imageUrl}" class="story-sticker__image" />
+                    <h1 class="story-sticker__title">${name}</h1>
+                    <p class="story-sticker__details">${date} &bull; ${location}</p>
+                </div>
+                <div class="story-sticker__footer">
+                    logisticaclubber.com.br
+                </div>
+            </div>
+        `;
+
+        const stickerElement = document.getElementById('story-sticker-to-render');
+        const imgElement = stickerElement.querySelector('img');
+        imgElement.crossOrigin = "anonymous";
+
+        const onImageLoad = () => {
+            html2canvas(stickerElement, { useCORS: true, allowTaint: true, backgroundColor: '#121212', width: 1080, height: 1920, scale: 1 })
+                .then(canvas => canvas.toBlob(blob => blob ? resolve(blob) : reject('Falha ao criar blob'), 'image/png'))
+                .catch(reject);
+        };
+
+        imgElement.onload = onImageLoad;
+        imgElement.onerror = () => reject('Falha ao carregar a imagem do sticker.');
+        
+        // If image is cached, onload might not fire.
+        if (imgElement.complete) {
+            onImageLoad();
+        }
+    });
 }
 
 // --- Funções Auxiliares para IndexedDB (Cache de Vídeo) ---
@@ -2244,6 +2359,10 @@ function renderEventDetailPage(event, container, allEvents = []) {
                 <div class="detail-actions">
                     ${ticketActionHtml}
                     ${instagramHtml}
+                    <button class="share-btn instagram-story-btn">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+                        <span>Compartilhar Story</span>
+                    </button>
                 </div>
                 ${mapHtml}
             </div>
@@ -2258,6 +2377,14 @@ function renderEventDetailPage(event, container, allEvents = []) {
     const carouselContainer = container.querySelector('.carousel-container');
     if (carouselContainer) {
         setupCarousel(carouselContainer);
+    }
+
+    // Adiciona listener para o botão de compartilhar story
+    const storyBtn = container.querySelector('.instagram-story-btn');
+    if (storyBtn) {
+        storyBtn.addEventListener('click', function() {
+            handleStoryShare(event, this);
+        });
     }
 
     // Lógica para Eventos Relacionados
