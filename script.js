@@ -231,7 +231,10 @@ const eventImageMap = {
     'fritaria showcase': 'assets/fritariashowcase.jpeg',
     'abyssal deep': 'assets/abyssaldeep.jpeg',
     'psy club new era': 'assets/psyclubnew.mp4',
-    'drop open air - 5 anos': 'assets/dropopenair.jpg'
+    'drop open air - 5 anos': 'assets/dropopenair.jpg',
+    'atrita 100 pudor': 'assets/atrita100pudor.mp4',
+    'papoco na rua': 'assets/papoconarua.mp4',
+    'fritaria sangue latino': 'assets/fritsanguelatino.mp4'
 }
 
 /**
