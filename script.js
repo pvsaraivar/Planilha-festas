@@ -1964,8 +1964,20 @@ function generateStorySticker(event) {
         if (!wrapper) {
             return reject('Container "story-sticker-container-wrapper" não encontrado no HTML.');
         }
+        
+        // Verifica se a biblioteca carregou. Se não, tenta carregar dinamicamente agora.
         if (typeof html2canvas === 'undefined') {
-            return reject('A biblioteca html2canvas não foi carregada corretamente.');
+            try {
+                await new Promise((resolveScript, rejectScript) => {
+                    const script = document.createElement('script');
+                    script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
+                    script.onload = resolveScript;
+                    script.onerror = rejectScript;
+                    document.head.appendChild(script);
+                });
+            } catch (e) {
+                return reject('A biblioteca html2canvas não foi carregada. Verifique sua conexão com a internet.');
+            }
         }
 
         const name = getProp(event, 'Evento') || getProp(event, 'Nome');
