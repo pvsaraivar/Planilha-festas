@@ -1945,7 +1945,11 @@ async function handleStoryShare(event, button) {
 
     } catch (error) {
         console.error('Erro ao gerar ou compartilhar o sticker:', error);
-        alert('Erro ao gerar sticker: ' + error);
+        if (error.name === 'NotAllowedError') {
+            alert('O compartilhamento foi bloqueado pelo navegador. Isso geralmente acontece ao testar em um celular sem uma conexão segura (HTTPS). A função deve funcionar normalmente quando o site estiver online.');
+        } else {
+            alert('Erro ao gerar sticker: ' + error);
+        }
     } finally {
         // Restore button state
         button.innerHTML = originalButtonHtml;
