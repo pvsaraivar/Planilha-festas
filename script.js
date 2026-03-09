@@ -1923,33 +1923,47 @@ async function handleStoryShare(event, button) {
         const fileName = `story-${createEventSlug(getProp(event, 'Evento') || getProp(event, 'Nome'))}.png`;
         const file = new File([stickerBlob], fileName, { type: 'image/png' });
 
+        let shareSuccess = false;
+
         // 3. Check if Web Share API is available and can share files
         if (navigator.canShare && navigator.canShare({ files: [file] })) {
-            // Use Web Share API on mobile
-            await navigator.share({
-                files: [file],
-                title: `Story do evento: ${getProp(event, 'Evento') || getProp(event, 'Nome')}`,
-            });
-            trackGAEvent('share', { method: 'Web Share API', content_type: 'story_sticker', item_id: getProp(event, 'Evento') || getProp(event, 'Nome') });
-        } else {
-            // Fallback for desktop: download the image
+            try {
+                // Use Web Share API on mobile
+                await navigator.share({
+                    files: [file],
+                    title: `Story do evento: ${getProp(event, 'Evento') || getProp(event, 'Nome')}`,
+                });
+                shareSuccess = true;
+                trackGAEvent('share', { method: 'Web Share API', content_type: 'story_sticker', item_id: getProp(event, 'Evento') || getProp(event, 'Nome') });
+            } catch (shareError) {
+                console.warn('Web Share API falhou (provavelmente timeout), tentando fallback:', shareError);
+                // Se o usuário cancelou intencionalmente (AbortError), consideramos sucesso para não baixar
+                if (shareError.name === 'AbortError') {
+                    shareSuccess = true; 
+                }
+            }
+        }
+
+        if (!shareSuccess) {
+            // Fallback: Se falhar no mobile ou for desktop, baixa a imagem
             const link = document.createElement('a');
             link.href = URL.createObjectURL(stickerBlob);
             link.download = fileName;
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
-            alert('Sticker baixado! Agora é só postar nos seus stories.');
+            
+            if (/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+                alert('O compartilhamento direto demorou muito e foi bloqueado pelo celular. Mas não se preocupe: a imagem foi salva na sua galeria! É só postar manualmente.');
+            } else {
+                alert('Sticker baixado! Agora é só postar nos seus stories.');
+            }
             trackGAEvent('download_story_sticker', { event_name: getProp(event, 'Evento') || getProp(event, 'Nome') });
         }
 
     } catch (error) {
         console.error('Erro ao gerar ou compartilhar o sticker:', error);
-        if (error.name === 'NotAllowedError') {
-            alert('O compartilhamento foi bloqueado pelo navegador. Isso geralmente acontece ao testar em um celular sem uma conexão segura (HTTPS). A função deve funcionar normalmente quando o site estiver online.');
-        } else {
-            alert('Erro ao gerar sticker: ' + error);
-        }
+        alert('Erro ao gerar sticker: ' + error);
     } finally {
         // Restore button state
         button.innerHTML = originalButtonHtml;
@@ -2439,6 +2453,48 @@ function renderEventDetailPage(event, container, allEvents = []) {
             related = getSortedEvents(related).slice(0, 3);
             
             const relatedGrid = document.getElementById('related-events-grid');
+            related.forEach(e => {
+                const card = createEventCardElement(e);
+                relatedGrid.appendChild(card);
+            });
+        } else {
+            document.getElementById('related-events-section').style.display = 'none';
+        }
+    } else {
+        document.getElementById('related-events-section').style.display = 'none';
+    }
+}
+
+/**
+ * Configura redirecionamento automático ao fim de vídeos específicos.
+ * Procura por vídeos com o atributo 'data-redirect-url'.
+ */
+function setupVideoRedirects() {
+    const videos = document.querySelectorAll('video[data-redirect-url]');
+    
+    videos.forEach(video => {
+        video.addEventListener('ended', () => {
+            const url = video.getAttribute('data-redirect-url');
+            if (url) {
+                window.location.href = url;
+            }
+        });
+    });
+}
+ * Procura por vídeos com o atributo 'data-redirect-url'.
+ */
+function setupVideoRedirects() {
+    const videos = document.querySelectorAll('video[data-redirect-url]');
+    
+    videos.forEach(video => {
+        video.addEventListener('ended', () => {
+            const url = video.getAttribute('data-redirect-url');
+            if (url) {
+                window.location.href = url;
+            }
+        });
+    });
+}
             related.forEach(e => {
                 const card = createEventCardElement(e);
                 relatedGrid.appendChild(card);
