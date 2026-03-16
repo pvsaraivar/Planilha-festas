@@ -234,7 +234,13 @@ const eventImageMap = {
     'drop open air - 5 anos': 'assets/dropopenair.jpg',
     'atrita 100 pudor': 'assets/atrita100pudor.mp4',
     'papoco na rua': 'assets/papoconarua.mp4',
-    'fritaria sangue latino': 'assets/fritsanguelatino.mp4'
+    'fritaria sangue latino': 'assets/fritsanguelatino.mp4',
+    'tubulosa submissa': 'assets/submissa.mp4',
+    'baile da bateu': 'assets/bdb1104.PNG',
+    'pacific de março': 'assets/pacific03.jpg',
+    'vila trance': 'assets/vilatrance.jpg',
+    'paris sessions': 'assets/portinha.jpeg',
+    '4rtin delas': 'assets/4rtindelas1.jpg, assets/4rtindelas2.jpg',
 }
 
 /**
