@@ -243,7 +243,8 @@ const eventImageMap = {
     '4rtin delas': 'assets/4rtindelas1.jpg, assets/4rtindelas2.jpg',
     'maré alta': 'assets/marealta2.jpeg',
     'alt+baile': 'assets/altbaile1.jpg, assets/altbaile2.jpg',
-
+    'plano aberto - vínculo febril': 'assets/planoabertofeb.jpg',
+    'balanço no sabbar': 'assets/balançonosabbar.jpeg'
 }
 
 /**
@@ -776,20 +777,20 @@ function setupFilters() {
 
         // 1. Filtra por data PRIMEIRO, pois ele define a base de eventos.
         if (selectedDate) {
-            // Se uma data for selecionada, a busca é feita em TODOS os eventos.
-            const [year, month, day] = selectedDate.split('-'); // 'YYYY', 'MM', 'DD'
-            
+            const [year, month, day] = selectedDate.split('-');
             const targetDay = parseInt(day, 10);
             const targetMonth = parseInt(month, 10);
             const targetYear = parseInt(year, 10);
-            
+
             filteredEvents = allEvents.filter(event => {
                 const eventDate = getProp(event, 'Data') || getProp(event, 'Date');
                 if (!eventDate) return false;
                 const parts = eventDate.split('/');
                 if (parts.length !== 3) return false;
                 
-                return parseInt(parts[0], 10) === targetDay && parseInt(parts[1], 10) === targetMonth && parseInt(parts[2], 10) === targetYear;
+                return parseInt(parts[0], 10) === targetDay && 
+                       parseInt(parts[1], 10) === targetMonth && 
+                       parseInt(parts[2], 10) === targetYear;
             });
         } else {
             filteredEvents = allEvents.filter(event => !isEventOver(event));
@@ -855,11 +856,23 @@ function setupFilters() {
         }, 300); // Atraso de 300ms
     });
 
-    dateInput.addEventListener('change', applyFilters);
-    // Impede a digitação manual no campo de data, forçando o uso do calendário.
-    dateInput.addEventListener('keydown', (e) => {
-        e.preventDefault();
-    });
+    // Inicializa o Flatpickr para um calendário visual bonito
+    const flatpickrConfig = {
+        locale: "pt",
+        dateFormat: "Y-m-d",
+        disableMobile: true, // Força o calendário visual também em dispositivos móveis
+        onChange: function() {
+            applyFilters();
+        }
+    };
+
+    const calendar = flatpickr(dateInput, flatpickrConfig);
+
+    // Garante que clicar em qualquer parte do container abra o calendário
+    const dateContainer = dateInput.closest('.date-filter-container');
+    if (dateContainer) {
+        dateContainer.addEventListener('click', () => calendar.open());
+    }
 
     genreFilter.addEventListener('change', applyFilters);
 
@@ -875,13 +888,15 @@ function setupFilters() {
     });
 
     clearDateBtn.addEventListener('click', () => {
+        if (typeof calendar !== 'undefined') calendar.clear(false);
         dateInput.value = '';
         applyFilters();
-        dateInput.classList.remove('is-active'); // Garante que o placeholder customizado reapareça
+        dateInput.classList.remove('is-active');
     });
 
     clearAllBtn.addEventListener('click', () => {
         searchInput.value = '';
+        if (typeof calendar !== 'undefined') calendar.clear(false);
         dateInput.value = '';
         genreFilter.value = '';
         favoritesFilterBtn.classList.remove('is-active');
