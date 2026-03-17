@@ -1769,10 +1769,6 @@ function openModal(event) {
             <hr class="modal-separator">
             <div class="modal-actions">
                 ${ticketActionHtml}
-                <button class="share-btn instagram-story-btn">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
-                    <span>Story</span>
-                </button>
                 <button class="share-btn copy-link-btn">${copyLinkIconSvg} Copiar link</button>
             </div>
         </div>
@@ -1785,18 +1781,6 @@ function openModal(event) {
     const carouselContainer = modalContent.querySelector('.carousel-container');
     if (carouselContainer) {
         setupCarousel(carouselContainer);
-    }
-
-    // Adiciona listener para o botão de compartilhar story
-    const storyBtn = modalContent.querySelector('.instagram-story-btn');
-    if (storyBtn) {
-        // Pré-gera o sticker em background para não perder o timeout de interação do mobile
-        const stickerPromise = generateStorySticker(event).catch(e => null);
-
-        storyBtn.addEventListener('click', function() {
-            handleStoryShare(event, this);
-            handleStoryShare(event, this, stickerPromise);
-        });
     }
 
     /* Copiar link */
@@ -1931,160 +1915,6 @@ function setupCarousel(carouselContainer) {
             dot.addEventListener('click', e => moveToSlide(parseInt(e.target.dataset.slide, 10)));
         });
     }
-}
-
-/**
- * Handles the logic for creating and sharing an Instagram story sticker.
- * @param {Object} event - The event object.
- * @param {HTMLElement} button - The button that was clicked.
- * @param {Promise} stickerPromise - Uma promise opcional com o sticker pré-gerado.
- */
-async function handleStoryShare(event, button, stickerPromise = null) {
-    const originalButtonHtml = button.innerHTML;
-    button.innerHTML = 'Gerando...';
-    button.disabled = true;
-
-    try {
-        // 1. Get the sticker as a Blob
-        let stickerBlob = stickerPromise ? await stickerPromise : null;
-        
-        if (!stickerBlob) {
-            stickerBlob = await generateStorySticker(event);
-        }
-
-        // 2. Create a file from the blob
-        const fileName = `story-${createEventSlug(getProp(event, 'Evento') || getProp(event, 'Nome'))}.png`;
-        const file = new File([stickerBlob], fileName, { type: 'image/png' });
-
-        let shareSuccess = false;
-
-        // 3. Check if Web Share API is available and can share files
-        if (navigator.canShare && navigator.canShare({ files: [file] })) {
-            try {
-                // Use Web Share API on mobile
-                await navigator.share({
-                    files: [file],
-                    title: `Story do evento: ${getProp(event, 'Evento') || getProp(event, 'Nome')}`,
-                });
-                shareSuccess = true;
-                trackGAEvent('share', { method: 'Web Share API', content_type: 'story_sticker', item_id: getProp(event, 'Evento') || getProp(event, 'Nome') });
-            } catch (shareError) {
-                console.warn('Web Share API falhou (provavelmente timeout), tentando fallback:', shareError);
-                // Se o usuário cancelou intencionalmente (AbortError), consideramos sucesso para não baixar
-                if (shareError.name === 'AbortError') {
-                    shareSuccess = true; 
-                }
-            }
-        }
-
-        if (!shareSuccess) {
-            // Fallback: Se falhar no mobile ou for desktop, baixa a imagem
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(stickerBlob);
-            link.download = fileName;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            
-            if (/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
-                alert('O compartilhamento direto demorou muito e foi bloqueado pelo celular. Mas não se preocupe: a imagem foi salva na sua galeria! É só postar manualmente.');
-            } else {
-                alert('Sticker baixado! Agora é só postar nos seus stories.');
-            }
-            trackGAEvent('download_story_sticker', { event_name: getProp(event, 'Evento') || getProp(event, 'Nome') });
-        }
-
-    } catch (error) {
-        console.error('Erro ao gerar ou compartilhar o sticker:', error);
-        alert('Erro ao gerar sticker: ' + error);
-    } finally {
-        // Restore button state
-        button.innerHTML = originalButtonHtml;
-        button.disabled = false;
-    }
-}
-
-/**
- * Generates an image blob from an HTML sticker for a given event.
- * @param {Object} event - The event object.
- * @returns {Promise<Blob>} A promise that resolves with the image Blob.
- */
-function generateStorySticker(event) {
-    return new Promise(async (resolve, reject) => {
-        const wrapper = document.getElementById('story-sticker-container-wrapper');
-        if (!wrapper) {
-            return reject('Container "story-sticker-container-wrapper" não encontrado no HTML.');
-        }
-        
-        // Verifica se a biblioteca carregou. Se não, tenta carregar dinamicamente agora.
-        if (typeof html2canvas === 'undefined') {
-            try {
-                await new Promise((resolveScript, rejectScript) => {
-                    const script = document.createElement('script');
-                    script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
-                    script.onload = resolveScript;
-                    script.onerror = rejectScript;
-                    document.head.appendChild(script);
-                });
-            } catch (e) {
-                return reject('A biblioteca html2canvas não foi carregada. Verifique sua conexão com a internet.');
-            }
-        }
-
-        const name = getProp(event, 'Evento') || getProp(event, 'Nome');
-        const date = getProp(event, 'Data') || getProp(event, 'Date');
-        const location = getProp(event, 'Local');
-        
-        let imageUrlsString = getProp(event, 'Imagem (URL)') || '';
-        if (eventImageMap[name.trim().toLowerCase()]) {
-            imageUrlsString = eventImageMap[name.trim().toLowerCase()];
-        }
-        let imageUrl = imageUrlsString.split(',')[0].trim();
-
-        // Se for um vídeo, usa o placeholder ao invés de tentar carregar na tag <img>, o que geraria erro
-        const isVideo = /\.(mp4|webm|ogg)($|\?)/i.test(imageUrl);
-        if (isVideo || !imageUrl) {
-            imageUrl = "data:image/svg+xml,%3csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 400 300%27%3e%3crect width=%27100%25%27 height=%27100%25%27 fill=%27%231a1a1a%27/%3e%3ctext x=%2750%25%27 y=%2750%25%27 fill=%27%23333%27 font-size=%2720%27 text-anchor=%27middle%27 dominant-baseline=%27middle%27%3eSem Imagem%3c/text%3e%3c/svg%3e";
-        }
-
-        wrapper.innerHTML = `
-            <div class="story-sticker-container" id="story-sticker-to-render" style="background-image: url('${imageUrl}')">
-                <div class="story-sticker__content">
-                    <img src="${imageUrl}" class="story-sticker__image" />
-                    <h1 class="story-sticker__title">${name}</h1>
-                    <p class="story-sticker__details">${date} &bull; ${location}</p>
-                </div>
-                <div class="story-sticker__footer">
-                    logisticaclubber.com.br
-                </div>
-            </div>
-        `;
-
-        const stickerElement = document.getElementById('story-sticker-to-render');
-        const imgElement = stickerElement.querySelector('img');
-        
-        // Removido crossOrigin="anonymous" pois pode bloquear imagens locais/relativas.
-        // O html2canvas com useCORS:true já lida com isso.
-        // Ajuste no allowTaint para não bloquear o toBlob via permissão (CORS resolve o resto).
-
-        const onImageLoad = () => {
-            html2canvas(stickerElement, { useCORS: true, allowTaint: false, backgroundColor: '#121212', width: 1080, height: 1920, scale: 1 })
-                .then(canvas => canvas.toBlob(blob => blob ? resolve(blob) : reject('Falha ao criar blob'), 'image/png'))
-                .catch(err => reject('Erro interno do html2canvas: ' + err));
-        };
-
-        imgElement.onload = onImageLoad;
-        // Se a imagem falhar, gera o sticker mesmo assim para não travar o usuário
-        imgElement.onerror = () => {
-            console.warn('Imagem do sticker não carregou. Gerando sem imagem.');
-            onImageLoad();
-        };
-        
-        // If image is cached, onload might not fire.
-        if (imgElement.complete) {
-            onImageLoad();
-        }
-    });
 }
 
 // --- Funções Auxiliares para IndexedDB (Cache de Vídeo) ---
@@ -2441,10 +2271,6 @@ function renderEventDetailPage(event, container, allEvents = []) {
                 <div class="detail-actions">
                     ${ticketActionHtml}
                     ${instagramHtml}
-                    <button class="share-btn instagram-story-btn">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
-                        <span>Compartilhar Story</span>
-                    </button>
                 </div>
                 ${mapHtml}
             </div>
@@ -2459,18 +2285,6 @@ function renderEventDetailPage(event, container, allEvents = []) {
     const carouselContainer = container.querySelector('.carousel-container');
     if (carouselContainer) {
         setupCarousel(carouselContainer);
-    }
-
-    // Adiciona listener para o botão de compartilhar story
-    const storyBtn = container.querySelector('.instagram-story-btn');
-    if (storyBtn) {
-        // Pré-gera o sticker em background
-        const stickerPromise = generateStorySticker(event).catch(e => null);
-
-        storyBtn.addEventListener('click', function() {
-            handleStoryShare(event, this);
-            handleStoryShare(event, this, stickerPromise);
-        });
     }
 
     // Lógica para Eventos Relacionados
