@@ -861,6 +861,7 @@ function setupFilters() {
         locale: "pt",
         dateFormat: "Y-m-d",
         disableMobile: true, // Força o calendário visual também em dispositivos móveis
+        position: "auto center",
         onChange: function() {
             applyFilters();
         }
