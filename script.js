@@ -244,7 +244,8 @@ const eventImageMap = {
     'maré alta': 'assets/marealta2.jpeg',
     'alt+baile': 'assets/altbaile1.jpg, assets/altbaile2.jpg',
     'plano aberto - vínculo febril': 'assets/planoabertofeb.jpg',
-    'balanço no sabbar': 'assets/balançonosabbar.jpeg'
+    'balanço no sabbar': 'assets/balançonosabbar.jpeg',
+    'showcase beije': 'assets/beijeshowcase.jpg'
 }
 
 /**
