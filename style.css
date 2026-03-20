@@ -1341,6 +1341,18 @@ video.modal-image {
     color: #fff;
 }
 
+.calendar-btn:hover {
+    background-color: rgba(66, 133, 244, 0.1);
+    border-color: #4285F4;
+    color: #4285F4;
+}
+
+.wa-share-btn:hover {
+    background-color: rgba(37, 211, 102, 0.1);
+    border-color: #25D366;
+    color: #25D366;
+}
+
 .tickets-btn {
     background-color: var(--primary-color);
     color: var(--background-start);

@@ -245,7 +245,9 @@ const eventImageMap = {
     'alt+baile': 'assets/altbaile1.jpg, assets/altbaile2.jpg',
     'plano aberto - vínculo febril': 'assets/planoabertofeb.jpg',
     'balanço no sabbar': 'assets/balançonosabbar.jpeg',
-    'showcase beije': 'assets/beijeshowcase.jpg'
+    'showcase beije': 'assets/beijeshowcase.jpg',
+    'ressaca do bloco freak': 'ressacabailefreak.mp4',
+    'papoco showcase': 'papocoshowcase.jpg'
 }
 
 /**
@@ -1305,6 +1307,14 @@ function createEventCardElement(event) {
                 ticketHtml = `<div class="event-card__footer"><a href="${waUrl}" target="_blank" rel="noopener noreferrer" class="event-card__tickets-btn whatsapp-btn" onclick="trackGAEvent('click_ticket', { event_name: '${name.replace(/'/g, "\\'")}', source: 'card_whatsapp' }); event.stopPropagation();">Comprar via WhatsApp</a></div>`;
             } else {
                 ticketHtml = `<div class="event-card__footer"><a href="${ticketUrl}" target="_blank" rel="noopener noreferrer" class="event-card__tickets-btn" onclick="trackGAEvent('click_ticket', { event_name: '${name.replace(/'/g, "\\'")}', source: 'card' }); event.stopPropagation();">Comprar Ingresso</a></div>`;
+                const isUrl = /^(https?:\/\/|www\.)/i.test(ticketInfo) || ticketInfo.includes('.com') || ticketInfo.includes('.br') || ticketInfo.includes('.live') || ticketInfo.includes('.ee') || ticketInfo.includes('sympla') || ticketInfo.includes('shotgun') || ticketInfo.includes('outgo');
+                if (isUrl) {
+                    let finalUrl = ticketUrl;
+                    if (!/^https?:\/\//i.test(finalUrl)) finalUrl = 'https://' + finalUrl;
+                    ticketHtml = `<div class="event-card__footer"><a href="${finalUrl}" target="_blank" rel="noopener noreferrer" class="event-card__tickets-btn" onclick="trackGAEvent('click_ticket', { event_name: '${name.replace(/'/g, "\\'")}', source: 'card' }); event.stopPropagation();">Comprar Ingresso</a></div>`;
+                } else {
+                    ticketHtml = `<div class="event-card__footer"><span class="event-card__tickets-btn event-card__tickets-btn--free">${ticketUrl}</span></div>`;
+                }
             }
         }
     } else {
@@ -1421,6 +1431,41 @@ function formatTimeString(startTime, endTime) {
         return timeString.charAt(0).toUpperCase() + timeString.slice(1);
     }
     return '';
+}
+
+/**
+ * Gera um link para adicionar o evento ao Google Calendar.
+ * @param {Object} event - O objeto do evento.
+ * @returns {string} A URL formatada para o Google Calendar.
+ */
+function createGoogleCalendarLink(event) {
+    const name = getProp(event, 'Evento') || getProp(event, 'Nome') || 'Evento';
+    const dateStr = getProp(event, 'Data') || getProp(event, 'Date');
+    const startTime = getProp(event, 'Início') || '22:00'; 
+    const endTime = getProp(event, 'Fim') || '06:00'; 
+    const location = getProp(event, 'Local') || '';
+    const link = window.location.href;
+    
+    if (!dateStr || !dateStr.includes('/')) return '#';
+
+    const parts = dateStr.split('/');
+    const year = parts[2];
+    const month = parts[1];
+    const day = parts[0];
+
+    // Formata a data para YYYYMMDDTHHmmss (sem Z para usar o fuso horário local do usuário)
+    const startString = `${year}${month}${day}T${startTime.replace(':', '')}00`;
+    // Para simplificar a virada de noite, se o fim for menor que o início, adicionamos 1 dia ao Google Calendar automaticamente no backend deles (usando datas completas requereria instanciar o Date)
+    const endString = `${year}${month}${day}T${endTime.replace(':', '')}00`; 
+
+    const url = new URL('https://calendar.google.com/calendar/render');
+    url.searchParams.append('action', 'TEMPLATE');
+    url.searchParams.append('text', name);
+    url.searchParams.append('dates', `${startString}/${endString}`);
+    url.searchParams.append('details', `Mais informações em: ${link}`);
+    if (location && location !== 'Localização não divulgada') url.searchParams.append('location', location);
+
+    return url.toString();
 }
 
 /**
@@ -1730,11 +1775,29 @@ function openModal(event) {
                 ticketActionHtml = `<a href="${waUrl}" target="_blank" rel="noopener noreferrer" class="share-btn tickets-btn whatsapp-btn" onclick="trackGAEvent('click_ticket', { event_name: '${name.replace(/'/g, "\\'")}', source: 'modal_whatsapp' })">Comprar via WhatsApp</a>`;
             } else {
                 ticketActionHtml = `<a href="${ticketUrl}" target="_blank" rel="noopener noreferrer" class="share-btn tickets-btn" onclick="trackGAEvent('click_ticket', { event_name: '${name.replace(/'/g, "\\'")}', source: 'modal' })">Comprar Ingresso</a>`;
+                const isUrl = /^(https?:\/\/|www\.)/i.test(ticketInfo) || ticketInfo.includes('.com') || ticketInfo.includes('.br') || ticketInfo.includes('.live') || ticketInfo.includes('.ee') || ticketInfo.includes('sympla') || ticketInfo.includes('shotgun') || ticketInfo.includes('outgo');
+                if (isUrl) {
+                    let finalUrl = ticketUrl;
+                    if (!/^https?:\/\//i.test(finalUrl)) finalUrl = 'https://' + finalUrl;
+                    ticketActionHtml = `<a href="${finalUrl}" target="_blank" rel="noopener noreferrer" class="share-btn tickets-btn" onclick="trackGAEvent('click_ticket', { event_name: '${name.replace(/'/g, "\\'")}', source: 'modal' })">Comprar Ingresso</a>`;
+                } else {
+                    ticketActionHtml = `<span class="share-btn tickets-btn tickets-btn--free">${ticketUrl}</span>`;
+                }
             }
         }
     } else {
         ticketActionHtml = `<span class="share-btn tickets-btn tickets-btn--free">Vendas não divulgadas</span>`;
     }
+
+    // Botão Adicionar ao Calendário
+    const calendarLink = createGoogleCalendarLink(event);
+    const calendarIconSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>`;
+    const calendarActionHtml = isPastEvent ? '' : `<a href="${calendarLink}" target="_blank" rel="noopener noreferrer" class="share-btn calendar-btn" onclick="trackGAEvent('add_to_calendar', { event_name: '${name.replace(/'/g, "\\'")}' })">${calendarIconSvg} Salvar na Agenda</a>`;
+
+    // Botão Compartilhar no WhatsApp
+    const waShareText = encodeURIComponent(`Bora pra essa festa? ${name}\nMais infos: ${window.location.href}`);
+    const waShareIconSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>`;
+    const waShareHtml = `<a href="https://wa.me/?text=${waShareText}" target="_blank" rel="noopener noreferrer" class="share-btn wa-share-btn" onclick="trackGAEvent('share', { method: 'WhatsApp', content_type: 'event', item_id: '${name.replace(/'/g, "\\'")}' })">${waShareIconSvg} WhatsApp</a>`;
 
     modalContent.innerHTML = `
         <div class="modal-image-wrapper">
@@ -1771,6 +1834,8 @@ function openModal(event) {
             <hr class="modal-separator">
             <div class="modal-actions">
                 ${ticketActionHtml}
+                ${calendarActionHtml}
+                ${waShareHtml}
                 <button class="share-btn copy-link-btn">${copyLinkIconSvg} Copiar link</button>
             </div>
         </div>
@@ -2183,9 +2248,27 @@ function renderEventDetailPage(event, container, allEvents = []) {
                 ticketActionHtml = `<a href="${waUrl}" target="_blank" class="share-btn tickets-btn whatsapp-btn" onclick="trackGAEvent('click_ticket', { event_name: '${name.replace(/'/g, "\\'")}', source: 'detail_page_whatsapp' })">Comprar via WhatsApp</a>`;
             } else {
                 ticketActionHtml = `<a href="${ticketUrl}" target="_blank" class="share-btn tickets-btn" onclick="trackGAEvent('click_ticket', { event_name: '${name.replace(/'/g, "\\'")}', source: 'detail_page' })">Comprar Ingresso</a>`;
+                const isUrl = /^(https?:\/\/|www\.)/i.test(ticketInfo) || ticketInfo.includes('.com') || ticketInfo.includes('.br') || ticketInfo.includes('.live') || ticketInfo.includes('.ee') || ticketInfo.includes('sympla') || ticketInfo.includes('shotgun') || ticketInfo.includes('outgo');
+                if (isUrl) {
+                    let finalUrl = ticketUrl;
+                    if (!/^https?:\/\//i.test(finalUrl)) finalUrl = 'https://' + finalUrl;
+                    ticketActionHtml = `<a href="${finalUrl}" target="_blank" class="share-btn tickets-btn" onclick="trackGAEvent('click_ticket', { event_name: '${name.replace(/'/g, "\\'")}', source: 'detail_page' })">Comprar Ingresso</a>`;
+                } else {
+                    ticketActionHtml = `<span class="share-btn tickets-btn tickets-btn--free">${ticketUrl}</span>`;
+                }
             }
         }
     }
+
+    // Botão Adicionar ao Calendário na Página de Detalhes
+    const calendarLink = createGoogleCalendarLink(event);
+    const calendarIconSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>`;
+    const calendarActionHtml = `<a href="${calendarLink}" target="_blank" rel="noopener noreferrer" class="share-btn calendar-btn" onclick="trackGAEvent('add_to_calendar', { event_name: '${name.replace(/'/g, "\\'")}', source: 'detail_page' })">${calendarIconSvg} Salvar na Agenda</a>`;
+
+    // Botão Compartilhar no WhatsApp na Página de Detalhes
+    const waShareText = encodeURIComponent(`Bora pra essa festa? ${name}\nMais infos: ${window.location.href}`);
+    const waShareIconSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>`;
+    const waShareHtml = `<a href="https://wa.me/?text=${waShareText}" target="_blank" rel="noopener noreferrer" class="share-btn wa-share-btn" onclick="trackGAEvent('share', { method: 'WhatsApp', content_type: 'event', item_id: '${name.replace(/'/g, "\\'")}', source: 'detail_page' })">${waShareIconSvg} Compartilhar no WhatsApp</a>`;
 
     let instagramHtml = '';
     if (instagramUrl) {
@@ -2273,6 +2356,8 @@ function renderEventDetailPage(event, container, allEvents = []) {
                 <div class="detail-actions">
                     ${ticketActionHtml}
                     ${instagramHtml}
+                    ${calendarActionHtml}
+                    ${waShareHtml}
                 </div>
                 ${mapHtml}
             </div>
