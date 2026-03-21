@@ -236,7 +236,7 @@ const eventImageMap = {
     'papoco na rua': 'assets/papoconarua.mp4',
     'fritaria sangue latino': 'assets/fritsanguelatino.mp4',
     'tubulosa submissa': 'assets/submissa.mp4',
-    'baile da bateu': 'assets/bdb1104.PNG',
+    'baile da bateu': 'assets/bdb1104.png',
     'pacific de março': 'assets/pacific03.jpg',
     'vila trance': 'assets/vilatrance.jpg',
     'paris sessions': 'assets/portinha.jpeg',
@@ -246,8 +246,9 @@ const eventImageMap = {
     'plano aberto - vínculo febril': 'assets/planoabertofeb.jpg',
     'balanço no sabbar': 'assets/balançonosabbar.jpeg',
     'showcase beije': 'assets/beijeshowcase.jpg',
-    'ressaca do bloco freak': 'ressacabailefreak.mp4',
-    'papoco showcase': 'papocoshowcase.jpg'
+    'papoco showcase': 'assets/papocoshowcase.jpg',
+    'ressaca baile freak': 'assets/ressacabloco.PNG'
+
 }
 
 /**
