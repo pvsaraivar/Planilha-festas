@@ -1410,6 +1410,31 @@ video.modal-image {
     margin-bottom: 2rem;
 }
 
+/* Botão de Localização do Usuário no Mapa */
+.locate-user-btn {
+    position: absolute;
+    bottom: 40px;
+    right: 20px;
+    z-index: 1000; /* Acima das camadas do mapa Leaflet */
+    background-color: var(--card-background);
+    color: var(--text-color);
+    border: 2px solid var(--border-color);
+    border-radius: 50%;
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: var(--shadow);
+    transition: all 0.2s ease;
+}
+.locate-user-btn:hover {
+    background-color: var(--primary-color);
+    color: var(--background-start);
+    transform: scale(1.05);
+}
+
 /* Container do pino resetado para evitar conflitos */
 .custom-map-pin {
     background: transparent !important;

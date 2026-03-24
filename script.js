@@ -2338,6 +2338,38 @@ function initEventMap() {
     }).addTo(eventMap);
 
     mapMarkersGroup = L.layerGroup().addTo(eventMap);
+
+    // --- Lógica de Localização do Usuário ---
+    const locateBtn = document.getElementById('locate-user-btn');
+    let userMarker = null;
+
+    if (locateBtn) {
+        locateBtn.addEventListener('click', () => {
+            // Pede a localização ao navegador e centraliza o mapa lá
+            eventMap.locate({setView: true, maxZoom: 14});
+        });
+    }
+
+    // Quando o usuário permite e a localização é encontrada
+    eventMap.on('locationfound', (e) => {
+        if (userMarker) {
+            eventMap.removeLayer(userMarker);
+        }
+        // Cria um marcador com uma bolinha azul para representar o usuário
+        userMarker = L.circleMarker(e.latlng, {
+            radius: 8,
+            fillColor: "#0078ff",
+            color: "#ffffff",
+            weight: 2,
+            opacity: 1,
+            fillOpacity: 0.8
+        }).addTo(eventMap).bindTooltip("Você está aqui!", { direction: 'top', permanent: false });
+    });
+
+    // Se o usuário negar permissão ou o GPS falhar
+    eventMap.on('locationerror', (e) => {
+        alert("Não foi possível acessar sua localização. Verifique se você deu permissão no navegador.");
+    });
 }
 
 /**
