@@ -242,7 +242,7 @@ const eventImageMap = {
     'atrita 100 pudor': 'assets/atrita100pudor.mp4',
     'papoco na rua': 'assets/papoconarua.mp4',
     'fritaria sangue latino': 'assets/fritsanguelatino.mp4',
-    'tubulosa submissa': 'assets/submissa.PNG',
+    'tubulosa submissa': 'assets/submissa.png',
     'baile da bateu': 'assets/bdb1104.png',
     'pacific de março': 'assets/pacific03.jpg',
     'vila trance': 'assets/vilatrance.jpg',
