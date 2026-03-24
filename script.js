@@ -242,7 +242,6 @@ const eventImageMap = {
     'atrita 100 pudor': 'assets/atrita100pudor.mp4',
     'papoco na rua': 'assets/papoconarua.mp4',
     'fritaria sangue latino': 'assets/fritsanguelatino.mp4',
-    'tubulosa submissa': 'assets/submissa.png',
     'baile da bateu': 'assets/bdb1104.png',
     'pacific de março': 'assets/pacific03.jpg',
     'vila trance': 'assets/vilatrance.jpg',
@@ -258,7 +257,8 @@ const eventImageMap = {
     'carol c & friends': 'assets/carolkaza.jpg',
     'mirage djs no arrumação': 'assets/miragearrumação.jpg',
     'longdreams x joão rave': 'assets/longjoaorave.jpg',
-    'korre e frita': 'assets/correfrita1.jpg, assets/correfrita2.jpg'
+    'korre e frita': 'assets/correfrita1.jpg, assets/correfrita2.jpg',
+    'tubulosa submissa': 'assets/submissa.PNG'
 }
 
 /**
