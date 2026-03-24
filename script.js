@@ -257,8 +257,8 @@ const eventImageMap = {
     'carol c & friends': 'assets/carolkaza.jpg',
     'mirage djs no arrumação': 'assets/miragearrumação.jpg',
     'longdreams x joão rave': 'assets/longjoaorave.jpg',
+    'tubulosa submissa': 'assets/sub.PNG',
     'korre e frita': 'assets/correfrita1.jpg, assets/correfrita2.jpg',
-    'tubulosa submissa': 'assets/submissa.PNG'
 }
 
 /**
