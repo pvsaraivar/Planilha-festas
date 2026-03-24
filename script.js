@@ -4,6 +4,9 @@ let eventSlugFromUrl = null; // Armazena o slug do evento da URL para uso poster
 let allEvents = []; // Armazena todos os eventos para filtragem
 let favoritedEventSlugs = new Set(); // Armazena os slugs dos eventos favoritados para consulta rápida
 
+let eventMap = null;
+let mapMarkersGroup = null;
+
 document.addEventListener('DOMContentLoaded', () => {
     const sheetId = '1LAfG4Nt2g_P12HMCx-wEmWpXoX3yp1qAKdw89eLbeWU';
     const eventsGid = '0'; // GID da aba "eventos" (geralmente 0 se for a primeira aba criada)
@@ -30,6 +33,8 @@ document.addEventListener('DOMContentLoaded', () => {
         setupBackToTopButton();
         setupVideoObserver(); 
         setupVideoRedirects();
+        initEventMap();
+        setupViewToggle();
         // setupSundayVideo();
     }
 });
@@ -340,6 +345,7 @@ async function loadAndDisplayEvents(csvPath) {
     } else {
         const futureEvents = allEvents.filter(event => !isEventOver(event));
         renderEvents(getSortedEvents(futureEvents), grid);
+        if (typeof updateMapMarkers === 'function') updateMapMarkers(futureEvents);
     }
 
     if (eventSlugFromUrl) {
@@ -707,10 +713,11 @@ function setupFilters() {
     const clearAllBtn = document.getElementById('clear-all-filters-btn');
     const datePickerTrigger = document.querySelector('.date-picker-trigger');
     const dateValueDisplay = document.getElementById('date-filter-value');
-    const shareFiltersBtn = document.getElementById('share-filters-btn');
     const searchLoader = document.getElementById('search-loader');
     const grid = document.getElementById('event-grid');
     const floatingClearBtn = document.getElementById('floating-clear-filters-btn');
+
+    let isInitialLoad = true;
 
     const applyFilters = () => {
         const searchTerm = searchInput.value.toLowerCase();
@@ -729,7 +736,6 @@ function setupFilters() {
         clearDateBtn.hidden = !selectedDate;
         const anyFilterActive = !!searchTerm || !!selectedDate || (!!selectedGenre && selectedGenre !== '') || favoritesOnly;
         clearAllBtn.hidden = !anyFilterActive;
-        shareFiltersBtn.hidden = !anyFilterActive;
 
         // Atualiza a visibilidade do botão flutuante
         if (floatingClearBtn) {
@@ -766,7 +772,7 @@ function setupFilters() {
 
         const queryString = params.toString();
 
-        if (anyFilterActive && !shareFiltersBtn.dataset.initialLoad) {
+        if (anyFilterActive && !isInitialLoad) {
             trackGAEvent('filter_used', { search_term: searchTerm, date: selectedDate, genre: selectedGenre, favorites: favoritesOnly });
         }
 
@@ -832,6 +838,7 @@ function setupFilters() {
         }
 
         renderEvents(getSortedEvents(filteredEvents), grid);
+        if (typeof updateMapMarkers === 'function') updateMapMarkers(filteredEvents);
     };
 
     // Re-aplica o filtro ao redimensionar a tela para ajustar o número de colunas
@@ -928,27 +935,7 @@ function setupFilters() {
     // Chama applyFilters uma vez na inicialização para definir o estado dos botões com base nos parâmetros da URL
     applyFilters();
     // Marca que a carga inicial foi concluída para não rastrear o primeiro `applyFilters` como uma ação do usuário.
-    shareFiltersBtn.dataset.initialLoad = 'true';
-
-    shareFiltersBtn.addEventListener('click', () => {
-        // A URL já está correta na barra de endereço
-        navigator.clipboard.writeText(window.location.href).then(() => {
-            const originalHtml = shareFiltersBtn.innerHTML;
-            const checkIconSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
-            shareFiltersBtn.innerHTML = `${checkIconSvg} <span>Link Copiado!</span>`;
-            shareFiltersBtn.disabled = true;
-
-            trackGAEvent('share', { method: 'Copy Filter Link', content_type: 'filters' });
-            
-            setTimeout(() => {
-                shareFiltersBtn.innerHTML = originalHtml;
-                shareFiltersBtn.disabled = false;
-            }, 2000);
-        }).catch(err => {
-            console.error('Falha ao copiar o link do filtro: ', err);
-            alert('Não foi possível copiar o link.');
-        });
-    });
+    isInitialLoad = false;
 }
 
 /**
@@ -2425,5 +2412,92 @@ function setupVideoRedirects() {
                 window.location.href = url;
             }
         });
+    });
+}
+
+/**
+ * Inicializa o mapa do Leaflet
+ */
+function initEventMap() {
+    const mapContainer = document.getElementById('event-map');
+    if (!mapContainer) return;
+
+    // Inicia centrado em Fortaleza
+    eventMap = L.map('event-map').setView([-3.7319, -38.5267], 12);
+
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+        maxZoom: 19,
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> &copy; <a href="https://carto.com/attributions">CARTO</a>'
+    }).addTo(eventMap);
+
+    mapMarkersGroup = L.layerGroup().addTo(eventMap);
+}
+
+/**
+ * Configura a alternância entre a visualização de Lista e Mapa
+ */
+function setupViewToggle() {
+    const listBtn = document.getElementById('view-list-btn');
+    const mapBtn = document.getElementById('view-map-btn');
+    const gridView = document.getElementById('event-grid');
+    const mapView = document.getElementById('map-view-container');
+
+    if (!listBtn || !mapBtn || !gridView || !mapView) return;
+
+    listBtn.addEventListener('click', () => {
+        listBtn.classList.add('is-active');
+        mapBtn.classList.remove('is-active');
+        gridView.style.display = '';
+        mapView.style.display = 'none';
+    });
+
+    mapBtn.addEventListener('click', () => {
+        mapBtn.classList.add('is-active');
+        listBtn.classList.remove('is-active');
+        gridView.style.display = 'none';
+        mapView.style.display = 'block';
+        
+        // Função essencial do Leaflet para ele renderizar certo se o contêiner estava oculto (display: none)
+        if (eventMap) {
+            eventMap.invalidateSize();
+        }
+    });
+}
+
+/**
+ * Atualiza os marcadores do mapa com base nos eventos filtrados
+ * @param {Array<Object>} events - Lista de eventos que devem aparecer no mapa
+ */
+function updateMapMarkers(events) {
+    if (!mapMarkersGroup) return;
+    
+    mapMarkersGroup.clearLayers(); // Remove os pins antigos
+
+    events.forEach(event => {
+        const lat = getProp(event, 'Latitude');
+        const lng = getProp(event, 'Longitude');
+        
+        if (lat && lng) {
+            // Prevenção inteligente: se você digitar vírgula na planilha no lugar de ponto, o código arruma.
+            const parsedLat = parseFloat(lat.replace(',', '.'));
+            const parsedLng = parseFloat(lng.replace(',', '.'));
+
+            if (!isNaN(parsedLat) && !isNaN(parsedLng)) {
+                const name = getProp(event, 'Evento') || getProp(event, 'Nome') || 'Evento';
+                const location = getProp(event, 'Local') || '';
+                const date = getProp(event, 'Data') || getProp(event, 'Date') || '';
+                const slug = createEventSlug(name);
+
+                const popupHtml = `
+                    <div class="map-popup-content">
+                        <h3>${name}</h3>
+                        <p>${date}<br>${location}</p>
+                        <button onclick="window.location.href='detalhes.html?event=${slug}'" class="map-popup-btn">Ver Detalhes</button>
+                    </div>
+                `;
+
+                L.marker([parsedLat, parsedLng]).bindPopup(popupHtml).addTo(mapMarkersGroup);
+            }
+        }
     });
 }
