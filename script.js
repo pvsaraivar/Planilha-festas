@@ -28,6 +28,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         applyFiltersFromURL();
         loadFavorites(); 
+        initEventMap();
         loadAndDisplayEvents(googleSheetUrl);
         setupFilters();
         setupModal();
@@ -2324,6 +2325,9 @@ function setupVideoRedirects() {
 function initEventMap() {
     const mapContainer = document.getElementById('event-map');
     if (!mapContainer) return;
+
+    // Previne a inicialização dupla
+    if (eventMap !== null) return;
 
     // Inicia centrado em Fortaleza
     eventMap = L.map('event-map').setView([-3.7319, -38.5267], 12);
