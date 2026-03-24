@@ -2430,8 +2430,25 @@ function updateMapMarkers(events) {
                 const date = getProp(event, 'Data') || getProp(event, 'Date') || '';
                 const slug = createEventSlug(name);
 
+                // --- Lógica de Imagem para o Popup ---
+                let imageUrl = getProp(event, 'Imagem (URL)');
+                const eventNameLower = name.trim().toLowerCase();
+                if (eventImageMap[eventNameLower]) {
+                    imageUrl = eventImageMap[eventNameLower];
+                }
+                if (imageUrl && imageUrl.includes(',')) {
+                    imageUrl = imageUrl.split(',')[0].trim();
+                }
+                
+                const placeholderSvg = "data:image/svg+xml,%3csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 400 300%27%3e%3crect width=%27100%25%27 height=%27100%25%27 fill=%27%233f3d3d%27/%3e%3ctext x=%2750%25%27 y=%2750%25%27 fill=%27%23A7A7A7%27 font-size=%2720%27 text-anchor=%27middle%27 dominant-baseline=%27middle%27%3eSem Imagem%3c/text%3e%3c/svg%3e";
+                const isVideo = imageUrl && /\.(mp4|webm|ogg)($|\?)/i.test(imageUrl);
+                const mediaHtml = isVideo 
+                    ? `<video src="${imageUrl}#t=0.1" class="map-popup-image" loop muted playsinline autoplay></video>`
+                    : `<img src="${imageUrl || placeholderSvg}" alt="${name}" class="map-popup-image" onerror="this.src='${placeholderSvg}';">`;
+
                 const popupHtml = `
                     <div class="map-popup-content">
+                        ${mediaHtml}
                         <h3>${name}</h3>
                         <p>${date}<br>${location}</p>
                         <button onclick="window.location.href='detalhes.html?event=${slug}'" class="map-popup-btn">Ver Detalhes</button>

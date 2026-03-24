@@ -1438,6 +1438,15 @@ video.modal-image {
 .leaflet-container a.leaflet-popup-close-button {
     color: var(--subtle-text) !important;
 }
+.map-popup-image {
+    width: 100%;
+    height: 120px;
+    object-fit: cover;
+    border-radius: 6px;
+    margin-bottom: 10px;
+    background-color: var(--background-start);
+    display: block;
+}
 .map-popup-content h3 {
     margin: 0 0 5px 0;
     font-size: 1.1rem;
