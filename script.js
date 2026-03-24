@@ -10,8 +10,10 @@ let mapMarkersGroup = null;
 document.addEventListener('DOMContentLoaded', () => {
     const sheetId = '1LAfG4Nt2g_P12HMCx-wEmWpXoX3yp1qAKdw89eLbeWU';
     const eventsGid = '0'; // GID da aba "eventos" (geralmente 0 se for a primeira aba criada)
-    // A URL agora aponta especificamente para a aba de eventos usando o GID.
-    const googleSheetUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/export?format=csv&gid=${eventsGid}`;
+    
+    // Adiciona um timestamp (cache-buster) para forçar o navegador a pegar os dados mais recentes
+    const cacheBuster = new Date().getTime();
+    const googleSheetUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/export?format=csv&gid=${eventsGid}&nocache=${cacheBuster}`;
     
     setupThemeToggle();
 
@@ -240,7 +242,7 @@ const eventImageMap = {
     'atrita 100 pudor': 'assets/atrita100pudor.mp4',
     'papoco na rua': 'assets/papoconarua.mp4',
     'fritaria sangue latino': 'assets/fritsanguelatino.mp4',
-    'tubulosa submissa': 'assets/submissa.mp4',
+    'tubulosa submissa': 'assets/submissa.PNG',
     'baile da bateu': 'assets/bdb1104.png',
     'pacific de março': 'assets/pacific03.jpg',
     'vila trance': 'assets/vilatrance.jpg',
@@ -252,8 +254,11 @@ const eventImageMap = {
     'balanço no sabbar': 'assets/balançonosabbar.jpeg',
     'showcase beije': 'assets/beijeshowcase.jpg',
     'papoco showcase': 'assets/papocoshowcase.jpg',
-    'ressaca baile freak': 'assets/ressacabloco.PNG'
-
+    'ressaca baile freak': 'assets/ressacabloco.PNG',
+    'carol c & friends': 'assets/carolkaza.jpg',
+    'mirage djs no arrumação': 'assets/miragearrumação.jpg',
+    'longdreams x joão rave': 'assets/longjoaorave.jpg',
+    'korre e frita': 'assets/correfrita1.jpg, assets/correfrita2.jpg'
 }
 
 /**
@@ -328,7 +333,6 @@ async function loadAndDisplayEvents(csvPath) {
       return oculto !== 'sim' && oculto !== 'true';
     });
     
-    renderWeeklyEvents(allEvents);
 
     populateGenreFilter(allEvents);
 
@@ -567,100 +571,6 @@ function populateGenreFilter(events) {
 }
 
 /**
- * @param {Array<Object>} allEvents - A lista completa de todos os eventos.
- */
-function renderWeeklyEvents(allEvents) {
-    const weeklySection = document.getElementById('weekly-events-section');
-    if (!weeklySection) return;
-
-    // Se estiver no modo domingo, não exibe a seção semanal
-    if (document.body.classList.contains('sunday-mode')) return;
-
-    const parseDate = (dateString) => {
-        if (!dateString || typeof dateString !== 'string') return null;
-        const cleanDateStr = dateString.split(' ')[0].trim();
-        const parts = cleanDateStr.split('/');
-        if (parts.length !== 3) return null;
-        const day = parseInt(parts[0], 10);
-        const month = parseInt(parts[1], 10) - 1;
-        const year = parseInt(parts[2], 10);
-        return (isNaN(day) || isNaN(month) || isNaN(year)) ? null : new Date(year, month, day);
-    };
-
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-
-    const nextFiveDays = new Date(today);
-    nextFiveDays.setDate(today.getDate() + 5);
-
-    const upcomingEvents = allEvents
-        .map(event => ({ ...event, parsedDate: parseDate(getProp(event, 'Data') || getProp(event, 'Date')) }))
-        .filter(event => event.parsedDate && event.parsedDate >= today && event.parsedDate <= nextFiveDays)
-        .sort((a, b) => a.parsedDate - b.parsedDate);
-
-    if (upcomingEvents.length > 0) {
-        weeklySection.style.display = 'block'; // Mostra a seção
-        
-        const eventsHtml = upcomingEvents.map((event, index) => {
-            const name = getProp(event, 'Evento') || getProp(event, 'Nome') || 'Evento';
-            const date = getProp(event, 'Data') || getProp(event, 'Date');
-            const location = getProp(event, 'Local') || 'Local a confirmar';
-            let imageUrl = getProp(event, 'Imagem (URL)');
-            
-            const eventNameLower = name.trim().toLowerCase();
-            if (eventImageMap[eventNameLower]) {
-                imageUrl = eventImageMap[eventNameLower];
-            }
-
-            // Se houver múltiplas imagens (carrossel), pega apenas a primeira para exibir no card da semana
-            if (imageUrl && imageUrl.includes(',')) {
-                imageUrl = imageUrl.split(',')[0].trim();
-            }
-
-            const featuredClass = eventNameLower.includes('tubulosa club metal') ? 'weekly-event-card--featured' : '';
-
-            const placeholderSvg = "data:image/svg+xml,%3csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3e%3crect width=%27100%25%27 height=%27100%25%27 fill=%27%23333%27/%3e%3c/svg%3e";
-
-            const isVideo = imageUrl && /\.(mp4|webm|ogg)($|\?)/i.test(imageUrl);
-            const mediaHtml = isVideo 
-                ? `<video src="${imageUrl}#t=0.1" class="weekly-event-card__image lazy-video" loop muted playsinline webkit-playsinline preload="metadata" onerror='this.outerHTML="<img src=\\"${placeholderSvg}\\" class=\\"weekly-event-card__image\\" loading=\\"lazy\\">"'></video>`
-                : `<img src="${imageUrl || placeholderSvg}" alt="${name}" class="weekly-event-card__image" loading="lazy">`;
-
-            return `
-                <a href="#" class="weekly-event-card ${featuredClass}" data-event-slug="${createEventSlug(name)}" style="animation-delay: ${index * 0.1}s">
-                    ${mediaHtml}
-                    <div class="weekly-event-card__info">
-                        <h3>${name}</h3>
-                        <p>${date} &bull; ${location}</p>
-                    </div>
-                </a>
-            `;
-        }).join('');
-
-        weeklySection.innerHTML = `
-            <h2 id="weekly-events-title">Eventos da semana</h2>
-            <div class="weekly-events-grid">${eventsHtml}</div>
-        `;
-
-        // Observa os vídeos para tocar apenas quando visíveis
-        if (window.videoObserver) {
-            weeklySection.querySelectorAll('.lazy-video').forEach(video => window.videoObserver.observe(video));
-        }
-
-        // Adiciona listeners para abrir o modal ao clicar nos cards da semana
-        weeklySection.querySelectorAll('.weekly-event-card').forEach(card => {
-            card.addEventListener('click', (e) => {
-                // e.preventDefault(); // Removemos o preventDefault para permitir o link normal se fosse um <a>, mas aqui vamos redirecionar via JS
-                const slug = card.dataset.eventSlug;
-                // Redireciona para a página de detalhes
-                window.location.href = `detalhes.html?event=${slug}`;
-            });
-        });
-    } else {
-        weeklySection.style.display = 'none'; // Oculta a seção se não houver eventos na semana
-    }
-}
-/**
  * Retorna uma cópia dos eventos ordenados por data.
  * @param {Array<Object>} events - A lista de eventos a ser ordenada.
  * @returns {Array<Object>} A lista de eventos ordenada.
@@ -745,12 +655,6 @@ function setupFilters() {
             } else {
                 floatingClearBtn.classList.remove('visible');
             }
-        }
-
-        // Oculta a seção "Eventos da semana" se qualquer filtro estiver ativo
-        const weeklySection = document.getElementById('weekly-events-section');
-        if (weeklySection) {
-            weeklySection.style.display = anyFilterActive ? 'none' : 'block';
         }
 
         // Atualiza o display do filtro de data com o novo estilo
@@ -961,7 +865,6 @@ async function setupSundayVideo() {
             '.site-header',
             '.main-nav', 
             '.filters-wrapper', 
-            '#weekly-events-section', 
             '#event-grid',
             '.site-footer',
             '#back-to-top-btn',
@@ -2457,9 +2360,11 @@ function setupViewToggle() {
         gridView.style.display = 'none';
         mapView.style.display = 'block';
         
-        // Função essencial do Leaflet para ele renderizar certo se o contêiner estava oculto (display: none)
+        // Um pequeno atraso (100ms) garante que a div já está visível antes do Leaflet calcular o tamanho
         if (eventMap) {
-            eventMap.invalidateSize();
+            setTimeout(() => {
+                eventMap.invalidateSize();
+            }, 250); // Atraso levemente maior para garantir que o CSS finalizou a exibição antes do mapa calcular o tamanho
         }
     });
 }
@@ -2470,19 +2375,56 @@ function setupViewToggle() {
  */
 function updateMapMarkers(events) {
     if (!mapMarkersGroup) return;
+
+    // Cria um ícone customizado usando SVG com as cores do site (Evita o bug do ícone azul invisível do Leaflet)
+    const customMarkerIcon = L.divIcon({
+        className: 'custom-map-pin',
+        html: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="36" height="36" fill="var(--primary-color)" stroke="var(--background-start)" stroke-width="1.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3" fill="var(--background-start)"></circle></svg>`,
+        iconSize: [36, 36],
+        iconAnchor: [18, 36], // Ponto exato da ponta do pino
+        popupAnchor: [0, -36] // Onde o balão de popup vai abrir em relação ao pino
+    });
     
     mapMarkersGroup.clearLayers(); // Remove os pins antigos
+
+    const coordinateCounts = {}; // Guarda quantas festas estão no mesmo lugar
 
     events.forEach(event => {
         const lat = getProp(event, 'Latitude');
         const lng = getProp(event, 'Longitude');
         
         if (lat && lng) {
-            // Prevenção inteligente: se você digitar vírgula na planilha no lugar de ponto, o código arruma.
-            const parsedLat = parseFloat(lat.replace(',', '.'));
-            const parsedLng = parseFloat(lng.replace(',', '.'));
+            // Limpeza pesada: troca vírgula por ponto e remove pontos duplicados (ex: -3.720.367 vira -3.720367)
+            let cleanLat = String(lat).replace(/,/g, '.').trim();
+            let cleanLng = String(lng).replace(/,/g, '.').trim();
+            
+            const fixDots = (str) => {
+                const parts = str.split('.');
+                return parts.length > 2 ? parts[0] + '.' + parts.slice(1).join('') : str;
+            };
+
+            let parsedLat = parseFloat(fixDots(cleanLat));
+            let parsedLng = parseFloat(fixDots(cleanLng));
+
+            // Auto-correção "Mágica" para Fortaleza (Corrige esquecimento de sinal negativo ou erro de casa decimal)
+            if (parsedLat > 0) parsedLat = -parsedLat;
+            if (parsedLng > 0) parsedLng = -parsedLng;
+            if (parsedLng > -4.0 && parsedLng < -3.0) parsedLng = parsedLng * 10; // Corrige de -3.85 para -38.5
 
             if (!isNaN(parsedLat) && !isNaN(parsedLng)) {
+                
+                // --- Anti-Sobreposição (Efeito "Teia") ---
+                // Se já houver um pino nesta exata coordenada, afasta o próximo em formato circular
+                const coordKey = `${parsedLat.toFixed(5)},${parsedLng.toFixed(5)}`;
+                if (coordinateCounts[coordKey]) {
+                    const offsetIndex = coordinateCounts[coordKey];
+                    const angle = offsetIndex * (Math.PI / 3); // Gira o ângulo para criar um círculo ao redor
+                    const radius = 0.0002; // Afastamento pequeno (aprox 20 metros na vida real)
+                    parsedLat += Math.sin(angle) * radius;
+                    parsedLng += Math.cos(angle) * radius;
+                }
+                coordinateCounts[coordKey] = (coordinateCounts[coordKey] || 0) + 1;
+
                 const name = getProp(event, 'Evento') || getProp(event, 'Nome') || 'Evento';
                 const location = getProp(event, 'Local') || '';
                 const date = getProp(event, 'Data') || getProp(event, 'Date') || '';
@@ -2496,7 +2438,16 @@ function updateMapMarkers(events) {
                     </div>
                 `;
 
-                L.marker([parsedLat, parsedLng]).bindPopup(popupHtml).addTo(mapMarkersGroup);
+                const tooltipHtml = `
+                    <div style="text-align: center; font-weight: 500;">
+                        ${name}
+                    </div>
+                `;
+
+                L.marker([parsedLat, parsedLng], { icon: customMarkerIcon })
+                    .bindTooltip(tooltipHtml, { direction: 'top', offset: [0, -36], className: 'custom-map-tooltip' })
+                    .bindPopup(popupHtml)
+                    .addTo(mapMarkersGroup);
             }
         }
     });

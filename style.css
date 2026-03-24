@@ -442,7 +442,7 @@ a {
 }
 
 .event-card--featured,
-.weekly-event-card--featured {
+.event-card--featured {
     border: 1px solid var(--primary-color);
     box-shadow: 0 0 20px rgba(253, 245, 230, 0.15);
 }
@@ -453,7 +453,7 @@ a {
 }
 
 .event-card--featured:hover,
-.weekly-event-card--featured:hover {
+.event-card--featured:hover {
     box-shadow: 0 0 30px rgba(253, 245, 230, 0.3);
     border-color: var(--primary-color);
 }
@@ -569,70 +569,6 @@ a {
     border: none;
     width: 100%;
     height: 166px; /* Altura padrão do player compacto do SoundCloud */
-}
-
-/* --- Seção Eventos da Semana --- */
-#weekly-events-section {
-    padding-top: 0;
-    padding-bottom: 1rem;
-    border-bottom: 1px solid var(--border-color);
-    display: none; /* Começa escondido, o JS mostra se houver eventos */
-}
-
-#weekly-events-title {
-    font-size: 1.5rem;
-    font-weight: 700;
-    margin-bottom: 1.5rem;
-    margin-top: 0;
-    color: var(--text-color);
-}
-
-.weekly-events-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    gap: 1.5rem;
-}
-
-.weekly-event-card {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    padding: 1rem;
-    background-color: transparent;
-    border: 1px solid var(--border-color);
-    border-radius: var(--border-radius);
-    transition: background-color 0.2s, border-color 0.2s;
-    color: var(--text-color);
-}
-
-.weekly-event-card:hover {
-    background-color: var(--card-background);
-    border-color: var(--primary-color);
-}
-
-.weekly-event-card__image {
-    width: 60px;
-    height: 60px;
-    object-fit: cover;
-    border-radius: 6px;
-    flex-shrink: 0;
-}
-
-.weekly-event-card__info {
-    flex: 1;
-    min-width: 0;
-}
-
-.weekly-event-card__info h3 {
-    font-size: 1rem;
-    font-weight: 700;
-    margin: 0 0 0.25rem 0;
-}
-
-.weekly-event-card__info p {
-    font-size: 0.85rem;
-    color: var(--subtle-text);
-    margin: 0;
 }
 
 .event-card__image-wrapper {
@@ -1474,6 +1410,26 @@ video.modal-image {
     margin-bottom: 2rem;
 }
 
+/* Container do pino resetado para evitar conflitos */
+.custom-map-pin {
+    background: transparent !important;
+    border: none !important;
+}
+
+/* Animação do pino customizado no mapa aplicada apenas ao SVG para não quebrar a posição do Leaflet */
+.custom-map-pin svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+    transition: transform 0.2s ease;
+    transform-origin: bottom center;
+    overflow: visible;
+    filter: drop-shadow(0 4px 4px rgba(0,0,0,0.3)); /* Sombra suave */
+}
+.custom-map-pin:hover svg {
+    transform: scale(1.15) translateY(-2px);
+}
+
 /* Ajustes para o popup do mapa Leaflet para combinar com o tema */
 .leaflet-popup-content-wrapper, .leaflet-popup-tip {
     background-color: var(--card-background) !important;
@@ -1510,6 +1466,19 @@ video.modal-image {
 }
 .map-popup-btn:hover {
     transform: scale(1.02);
+}
+
+/* Estilos do Tooltip (Ao passar o mouse) do Mapa */
+.custom-map-tooltip {
+    background-color: var(--card-background) !important;
+    color: var(--text-color) !important;
+    border: 1px solid var(--border-color) !important;
+    border-radius: 6px;
+    box-shadow: var(--shadow);
+    font-family: inherit;
+}
+.leaflet-tooltip-top.custom-map-tooltip::before {
+    border-top-color: var(--border-color) !important;
 }
 
 /* Efeito mapa escuro (Dark mode) */
@@ -1614,12 +1583,6 @@ body:not(.light-theme) .leaflet-control-attribution {
     .view-btn {
         flex: 1;
         justify-content: center;
-    }
-
-    .weekly-events-grid {
-        grid-template-columns: 1fr; /* Uma coluna em telas pequenas */
-        grid-template-columns: repeat(2, 1fr);
-        grid-template-columns: 1fr;
     }
 
     #event-grid {
