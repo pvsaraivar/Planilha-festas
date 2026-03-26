@@ -2540,23 +2540,3 @@ function updateMapMarkers(events) {
         }
     });
 }
-                        <h3>${name}</h3>
-                        <p>${date}<br>${location}</p>
-                        <button onclick="window.location.href='detalhes.html?event=${slug}'" class="map-popup-btn">Ver Detalhes</button>
-                    </div>
-                `;
-
-                const tooltipHtml = `
-                    <div style="text-align: center; font-weight: 500;">
-                        ${name}
-                    </div>
-                `;
-
-                L.marker([parsedLat, parsedLng], { icon: customMarkerIcon })
-                    .bindTooltip(tooltipHtml, { direction: 'top', offset: [0, -36], className: 'custom-map-tooltip' })
-                    .bindPopup(popupHtml)
-                    .addTo(mapMarkersGroup);
-            }
-        }
-    });
-}
