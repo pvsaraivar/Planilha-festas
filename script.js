@@ -260,6 +260,7 @@ const eventImageMap = {
     'longdreams x joão rave': 'assets/longjoaorave.jpg',
     'tubulosa submissa': 'assets/sub.PNG',
     'korre e frita': 'assets/correfrita1.jpg, assets/correfrita2.jpg, assets/correfrita3.jpeg, assets/correfrita4.jpeg',
+    
 }
 
 /**
@@ -2022,10 +2023,17 @@ function setupVideoObserver() {
                 const playBtn = wrapper ? wrapper.querySelector('.video-play-button') : null;
 
                 if (entry.isIntersecting) {
-                    // Carrega Imagens dinamicamente
+                    // Carrega Imagens dinamicamente (pré-carregamento em memória)
                     if (media.tagName.toLowerCase() === 'IMG' && media.dataset.src) {
-                        media.src = media.dataset.src;
+                        const realSrc = media.dataset.src;
                         media.removeAttribute('data-src');
+                        
+                        const tempImg = new Image();
+                        tempImg.onload = () => {
+                            media.src = realSrc;
+                        };
+                        tempImg.src = realSrc;
+                        
                         observer.unobserve(media); 
                     }
                     
