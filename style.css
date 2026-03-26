@@ -631,10 +631,6 @@ a {
     transform: scale(1.05);
 }
 
-video.event-card__image {
-    object-fit: contain;
-}
-
 .event-card__info {
     padding: 1.25rem;
     display: flex;
