@@ -242,7 +242,7 @@ const eventImageMap = {
     'drop open air - 5 anos': 'assets/dropopenair.jpg',
     'atrita 100 pudor': 'assets/atrita100pudor.mp4',
     'papoco na rua': 'assets/papoconarua.mp4',
-    'fritaria sangue latino': 'assets/fritsanguelatino.mp4',
+    'fritaria sangue latino': 'assets/fritariasl.mp4',
     'baile da bateu': 'assets/bdb1104.png',
     'pacific de março': 'assets/pacific03.jpg',
     'vila trance': 'assets/vilatrance.jpg',
@@ -527,6 +527,11 @@ function renderEvents(events, gridElement) {
         const card = createEventCardElement(event);
         columns[index % numCols].appendChild(card);
     });
+
+    // Observa os vídeos recém-criados para carregar e tocar apenas quando rolados para a tela
+    if (window.videoObserver) {
+        gridElement.querySelectorAll('video').forEach(video => window.videoObserver.observe(video));
+    }
 }
 
 /**
@@ -1217,11 +1222,11 @@ function createEventCardElement(event) {
     let playButtonHtml = '';
 
     if (isVideo) {
-        mediaHtml = `<video src="${imageUrl}#t=0.1" class="event-card__image" loop muted playsinline webkit-playsinline preload="metadata" oncontextmenu="return false;" onerror='this.outerHTML="<img src=\\"${errorSvg}\\" class=\\"event-card__image\\" loading=\\"lazy\\">"'></video>`;
+        mediaHtml = `<video src="${imageUrl}#t=0.1" class="event-card__image lazy-video" loop muted playsinline webkit-playsinline preload="metadata" oncontextmenu="return false;" onerror='this.outerHTML="<img src=\\"${errorSvg}\\" class=\\"event-card__image\\" loading=\\"lazy\\" decoding=\\"async\\">"'></video>`;
         const playIconSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="white" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>`;
         playButtonHtml = `<div class="video-play-button">${playIconSvg}</div>`;
     } else {
-        mediaHtml = `<img src="${imageUrl || placeholderSvg}" alt="${name}" class="event-card__image" loading="lazy" onerror="this.src='${errorSvg}';">`;
+        mediaHtml = `<img src="${imageUrl || placeholderSvg}" alt="${name}" class="event-card__image" loading="lazy" decoding="async" onerror="this.src='${errorSvg}';">`;
     }
 
     card.innerHTML = `
@@ -2010,21 +2015,51 @@ function setupFloatingBackButton() {
  */
 function setupVideoObserver() {
     if ('IntersectionObserver' in window) {
-        window.videoObserver = new IntersectionObserver((entries) => {
+        window.videoObserver = new IntersectionObserver((entries, observer) => {
             entries.forEach(entry => {
-                const video = entry.target;
+                const media = entry.target;
+                const wrapper = media.closest('.event-card__image-wrapper');
+                const playBtn = wrapper ? wrapper.querySelector('.video-play-button') : null;
+
                 if (entry.isIntersecting) {
-                    const playPromise = video.play();
-                    if (playPromise !== undefined) {
-                        playPromise.catch(() => {}); // Ignora erros de interrupção
+                    // Carrega Imagens dinamicamente
+                    if (media.tagName.toLowerCase() === 'IMG' && media.dataset.src) {
+                        media.src = media.dataset.src;
+                        media.removeAttribute('data-src');
+                        observer.unobserve(media); 
+                    }
+                    
+                    // Carrega e toca Vídeos
+                    if (media.tagName.toLowerCase() === 'VIDEO') {
+                        if (media.dataset.src) {
+                            media.src = media.dataset.src;
+                            media.removeAttribute('data-src');
+                            media.load();
+                        }
+                        const playPromise = media.play();
+                        if (playPromise !== undefined) {
+                            playPromise.then(() => {
+                                if (playBtn) {
+                                    playBtn.style.opacity = '0';
+                                    playBtn.style.pointerEvents = 'none';
+                                }
+                            }).catch(() => {});
+                        }
                     }
                 } else {
-                    if (!video.paused) {
-                        video.pause();
+                    if (media.tagName.toLowerCase() === 'VIDEO' && !media.paused) {
+                        media.pause();
+                        if (playBtn) {
+                            playBtn.style.opacity = '1';
+                            playBtn.style.pointerEvents = 'auto';
+                        }
                     }
                 }
             });
-        }, { threshold: 0.5 }); // Requer 50% de visibilidade para evitar bugs ao rolar
+        }, { 
+            rootMargin: '400px 0px', // Carrega 400px antes do elemento aparecer na tela (garante que já esteja lá no scroll rápido)
+            threshold: 0.01
+        }); 
     }
 }
 
@@ -2485,6 +2520,26 @@ function updateMapMarkers(events) {
                 const popupHtml = `
                     <div class="map-popup-content">
                         ${mediaHtml}
+                        <h3>${name}</h3>
+                        <p>${date}<br>${location}</p>
+                        <button onclick="window.location.href='detalhes.html?event=${slug}'" class="map-popup-btn">Ver Detalhes</button>
+                    </div>
+                `;
+
+                const tooltipHtml = `
+                    <div style="text-align: center; font-weight: 500;">
+                        ${name}
+                    </div>
+                `;
+
+                L.marker([parsedLat, parsedLng], { icon: customMarkerIcon })
+                    .bindTooltip(tooltipHtml, { direction: 'top', offset: [0, -36], className: 'custom-map-tooltip' })
+                    .bindPopup(popupHtml)
+                    .addTo(mapMarkersGroup);
+            }
+        }
+    });
+}
                         <h3>${name}</h3>
                         <p>${date}<br>${location}</p>
                         <button onclick="window.location.href='detalhes.html?event=${slug}'" class="map-popup-btn">Ver Detalhes</button>
