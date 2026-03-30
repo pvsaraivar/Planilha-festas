@@ -424,6 +424,7 @@ a {
     flex-direction: column;
     transition: transform var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
     cursor: pointer;
+        border: 1px solid var(--border-color);
     border-radius: var(--border-radius);
     position: relative; /* Essencial para posicionar o botão de favorito */
     opacity: 0;

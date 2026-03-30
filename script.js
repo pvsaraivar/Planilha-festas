@@ -285,7 +285,7 @@ const eventImageMap = {
     'drop open air - 5 anos': 'assets/dropopenair.jpg',
     'atrita 100 pudor': 'assets/atrita100pudor.mp4',
     'papoco na rua': 'assets/papoconarua.mp4',
-    'fritaria sangue latino': 'assets/fritariasl.MP4',
+    'fritaria sangue latino': 'assets/fritariasl.mp4',
     'baile da bateu': 'assets/bdb1104.png',
     'pacific de março': 'assets/pacific03.jpg',
     'vila trance': 'assets/vilatrance.jpg',
@@ -303,7 +303,8 @@ const eventImageMap = {
     'longdreams x joão rave': 'assets/longjoaorave.jpg',
     'tubulosa submissa': 'assets/sub.PNG',
     'korre e frita': 'assets/correfrita1.jpg, assets/correfrita2.jpg, assets/correfrita3.jpeg, assets/correfrita4.jpeg',
-    
+    'bateuzinha clandestina': 'assets/bateuclandestina.jpg',
+    'psy beach': 'assets/psybeach.jpg'
 }
 
 /**
