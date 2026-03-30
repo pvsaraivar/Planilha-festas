@@ -304,7 +304,8 @@ const eventImageMap = {
     'tubulosa submissa': 'assets/sub.PNG',
     'korre e frita': 'assets/correfrita1.jpg, assets/correfrita2.jpg, assets/correfrita3.jpeg, assets/correfrita4.jpeg',
     'bateuzinha clandestina': 'assets/bateuclandestina.jpg',
-    'psy beach': 'assets/psybeach.jpg'
+    'psy beach': 'assets/psybeach.jpg',
+    'ignis: modo schranz': 'assets/ignismodoschranz.mp4'
 }
 
 /**
