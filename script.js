@@ -15,6 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const cacheBuster = new Date().getTime();
     const googleSheetUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/export?format=csv&gid=${eventsGid}&nocache=${cacheBuster}`;
     
+    setupPromotionalBanner();
     setupThemeToggle();
 
     // Verifica se estamos na página de detalhes
@@ -42,6 +43,48 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
+/**
+ * Configura o banner promocional, se existir.
+ */
+function setupPromotionalBanner() {
+    const banner = document.getElementById('promo-banner');
+    if (!banner) return;
+
+    const closeBtn = document.getElementById('promo-banner-close');
+    const ctaBtn = document.getElementById('promo-banner-cta');
+    const bannerId = 'promo-banner-tubulosa-submissa'; // Um ID único para este banner
+
+    // Verifica no sessionStorage se o banner já foi fechado nesta sessão
+    if (sessionStorage.getItem(bannerId) === 'closed') {
+        banner.classList.add('hidden');
+        // Desativa a transição para que ele desapareça instantaneamente no carregamento da página
+        banner.style.transition = 'none';
+        return;
+    }
+    
+    // Lógica para o botão de fechar
+    if (closeBtn) {
+        closeBtn.addEventListener('click', () => {
+            banner.classList.add('hidden');
+            // Salva o estado no sessionStorage para não mostrar novamente na mesma sessão
+            sessionStorage.setItem(bannerId, 'closed');
+        });
+    }
+
+    // Lógica para o botão CTA (Call to Action)
+    // O slug é conhecido, então podemos montá-lo diretamente
+    if (ctaBtn) {
+        const eventSlug = 'tubulosa-submissa'; // Slug do evento
+        ctaBtn.href = `detalhes.html?event=${eventSlug}`;
+        
+        // Adiciona tracking do GA
+        ctaBtn.addEventListener('click', () => {
+            trackGAEvent('click_promo_banner', {
+                event_name: 'Tubulosa Submissa'
+            });
+        });
+    }
+}
 /**
  * Envia um evento para o Google Analytics.
  * @param {string} action - O nome da ação do evento (ex: 'click_button').
@@ -1084,8 +1127,14 @@ function createEventCardElement(event) {
 
     const eventName = getProp(event, 'Evento') || getProp(event, 'Nome') || 'Evento sem nome';
 
-    if (eventName.toLowerCase().includes('tubulosa club metal')) {
+    if (eventName.toLowerCase().includes('tubulosa club metal') || eventName.toLowerCase().includes('tubulosa submissa')) {
         card.classList.add('event-card--featured');
+    }
+
+    // Adiciona uma classe especial para eventos cuja imagem não deve ser cortada
+    const containImageEvents = [];
+    if (containImageEvents.includes(eventName.toLowerCase())) {
+        card.classList.add('event-card--contain-image');
     }
 
     const eventSlug = createEventSlug(eventName);
@@ -1567,11 +1616,13 @@ function openModal(event) {
 
     let mediaHtml = '';
     if (mediaUrls.length > 1) {
+        // Lazy load all slides in the carousel
         const slides = mediaUrls.map(url => {
             const isVideo = /\.(mp4|webm|ogg)($|\?)/i.test(url);
+            // Use data-src for lazy loading and a placeholder for the initial view
             const mediaTag = isVideo
-                ? `<video src="${url}" loop muted playsinline oncontextmenu="return false;"></video>`
-                : `<img src="${url}" alt="${name}" onerror="this.src='${placeholderSvg}'">`;
+                ? `<video data-src="${url}" loop muted playsinline oncontextmenu="return false;"></video>`
+                : `<img src="${placeholderSvg}" data-src="${url}" alt="${name}" onerror="this.src='${placeholderSvg}'">`;
             return `<div class="carousel-slide">${mediaTag}</div>`;
         }).join('');
 
@@ -1845,6 +1896,33 @@ function setupCarousel(carouselContainer) {
 
     let currentIndex = 0;
 
+    /**
+     * Carrega a mídia (imagem ou vídeo) de um slide específico sob demanda.
+     * @param {number} index - O índice do slide a ser carregado.
+     */
+    const loadSlideMedia = (index) => {
+        const slide = slides[index];
+        if (!slide) return;
+
+        const media = slide.querySelector('img[data-src], video[data-src]');
+        if (media && media.dataset.src) {
+            const realSrc = media.dataset.src;
+            // Para imagens, usamos a técnica de pré-carregamento em memória para uma transição suave
+            if (media.tagName.toLowerCase() === 'img') {
+                const tempImg = new Image();
+                tempImg.onload = () => {
+                    media.src = realSrc;
+                    media.removeAttribute('data-src');
+                };
+                tempImg.src = realSrc;
+            } else { // Para vídeos, carregamos diretamente
+                media.src = realSrc;
+                media.removeAttribute('data-src');
+                media.load();
+            }
+        }
+    };
+
     const moveToSlide = (targetIndex) => {
         // Para de tocar o vídeo que está saindo
         const departingSlide = slides[currentIndex];
@@ -1853,6 +1931,10 @@ function setupCarousel(carouselContainer) {
             departingVideo.pause();
         }
 
+        // Carrega a mídia para o slide que estamos movendo e para o próximo (pré-carregamento)
+        loadSlideMedia(targetIndex);
+        loadSlideMedia((targetIndex + 1) % slides.length);
+
         // Move o carrossel
         track.style.transform = 'translateX(-' + targetIndex * 100 + '%)';
         
@@ -1860,8 +1942,11 @@ function setupCarousel(carouselContainer) {
         const arrivingSlide = slides[targetIndex];
         const arrivingVideo = arrivingSlide.querySelector('video');
         if (arrivingVideo) {
-            arrivingVideo.muted = true; 
-            arrivingVideo.play().catch(() => {});
+            arrivingVideo.muted = true; // Garante que o autoplay funcione na maioria dos navegadores
+            const playPromise = arrivingVideo.play();
+            if (playPromise !== undefined) {
+                playPromise.catch(() => {}); // Ignora erros se o usuário interagir rápido
+            }
         }
 
         if (dots.length > 0) {
@@ -1880,6 +1965,9 @@ function setupCarousel(carouselContainer) {
             dot.addEventListener('click', e => moveToSlide(parseInt(e.target.dataset.slide, 10)));
         });
     }
+
+    // Carga inicial para o primeiro slide
+    loadSlideMedia(0);
 }
 
 // --- Funções Auxiliares para IndexedDB (Cache de Vídeo) ---

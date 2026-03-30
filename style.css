@@ -420,7 +420,6 @@ a {
     background-color: transparent;
     box-shadow: var(--shadow);
     overflow: hidden;
-    border: 1px solid var(--border-color);
     display: flex;
     flex-direction: column;
     transition: transform var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
@@ -433,7 +432,6 @@ a {
 .event-card:hover {
     transform: translateY(-6px);
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
-    border-color: var(--text-color);
     background-color: rgba(255, 255, 255, 0.03);
 }
 .event-card:active {
@@ -443,7 +441,6 @@ a {
 
 .event-card--featured,
 .event-card--featured {
-    border: 1px solid var(--primary-color);
     box-shadow: 0 0 20px rgba(253, 245, 230, 0.15);
 }
 
@@ -455,7 +452,6 @@ a {
 .event-card--featured:hover,
 .event-card--featured:hover {
     box-shadow: 0 0 30px rgba(253, 245, 230, 0.3);
-    border-color: var(--primary-color);
 }
 
 .favorites-filter-btn {
@@ -511,12 +507,10 @@ a {
     padding: 0.5rem 1rem 1rem;
     box-shadow: var(--shadow);
     transition: transform 0.2s ease-in-out, border-color 0.2s ease-in-out, background-color 0.2s ease-in-out;
-    border: 1px solid var(--border-color);
 }
 
 .set-card:hover {
     transform: translateY(-5px);
-    border-color: var(--primary-color);
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
     background-color: rgba(255, 255, 255, 0.03);
 }
@@ -629,6 +623,12 @@ a {
 
 .event-card:hover .event-card__image {
     transform: scale(1.05);
+}
+
+/* Estilo para forçar a imagem a ser contida, em vez de cortada, para flyers específicos */
+.event-card--contain-image .event-card__image {
+    object-fit: contain;
+    background-color: #000; /* Adiciona um fundo preto para preencher o espaço vazio (letterboxing) */
 }
 
 .event-card__info {
@@ -2191,4 +2191,121 @@ span.flatpickr-weekday {
 .flatpickr-months .flatpickr-prev-month:hover svg, 
 .flatpickr-months .flatpickr-next-month:hover svg {
     fill: var(--primary-color) !important;
+}
+
+/* --- Banner Promocional --- */
+.promo-banner {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    background: linear-gradient(90deg, #2a2a2a, #1a1a1a);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 1rem;
+    margin-top: 2rem;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+    transition: all 0.5s ease-in-out;
+    opacity: 1;
+    max-height: 200px; /* for transition */
+}
+
+.promo-banner.hidden {
+    opacity: 0;
+    max-height: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+    margin-top: 0;
+    border-width: 0;
+    overflow: hidden;
+}
+
+.promo-banner__image {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 8px;
+    flex-shrink: 0;
+}
+
+.promo-banner__content {
+    flex-grow: 1;
+}
+
+.promo-banner__tag {
+    display: inline-block;
+    background-color: var(--primary-color);
+    color: var(--background-start);
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 4px 8px;
+    border-radius: 6px;
+    text-transform: uppercase;
+    margin-bottom: 0.5rem;
+}
+
+.promo-banner__title {
+    margin: 0 0 0.25rem 0;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-color);
+}
+
+.promo-banner__description {
+    margin: 0;
+    color: var(--subtle-text);
+    font-size: 0.9rem;
+}
+
+.promo-banner__cta {
+    background-color: var(--primary-color);
+    color: var(--background-start);
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 700;
+    flex-shrink: 0;
+    transition: transform 0.2s, background-color 0.2s;
+}
+
+.promo-banner__cta:hover {
+    background-color: #F5EFE0;
+    transform: scale(1.05);
+}
+
+.promo-banner__close {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    background: none;
+    border: none;
+    color: var(--subtle-text);
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 0.25rem;
+    line-height: 1;
+    transition: color 0.2s;
+}
+
+.promo-banner__close:hover {
+    color: var(--text-color);
+}
+
+@media (max-width: 768px) {
+    .promo-banner {
+        flex-direction: column;
+        text-align: center;
+        padding: 1.5rem 1rem 1rem;
+        gap: 1rem;
+        max-height: 1000px;
+    }
+    .promo-banner__image {
+        width: 100%;
+        height: auto;
+    }
+    .promo-banner__cta {
+        width: 100%;
+        text-align: center;
+    }
 }
