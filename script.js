@@ -306,6 +306,7 @@ const eventImageMap = {
     'psy beach': 'assets/psybeach.jpg',
     'ignis: modo schranz': 'assets/ignismodoschranz.mp4',
     'fritaria sangue latino': 'assets/fritariasl.mp4',
+    'insana na praia': 'assets/insanapraia.jpg'
 }
 
 /**
