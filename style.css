@@ -2276,21 +2276,24 @@ span.flatpickr-weekday {
 }
 
 .promo-banner__close {
-    position: absolute;
-    top: 0.5rem;
-    right: 0.5rem;
-    background: none;
+    background-color: rgba(255, 255, 255, 0.1);
     border: none;
-    color: var(--subtle-text);
-    font-size: 1.5rem;
+    border-radius: 50%;
+    color: var(--text-color);
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     cursor: pointer;
-    padding: 0.25rem;
-    line-height: 1;
-    transition: color 0.2s;
+    padding: 0;
+    transition: background-color 0.2s, color 0.2s;
+    flex-shrink: 0;
 }
 
 .promo-banner__close:hover {
-    color: var(--text-color);
+    background-color: rgba(255, 255, 255, 0.2);
+    color: var(--primary-color);
 }
 
 @media (max-width: 768px) {
@@ -2308,5 +2311,10 @@ span.flatpickr-weekday {
     .promo-banner__cta {
         width: 100%;
         text-align: center;
+    }
+    .promo-banner__close {
+        position: absolute;
+        top: 0.5rem;
+        right: 0.5rem;
     }
 }
