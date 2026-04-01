@@ -309,7 +309,8 @@ const eventImageMap = {
     'insana na praia': 'assets/insanapraia.jpg',
     'gasguita elétrica': 'assets/gasgeletrica.mp4',
     'after da ignis: modo schranz': 'assets/afterignismodo.jpg',
-    'summer dreams': 'assets/summerdreams.jpg'
+    'summer dreams': 'assets/summerdreams.jpg',
+    'ovo frito 17': 'assets/ovofrito17.jpg'
     
 }
 
