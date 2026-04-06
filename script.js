@@ -310,14 +310,13 @@ const eventImageMap = {
     'psy beach': 'assets/psybeach.jpg',
     'ignis: modo schranz': 'assets/ignismodoschranz.mp4',
     'insana na praia': 'assets/insanapraia.jpg',
-    'gasguita elétrica': 'assets/gasgeletrica.mp4',
     'after da ignis: modo schranz': 'assets/afterignismodo.jpg',
     'summer dreams': 'assets/summerdreams.jpg',
     'ovo frito 17': 'assets/ovofrito17.jpg',
     'link.a': 'assets/link2.jpg',
     'fritaria sangue latino': 'assets/fritariasanguelatino.mp4',
-    'beije #2': 'assets/beije1204.mp4'
-    
+    'beije #2': 'assets/beije1204.mp4',
+    'gasguita elétrica': 'assets/gasgeletrica.mp4',
 }
 
 /**
