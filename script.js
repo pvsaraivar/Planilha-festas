@@ -310,7 +310,8 @@ const eventImageMap = {
     'gasguita elétrica': 'assets/gasgeletrica.mp4',
     'after da ignis: modo schranz': 'assets/afterignismodo.jpg',
     'summer dreams': 'assets/summerdreams.jpg',
-    'ovo frito 17': 'assets/ovofrito17.jpg'
+    'ovo frito 17': 'assets/ovofrito17.jpg',
+    'link.a': 'assets/link2.jpg'
     
 }
 
