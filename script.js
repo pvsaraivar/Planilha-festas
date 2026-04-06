@@ -49,6 +49,10 @@ document.addEventListener('DOMContentLoaded', () => {
 function setupPromotionalBanner() {
     const banner = document.getElementById('promo-banner');
     if (!banner) return;
+    
+    // Oculta o banner promocional, pois o evento em destaque já passou
+    banner.classList.add('hidden');
+    return;
 
     const closeBtn = document.getElementById('promo-banner-close');
     const ctaBtn = document.getElementById('promo-banner-cta');
@@ -1136,7 +1140,7 @@ function createEventCardElement(event) {
 
     const eventName = getProp(event, 'Evento') || getProp(event, 'Nome') || 'Evento sem nome';
 
-    if (eventName.toLowerCase().includes('tubulosa club metal') || eventName.toLowerCase().includes('tubulosa submissa')) {
+    if (eventName.toLowerCase().includes('tubulosa club metal')) {
         card.classList.add('event-card--featured');
     }
 
