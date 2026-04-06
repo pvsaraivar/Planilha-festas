@@ -289,7 +289,7 @@ const eventImageMap = {
     'drop open air - 5 anos': 'assets/dropopenair.jpg',
     'atrita 100 pudor': 'assets/atrita100pudor.mp4',
     'papoco na rua': 'assets/papoconarua.mp4',
-    'baile da bateu': 'assets/bdb1104.png',
+    'baile da bateu': 'assets/bdb1104.jpg',
     'pacific de março': 'assets/pacific03.jpg',
     'vila trance': 'assets/vilatrance.jpg',
     'paris sessions': 'assets/portinha.jpeg',
