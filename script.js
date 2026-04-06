@@ -315,7 +315,8 @@ const eventImageMap = {
     'summer dreams': 'assets/summerdreams.jpg',
     'ovo frito 17': 'assets/ovofrito17.jpg',
     'link.a': 'assets/link2.jpg',
-    'fritaria sangue latino': 'assets/fritariasanguelatino.mp4'
+    'fritaria sangue latino': 'assets/fritariasanguelatino.mp4',
+    'beije #2': 'assets/beije1204.mp4'
     
 }
 
