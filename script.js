@@ -1286,7 +1286,7 @@ function createEventCardElement(event) {
     let playButtonHtml = '';
 
     if (isVideo) {
-        mediaHtml = `<video src="${imageUrl}#t=0.1" class="event-card__image lazy-video" loop muted playsinline webkit-playsinline preload="metadata" oncontextmenu="return false;" onerror='this.outerHTML="<img src=\\"${errorSvg}\\" class=\\"event-card__image\\" loading=\\"lazy\\" decoding=\\"async\\">"'></video>`;
+        mediaHtml = `<video data-src="${imageUrl}#t=0.1" class="event-card__image lazy-video" loop muted playsinline webkit-playsinline preload="none" oncontextmenu="return false;" onerror='this.outerHTML="<img src=\\"${errorSvg}\\" class=\\"event-card__image\\" loading=\\"lazy\\" decoding=\\"async\\">"'></video>`;
         const playIconSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="white" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>`;
         playButtonHtml = `<div class="video-play-button">${playIconSvg}</div>`;
     } else {
@@ -1635,7 +1635,7 @@ function openModal(event) {
             const isVideo = /\.(mp4|webm|ogg)($|\?)/i.test(url);
             // Use data-src for lazy loading and a placeholder for the initial view
             const mediaTag = isVideo
-                ? `<video data-src="${url}" loop muted playsinline oncontextmenu="return false;"></video>`
+            ? `<video data-src="${url}" loop muted playsinline oncontextmenu="return false;" preload="none"></video>`
                 : `<img src="${placeholderSvg}" data-src="${url}" alt="${name}" onerror="this.src='${placeholderSvg}'">`;
             return `<div class="carousel-slide">${mediaTag}</div>`;
         }).join('');
@@ -1923,12 +1923,8 @@ function setupCarousel(carouselContainer) {
             const realSrc = media.dataset.src;
             // Para imagens, usamos a técnica de pré-carregamento em memória para uma transição suave
             if (media.tagName.toLowerCase() === 'img') {
-                const tempImg = new Image();
-                tempImg.onload = () => {
-                    media.src = realSrc;
-                    media.removeAttribute('data-src');
-                };
-                tempImg.src = realSrc;
+                media.src = realSrc;
+                media.removeAttribute('data-src');
             } else { // Para vídeos, carregamos diretamente
                 media.src = realSrc;
                 media.removeAttribute('data-src');
@@ -2167,7 +2163,7 @@ function setupVideoObserver() {
                 }
             });
         }, { 
-            rootMargin: '400px 0px', // Carrega 400px antes do elemento aparecer na tela (garante que já esteja lá no scroll rápido)
+            rootMargin: '800px 0px', // Carrega 800px antes do elemento aparecer na tela (antecipa o download em conexões lentas)
             threshold: 0.01
         }); 
     }
@@ -2244,7 +2240,7 @@ function renderEventDetailPage(event, container, allEvents = []) {
         const slides = mediaUrls.map(url => {
             const isVideo = /\.(mp4|webm|ogg)($|\?)/i.test(url);
             const mediaTag = isVideo
-                ? `<video src="${url}" loop muted playsinline oncontextmenu="return false;"></video>`
+            ? `<video data-src="${url}" loop muted playsinline oncontextmenu="return false;" preload="none"></video>`
                 : `<img src="${url}" alt="${name}" onerror="this.src='${placeholderSvg}'">`;
             return `<div class="carousel-slide">${mediaTag}</div>`;
         }).join('');
