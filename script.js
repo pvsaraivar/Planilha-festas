@@ -317,6 +317,7 @@ const eventImageMap = {
     'fritaria sangue latino': 'assets/fritariasanguelatino.mp4',
     'beije #2': 'assets/beije1204.mp4',
     'gasguita elétrica': 'assets/gasgeletrica.mp4',
+    'naturaiz ce': 'assets/naturaiz.jpg'
 }
 
 /**
