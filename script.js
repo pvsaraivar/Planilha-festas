@@ -315,7 +315,7 @@ const eventImageMap = {
     'ovo frito 17': 'assets/ovofrito17.jpg',
     'link.a': 'assets/link2.jpg',
     'fritaria sangue latino': 'assets/fritariasanguelatino.mp4',
-    'beije #2': 'assets/beije1204.mp4',
+    'beije #2': 'assets/beije2.jpg',
     'gasguita elétrica': 'assets/gasgeletrica.mp4',
     'naturaiz ce': 'assets/naturaiz.jpg'
 }
