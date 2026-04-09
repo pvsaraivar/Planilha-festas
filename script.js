@@ -316,13 +316,14 @@ const eventImageMap = {
     'link.a': 'assets/link2.jpg',
     'fritaria sangue latino': 'assets/fritariasanguelatino.mp4',
     'beije #2': 'assets/beije2.jpg',
-    'gasguita elétrica': 'assets/gasgeletrica.mp4',
+    'gasguita elétrica': 'assets/gasgeletrica.jpg',
     'naturaiz ce': 'assets/naturaiz.jpg',
     'baile groovado no ajeum': 'assets/bailegroovado2.jpg',
     'house family': 'assets/housefamily.jpg',
     'de volta aos anos 2000': 'assets/devolta2k.jpeg',
     'disclubinho': 'assets/disclubinho1.jpg, assets/disclubinho2.jpg',
-    'psy club fantasy': 'assets/psyclubfantasy.mp4'
+    'psy club fantasy': 'assets/psyclubfantasy.mp4',
+
 }
 
 /**
