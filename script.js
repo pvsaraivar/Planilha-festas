@@ -1345,7 +1345,11 @@ function createEventCardElement(event) {
                         playBtn.style.opacity = '0';
                         playBtn.style.pointerEvents = 'none';
                     }
-                }).catch(err => console.error("Erro ao reproduzir vídeo:", err));
+                }).catch(err => {
+                    if (err.name !== 'AbortError') {
+                        console.error("Erro ao reproduzir vídeo:", err);
+                    }
+                });
             } else {
                 videoEl.pause();
                 if (playBtn) {
