@@ -2112,6 +2112,25 @@ body:not(.light-theme) .map-iframe {
     margin-bottom: 1rem;
 }
 
+.event-video-loader {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 40px;
+    height: 40px;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin-center 1s linear infinite;
+    z-index: 4;
+    pointer-events: none;
+}
+
+@keyframes spin-center {
+    0% { transform: translate(-50%, -50%) rotate(0deg); }
+    100% { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
 /* --- Estilos do Calendário Visual (Flatpickr) --- */
 .flatpickr-calendar {
     background: var(--background-start) !important;

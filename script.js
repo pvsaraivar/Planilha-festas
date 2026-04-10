@@ -1294,7 +1294,10 @@ function createEventCardElement(event) {
     if (isVideo) {
         mediaHtml = `<video data-src="${imageUrl}#t=0.1" class="event-card__image lazy-video" loop muted playsinline webkit-playsinline preload="none" oncontextmenu="return false;" onerror='this.outerHTML="<img src=\\"${errorSvg}\\" class=\\"event-card__image\\" loading=\\"lazy\\" decoding=\\"async\\">"'></video>`;
         const playIconSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="white" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>`;
-        playButtonHtml = `<div class="video-play-button">${playIconSvg}</div>`;
+        playButtonHtml = `
+            <div class="event-video-loader" style="display: none;"></div>
+            <div class="video-play-button">${playIconSvg}</div>
+        `;
     } else {
         mediaHtml = `<img src="${imageUrl || placeholderSvg}" alt="${name}" class="event-card__image" loading="lazy" decoding="async" onerror="this.src='${errorSvg}';">`;
     }
@@ -1330,6 +1333,7 @@ function createEventCardElement(event) {
     if (isVideo) {
         const videoEl = card.querySelector('video');
         const playBtn = card.querySelector('.video-play-button');
+        const spinner = card.querySelector('.event-video-loader');
 
         const togglePlay = (e) => {
             e.preventDefault();
@@ -1351,7 +1355,23 @@ function createEventCardElement(event) {
             }
         };
 
-        if (videoEl) videoEl.addEventListener('click', togglePlay);
+        if (videoEl) {
+            videoEl.addEventListener('click', togglePlay);
+            
+            videoEl.addEventListener('waiting', () => {
+                if (spinner) spinner.style.display = 'block';
+            });
+            videoEl.addEventListener('playing', () => {
+                if (spinner) spinner.style.display = 'none';
+                if (playBtn) {
+                    playBtn.style.opacity = '0';
+                    playBtn.style.pointerEvents = 'none';
+                }
+            });
+            videoEl.addEventListener('canplay', () => {
+                if (spinner) spinner.style.display = 'none';
+            });
+        }
         if (playBtn) playBtn.addEventListener('click', togglePlay);
     }
 
@@ -2168,10 +2188,10 @@ function setupVideoObserver() {
                     }
                 }
             });
-        }, { 
-            rootMargin: '800px 0px', // Carrega 800px antes do elemento aparecer na tela (antecipa o download em conexões lentas)
-            threshold: 0.01
-        }); 
+    }, { 
+        rootMargin: '400px 0px', // Reduzido de 800px para 400px para evitar carregamento massivo simultâneo
+        threshold: 0.01
+    }); 
     }
 }
 
