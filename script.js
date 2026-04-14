@@ -2152,7 +2152,7 @@ function setupVideoObserver() {
 
                 if (entry.isIntersecting) {
                     // Carrega Imagens dinamicamente (pré-carregamento em memória)
-                    if (media.tagName.toLowerCase() === 'IMG' && media.dataset.src) {
+                        if (media.tagName === 'IMG' && media.dataset.src) {
                         const realSrc = media.dataset.src;
                         media.removeAttribute('data-src');
                         
@@ -2183,7 +2183,7 @@ function setupVideoObserver() {
                         }
                     }
                 } else {
-                    if (media.tagName.toLowerCase() === 'VIDEO' && !media.paused) {
+                        if (media.tagName === 'VIDEO' && !media.paused) {
                         media.pause();
                         if (playBtn) {
                             playBtn.style.opacity = '1';
