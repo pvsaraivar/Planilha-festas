@@ -35,7 +35,6 @@ document.addEventListener('DOMContentLoaded', () => {
         setupModal();
         setupContactModal();
         setupBackToTopButton();
-        setupVideoObserver(); 
         setupVideoRedirects();
         initEventMap();
         setupViewToggle();
@@ -1952,7 +1951,7 @@ function setupCarousel(carouselContainer) {
         if (media && media.dataset.src) {
             const realSrc = media.dataset.src;
             // Para imagens, usamos a técnica de pré-carregamento em memória para uma transição suave
-            if (media.tagName.toLowerCase() === 'img') {
+            if (media.tagName === 'IMG') {
                 media.src = realSrc;
                 media.removeAttribute('data-src');
             } else { // Para vídeos, carregamos diretamente
@@ -2166,7 +2165,7 @@ function setupVideoObserver() {
                     }
                     
                     // Carrega e toca Vídeos
-                    if (media.tagName.toLowerCase() === 'VIDEO') {
+                    if (media.tagName === 'VIDEO') {
                         if (media.dataset.src) {
                             media.src = media.dataset.src;
                             media.removeAttribute('data-src');
