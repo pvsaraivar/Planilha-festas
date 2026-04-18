@@ -1339,6 +1339,13 @@ function createEventCardElement(event) {
             e.stopPropagation(); // Impede abrir o modal
             
             if (videoEl.paused) {
+                // Plano B: Se o observador falhar e o vídeo ainda não tiver src, injeta agora!
+                if (videoEl.dataset.src) {
+                    videoEl.src = videoEl.dataset.src;
+                    videoEl.removeAttribute('data-src');
+                    videoEl.load();
+                }
+                
                 videoEl.play().then(() => {
                     if (playBtn) {
                         playBtn.style.opacity = '0';
@@ -2007,6 +2014,15 @@ function setupCarousel(carouselContainer) {
 
     // Carga inicial para o primeiro slide
     loadSlideMedia(0);
+    
+    const firstVideo = slides[0].querySelector('video');
+    if (firstVideo) {
+        firstVideo.muted = true;
+        const playPromise = firstVideo.play();
+        if (playPromise !== undefined) {
+            playPromise.catch(() => {}); // Ignora erros inofensivos
+        }
+    }
 }
 
 // --- Funções Auxiliares para IndexedDB (Cache de Vídeo) ---
