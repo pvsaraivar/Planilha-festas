@@ -21,6 +21,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Verifica se estamos na página de detalhes
     const detailContainer = document.getElementById('event-detail-container');
     if (detailContainer) {
+        setupVideoObserver();
         loadEventDetails(googleSheetUrl);
         setupFloatingBackButton();
     } else {
@@ -379,6 +380,43 @@ function isEventOver(event) {
     const endOfDay = new Date(eventDate);
     endOfDay.setHours(23, 59, 59, 999);
     return now > endOfDay;
+}
+
+/**
+ * Verifica se o evento está acontecendo agora.
+ * @param {Object} event - O objeto do evento.
+ * @returns {boolean} True se o evento estiver em andamento.
+ */
+function isEventInProgress(event) {
+    if (isEventOver(event)) return false; // Se já acabou, não está em andamento
+
+    let dateStr = getProp(event, 'Data') || getProp(event, 'Date');
+    if (!dateStr) return false;
+
+    dateStr = dateStr.split(' ')[0].trim();
+    const parts = dateStr.split('/');
+    if (parts.length !== 3) return false;
+
+    const day = parseInt(parts[0], 10);
+    const month = parseInt(parts[1], 10) - 1;
+    const year = parseInt(parts[2], 10);
+
+    if (isNaN(day) || isNaN(month) || isNaN(year)) return false;
+
+    const eventDate = new Date(year, month, day);
+    const now = new Date();
+
+    const startTime = getProp(event, 'Início');
+    
+    let eventStartDate = new Date(eventDate);
+    if (startTime) {
+        const [startHour, startMinute] = startTime.split(':').map(Number);
+        eventStartDate.setHours(startHour, startMinute || 0, 0, 0);
+    } else {
+        eventStartDate.setHours(22, 0, 0, 0); // Padrão: assume que começa às 22h se não houver horário
+    }
+
+    return now >= eventStartDate;
 }
 
 /**
@@ -1236,23 +1274,8 @@ function createEventCardElement(event) {
         genreTagsHtml = `<div class="event-card__genres">${genreChips}</div>`;
     }
 
-    // Helper para converter "DD/MM/YYYY" para um objeto Date
-    const parseDate = (dateString) => {
-        if (!dateString || typeof dateString !== 'string') return null;
-        const cleanDateStr = dateString.split(' ')[0].trim();
-        const parts = cleanDateStr.split('/');
-        if (parts.length !== 3) return null;
-        const day = parseInt(parts[0], 10);
-        const month = parseInt(parts[1], 10) - 1;
-        const year = parseInt(parts[2], 10);
-        return (isNaN(day) || isNaN(month) || isNaN(year)) ? null : new Date(year, month, day);
-    };
-
-    const today = new Date();
-    today.setHours(0, 0, 0, 0); // Zera o horário para comparar apenas o dia
-
-    const eventDate = parseDate(date);
-    const isPastEvent = eventDate && eventDate < today;
+    const isPastEvent = isEventOver(event);
+    const inProgress = isEventInProgress(event);
 
     const favoriteButtonHtml = `
         <button class="favorite-btn ${isEventFavorited ? 'favorited' : ''}" data-event-slug="${eventSlug}" title="${isEventFavorited ? 'Remover dos favoritos' : 'Adicionar aos favoritos'}">
@@ -1263,6 +1286,8 @@ function createEventCardElement(event) {
     let ticketHtml = '';
     if (isPastEvent) {
         ticketHtml = `<div class="event-card__footer"><span class="event-card__tickets-btn event-card__tickets-btn--free event-card__status--highlight">Evento já realizado</span></div>`;
+    } else if (inProgress) {
+        ticketHtml = `<div class="event-card__footer"><span class="event-card__tickets-btn event-card__tickets-btn--free" style="color: #2ecc71; border-color: rgba(46, 204, 113, 0.3); background-color: rgba(46, 204, 113, 0.1);">Evento em andamento</span></div>`;
     } else if (ticketUrl) {
         const ticketInfo = ticketUrl.toLowerCase().trim();
         if (ticketInfo === 'gratuito') {
@@ -1750,20 +1775,14 @@ function openModal(event) {
     }
     const copyLinkIconSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.72"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.72-1.72"></path></svg>`;
 
-    // Verifica se o evento já passou para definir o botão de ação
-    const parseDate = (dateString) => {
-        if (!dateString || typeof dateString !== 'string') return null;
-        const parts = dateString.split('/');
-        if (parts.length !== 3) return null;
-        return new Date(parts[2], parts[1] - 1, parts[0]);
-    };
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const isPastEvent = parseDate(date) && parseDate(date) < today;
+    const isPastEvent = isEventOver(event);
+    const inProgress = isEventInProgress(event);
 
     let ticketActionHtml = '';
     if (isPastEvent) {
         ticketActionHtml = `<span class="share-btn tickets-btn tickets-btn--free event-card__status--highlight">Evento já realizado</span>`;
+    } else if (inProgress) {
+        ticketActionHtml = `<span class="share-btn tickets-btn tickets-btn--free" style="color: #2ecc71; border-color: rgba(46, 204, 113, 0.3); background-color: rgba(46, 204, 113, 0.1);">Evento em andamento</span>`;
     } else if (ticketUrl) {
         const ticketInfo = ticketUrl.toLowerCase().trim();
         if (ticketInfo === 'gratuito') {
@@ -2316,9 +2335,16 @@ function renderEventDetailPage(event, container, allEvents = []) {
 
     const timeString = formatTimeString(startTime, endTime);
     
+    const isPastEvent = isEventOver(event);
+    const inProgress = isEventInProgress(event);
+
     // Reutilizando lógica de botões e links
     let ticketActionHtml = '';
-    if (ticketUrl) {
+    if (isPastEvent) {
+        ticketActionHtml = `<span class="share-btn tickets-btn tickets-btn--free event-card__status--highlight">Evento já realizado</span>`;
+    } else if (inProgress) {
+        ticketActionHtml = `<span class="share-btn tickets-btn tickets-btn--free" style="color: #2ecc71; border-color: rgba(46, 204, 113, 0.3); background-color: rgba(46, 204, 113, 0.1);">Evento em andamento</span>`;
+    } else if (ticketUrl) {
         const ticketInfo = ticketUrl.toLowerCase().trim();
         if (ticketInfo === 'gratuito' || ticketInfo === 'couvert') {
             ticketActionHtml = `<span class="share-btn tickets-btn tickets-btn--free">${ticketInfo === 'gratuito' ? 'Gratuito' : 'Couvert no local'}</span>`;
@@ -2486,6 +2512,11 @@ function renderEventDetailPage(event, container, allEvents = []) {
                 const card = createEventCardElement(e);
                 relatedGrid.appendChild(card);
             });
+            
+            // Observa os vídeos recém-criados nos eventos relacionados para carregar preguiçosamente
+            if (window.videoObserver) {
+                relatedGrid.querySelectorAll('video').forEach(video => window.videoObserver.observe(video));
+            }
         } else {
             document.getElementById('related-events-section').style.display = 'none';
         }
