@@ -30,6 +30,7 @@ document.addEventListener('DOMContentLoaded', () => {
         applyFiltersFromURL();
         loadFavorites(); 
         initEventMap();
+        setupVideoObserver();
         loadAndDisplayEvents(googleSheetUrl);
         setupFilters();
         setupModal();
