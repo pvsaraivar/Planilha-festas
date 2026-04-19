@@ -323,6 +323,11 @@ const eventImageMap = {
     'de volta aos anos 2000': 'assets/devolta2k.jpeg',
     'disclubinho': 'assets/disclubinho1.jpg, assets/disclubinho2.jpg',
     'psy club fantasy': 'assets/psyclubfantasy.mp4',
+    'mergulhe': 'assets/mergulhe.jpg',
+    'houzeria': 'assets/houzeria.PNG',
+    'maré alta - aniversário do salão das ilusões': 'assets/marealta3.jpg',
+    'pacific.zip': 'assets/pacificzip.jpg',
+    'maz jackson meriva': 'assets/mazjacksonmeriva.jpg'
 
 }
 
