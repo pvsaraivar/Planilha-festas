@@ -332,7 +332,8 @@ const eventImageMap = {
     'baile da bateu - vem hexa': 'assets/bdb1306.jpeg',
     'plantinha': 'assets/plantinha1.jpg, assets/plantinha2.jpg',
     'motel melange': 'assets/melange3.PNG',
-    'insana: bdsm': 'assets/insanabdsm.jpg'
+    'insana: bdsm': 'assets/insanabdsm.jpg',
+    'viboras house': 'assets/viborashouse1.jpg, assets/viborashouse2.jpg, assets/viborashouse3.jpg'
 
 }
 
