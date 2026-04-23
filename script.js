@@ -277,7 +277,7 @@ const eventImageMap = {
     'gravação live set - crisa': 'assets/crisaliveset.jpeg',
     'dale duro': 'assets/daleduro1.jpeg',
     'wow - 5 anos': 'assets/wow5.jpeg',
-    'festa onda 1 ano': 'assets/onda1ano.mp4',
+    'festa onda 1 ano': 'assets/onda1ano.jpg',
     'baile groovado': 'assets/bailegroovado.jpeg',
     'trance beneficiente pelo breno cruz': 'assets/benef1.jpg, assets/benef2.jpg, assets/benef3.jpg, assets/benef4.mp4, assets/benef5.mp4, assets/benef6.jpg',
     'ressonância astrologic': 'assets/ressonancia.mp4',
@@ -314,21 +314,25 @@ const eventImageMap = {
     'after da ignis: modo schranz': 'assets/afterignismodo.jpg',
     'summer dreams': 'assets/summerdreams.jpg',
     'ovo frito 17': 'assets/ovofrito17.jpg',
-    'link.a': 'assets/link2.jpg',
+    'link.a': 'assets/linka.jpeg',
     'fritaria sangue latino': 'assets/fritariasl.jpg',
     'beije #2': 'assets/beije2.jpg',
     'gasguita elétrica': 'assets/gasgeletrica.jpg',
     'naturaiz ce': 'assets/naturaiz.jpg',
-    'baile groovado no ajeum': 'assets/bailegroovado2.jpg',
+    'baile groovado no manganga': 'assets/bailegroovado2.jpg',
     'house family': 'assets/housefamily.jpg',
     'de volta aos anos 2000': 'assets/devolta2k.jpeg',
     'disclubinho': 'assets/disclubinho1.jpg, assets/disclubinho2.jpg',
     'psy club fantasy': 'assets/psyclubfantasy.mp4',
     'mergulhe': 'assets/mergulhe.jpg',
-    'houzeria': 'assets/houzeria.PNG',
+    'houzeria': 'assets/houzeria.jpg',
     'maré alta - aniversário do salão das ilusões': 'assets/marealta3.jpg',
     'pacific.zip': 'assets/pacificzip.jpg',
-    'maz jackson meriva': 'assets/mazjacksonmeriva.jpg'
+    'maz jackson meriva': 'assets/mazjacksonmeriva.jpg',
+    'baile da bateu - vem hexa': 'assets/bdb1306.jpeg',
+    'plantinha': 'plantinha1.jpg, plantinha2.jpg',
+    'motel melange': 'assets/melange3.PNG',
+    'insana: bdsm': 'assets/insanabdsm.jpg'
 
 }
 
