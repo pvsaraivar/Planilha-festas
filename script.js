@@ -330,7 +330,7 @@ const eventImageMap = {
     'pacific.zip': 'assets/pacificzip.jpg',
     'maz jackson meriva': 'assets/mazjacksonmeriva.jpg',
     'baile da bateu - vem hexa': 'assets/bdb1306.jpeg',
-    'plantinha': 'plantinha1.jpg, plantinha2.jpg',
+    'plantinha': 'assets/plantinha1.jpg, assets/plantinha2.jpg',
     'motel melange': 'assets/melange3.PNG',
     'insana: bdsm': 'assets/insanabdsm.jpg'
 
