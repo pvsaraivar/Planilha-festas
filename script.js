@@ -333,8 +333,8 @@ const eventImageMap = {
     'plantinha': 'assets/plantinha1.jpg, assets/plantinha2.jpg',
     'motel melange': 'assets/melange3.PNG',
     'insana: bdsm': 'assets/insanabdsm.jpg',
-    'viboras house': 'assets/viborashouse1.jpg, assets/viborashouse2.jpg, assets/viborashouse3.jpg'
-
+    'viboras house': 'assets/viborashouse1.jpg, assets/viborashouse2.jpg, assets/viborashouse3.jpg',
+    'papoco #5': 'assets/papoco1505.PNG'
 }
 
 /**
