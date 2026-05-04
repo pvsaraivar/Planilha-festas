@@ -331,10 +331,12 @@ const eventImageMap = {
     'maz jackson meriva': 'assets/mazjacksonmeriva.jpg',
     'baile da bateu - vem hexa': 'assets/bdb1306.jpeg',
     'plantinha': 'assets/plantinha1.jpg, assets/plantinha2.jpg',
-    'motel melange': 'assets/melange3.PNG',
+    'motel melange': 'assets/melange3.jpg',
     'insana: bdsm': 'assets/insanabdsm.jpg',
     'viboras house': 'assets/viborashouse1.jpg, assets/viborashouse2.jpg, assets/viborashouse3.jpg',
-    'papoco 5': 'assets/papoco1505.PNG'
+    'papoco 5': 'assets/papoco1505.PNG',
+    'wav sunset - maracanau': 'assets/wavsunsetmaracanau.jpg',
+    'papoco x goelabaixo': 'assets/papocoxgoela.jpg'
 }
 
 /**
