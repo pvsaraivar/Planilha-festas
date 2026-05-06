@@ -336,7 +336,8 @@ const eventImageMap = {
     'viboras house': 'assets/viborashouse1.jpg, assets/viborashouse2.jpg, assets/viborashouse3.jpg',
     'papoco 5': 'assets/papoco1505.PNG',
     'wav sunset - maracanau': 'assets/wavsunsetmaracanau.jpg',
-    'papoco x goelabaixo': 'assets/papocoxgoela.jpg'
+    'papoco x goelabaixo': 'assets/papocoxgoela.jpg',
+    'bateu 10 anos': 'assets/bcf10anos.jpg'
 }
 
 /**
