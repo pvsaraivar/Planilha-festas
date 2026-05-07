@@ -337,7 +337,13 @@ const eventImageMap = {
     'papoco 5': 'assets/papoco1505.PNG',
     'wav sunset - maracanau': 'assets/wavsunsetmaracanau.jpg',
     'papoco x goelabaixo': 'assets/papocoxgoela.jpg',
-    'bateu com fritas': 'assets/bcf10anos.jpg'
+    'bateu com fritas': 'assets/bcf10anos.jpg',
+    'voyage les années 80': 'assets/voyageles.jpg',
+    'marola - esquenta festa onda': 'assets/marola.jpg',
+    'festival cearense de música eletrônica': 'assets/festivalstratus.PNG',
+    'vitas house': 'assets/vitashouse.jpg',
+    'fórum de música eletrônica': 'assets/festivalbelchior.jpg',
+    'alma': 'assets/alma.jpg'
 }
 
 /**
