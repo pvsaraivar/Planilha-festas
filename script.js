@@ -349,8 +349,9 @@ const eventImageMap = {
     'solta o grave festival': 'assets/soltaograve.jpg',
     'underground 20 anos': 'assets/underground.jpg',
     'flec na estação': 'assets/flecnaestacao.jpg',
-    'numalaje na foi sol': 'assets/numalajefoisol.png',
-    
+    'numalaje na foi sol': 'assets/numalajefoisol.jpg',
+    'rlk furacão no laje': 'assets/rlkfuracao.jpg'
+
 }
 
 /**
