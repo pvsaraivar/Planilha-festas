@@ -350,7 +350,12 @@ const eventImageMap = {
     'underground 20 anos': 'assets/underground.jpg',
     'flec na estação': 'assets/flecnaestacao.jpg',
     'numalaje na foi sol': 'assets/numalajefoisol.jpg',
-    'rlk furacão no laje': 'assets/rlkfuracao.jpg'
+    'rlk furacão no laje': 'assets/rlkfuracao.jpg',
+    'intro': 'assets/intro.jpg',
+    'mergulhe 2': 'assets/mergulhe2.mp4',
+    'feitiço': 'assets/feitiço.mp4',
+    'brabas no comando': 'assets/brabasnocomando.jpg',
+    'pacific convida jardineira records': 'assets/pacificjard.jpg'
 
 }
 
