@@ -355,7 +355,9 @@ const eventImageMap = {
     'mergulhe 2': 'assets/mergulhe2.mp4',
     'feitiço': 'assets/feitiço.mp4',
     'brabas no comando': 'assets/brabasnocomando.jpg',
-    'pacific convida jardineira records': 'assets/pacificjard.jpg'
+    'pacific convida jardineira records': 'assets/pacificjard.jpg',
+    'calunia full house 1': 'assets/calunia3est.jpg',
+    'calunia full house 2': 'assets/calunia3lambe.jpg',
 
 }
 
