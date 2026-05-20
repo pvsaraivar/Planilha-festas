@@ -361,7 +361,8 @@ const eventImageMap = {
     'plano aberto - zona de contato': 'assets/planoabertocontato.jpg',
     'baile do gato': 'assets/bailedogato.jpg',
     'ignis: modo bounce': 'assets/ignisbounce.jpg',
-    'mickey house': 'assets/mickeyhouse.jpg'
+    'mickey house': 'assets/mickeyhouse.jpg',
+    'beije no luzes': 'assets/beije3.jpg'
 
 }
 
