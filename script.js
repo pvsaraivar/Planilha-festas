@@ -358,6 +358,10 @@ const eventImageMap = {
     'pacific convida jardineira records': 'assets/pacificjard.jpg',
     'calunia full house 1': 'assets/calunia3est.jpg',
     'calunia full house 2': 'assets/calunia3lambe.jpg',
+    'plano aberto - zona de contato': 'assets/planoabertocontato.jpg',
+    'baile do gato': 'assets/bailedogato.jpg',
+    'ignis: modo bounce': 'assets/ignisbounce.jpg',
+    'mickey house': 'assets/mickeyhouse.jpg'
 
 }
 
