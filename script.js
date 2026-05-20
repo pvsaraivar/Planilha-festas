@@ -1321,34 +1321,8 @@ function createEventCardElement(event) {
         ticketHtml = `<div class="event-card__footer"><span class="event-card__tickets-btn event-card__tickets-btn--free event-card__status--highlight">Evento já realizado</span></div>`;
     } else if (inProgress) {
         ticketHtml = `<div class="event-card__footer"><span class="event-card__tickets-btn event-card__tickets-btn--free" style="color: #2ecc71; border-color: rgba(46, 204, 113, 0.3); background-color: rgba(46, 204, 113, 0.1);">Evento em andamento</span></div>`;
-    } else if (ticketUrl) {
-        const ticketInfo = ticketUrl.toLowerCase().trim();
-        if (ticketInfo === 'gratuito') {
-            ticketHtml = `<div class="event-card__footer"><span class="event-card__tickets-btn event-card__tickets-btn--free">Gratuito</span></div>`;
-        } else if (ticketInfo === 'couvert') {
-            ticketHtml = `<div class="event-card__footer"><span class="event-card__tickets-btn event-card__tickets-btn--free">Couvert no local</span></div>`;
-        } else {
-            // Verifica se é um número de telefone (WhatsApp)
-            const cleanNumber = ticketInfo.replace(/\D/g, '');
-            const isPhoneNumber = /^[\d\s\-\(\)\+]+$/.test(ticketInfo) && cleanNumber.length >= 8;
-
-            if (isPhoneNumber) {
-                const waUrl = `https://wa.me/55${cleanNumber}`;
-                ticketHtml = `<div class="event-card__footer"><a href="${waUrl}" target="_blank" rel="noopener noreferrer" class="event-card__tickets-btn whatsapp-btn" onclick="trackGAEvent('click_ticket', { event_name: '${name.replace(/'/g, "\\'")}', source: 'card_whatsapp' }); event.stopPropagation();">Comprar via WhatsApp</a></div>`;
-            } else {
-                ticketHtml = `<div class="event-card__footer"><a href="${ticketUrl}" target="_blank" rel="noopener noreferrer" class="event-card__tickets-btn" onclick="trackGAEvent('click_ticket', { event_name: '${name.replace(/'/g, "\\'")}', source: 'card' }); event.stopPropagation();">Comprar Ingresso</a></div>`;
-                const isUrl = /^(https?:\/\/|www\.)/i.test(ticketInfo) || ticketInfo.includes('.com') || ticketInfo.includes('.br') || ticketInfo.includes('.live') || ticketInfo.includes('.ee') || ticketInfo.includes('sympla') || ticketInfo.includes('shotgun') || ticketInfo.includes('outgo');
-                if (isUrl) {
-                    let finalUrl = ticketUrl;
-                    if (!/^https?:\/\//i.test(finalUrl)) finalUrl = 'https://' + finalUrl;
-                    ticketHtml = `<div class="event-card__footer"><a href="${finalUrl}" target="_blank" rel="noopener noreferrer" class="event-card__tickets-btn" onclick="trackGAEvent('click_ticket', { event_name: '${name.replace(/'/g, "\\'")}', source: 'card' }); event.stopPropagation();">Comprar Ingresso</a></div>`;
-                } else {
-                    ticketHtml = `<div class="event-card__footer"><span class="event-card__tickets-btn event-card__tickets-btn--free">${ticketUrl}</span></div>`;
-                }
-            }
-        }
     } else {
-        ticketHtml = `<div class="event-card__footer"><span class="event-card__tickets-btn event-card__tickets-btn--free">Vendas não divulgadas</span></div>`;
+        ticketHtml = `<div class="event-card__footer">${getTicketButtonHtml(ticketUrl, name, 'card')}</div>`;
     }
 
     let mediaHtml;
@@ -1474,6 +1448,58 @@ function createEventSlug(name) {
         .trim()
         .replace(/\s+/g, '-'); // Substitui espaços por hífens
 }
+
+/**
+ * Gera o HTML do botão de ingresso com base na URL e no contexto.
+ * @param {string} ticketUrl - O valor da coluna 'Ingressos (URL)'.
+ * @param {string} eventName - O nome do evento para tracking.
+ * @param {string} context - Onde o botão será exibido ('card', 'modal', 'detail_page').
+ * @returns {string} O HTML do botão.
+ */
+function getTicketButtonHtml(ticketUrl, eventName, context) {
+    const isModalOrDetail = context === 'modal' || context === 'detail_page';
+    const btnClass = isModalOrDetail ? 'share-btn tickets-btn' : 'event-card__tickets-btn';
+    const freeBtnClass = `${btnClass} ${isModalOrDetail ? 'tickets-btn--free' : 'event-card__tickets-btn--free'}`;
+    const waBtnClass = `${btnClass} whatsapp-btn`;
+    const gaSource = isModalOrDetail ? (context === 'modal' ? 'modal' : 'detail_page') : 'card';
+
+    if (!ticketUrl) return `<span class="${freeBtnClass}">Vendas não divulgadas</span>`;
+
+    const ticketInfo = ticketUrl.trim();
+    const lowerCaseTicketInfo = ticketInfo.toLowerCase();
+
+    if (lowerCaseTicketInfo === 'gratuito') return `<span class="${freeBtnClass}">Gratuito</span>`;
+    if (lowerCaseTicketInfo === 'couvert') return `<span class="${freeBtnClass}">Couvert no local</span>`;
+
+    if (lowerCaseTicketInfo.startsWith('gratuito:')) {
+        let url = ticketInfo.substring('gratuito:'.length).trim();
+        if (!/^(https?:\/\/)/i.test(url)) url = 'https://' + url;
+        const gaEvent = `trackGAEvent('click_ticket', { event_name: '${eventName.replace(/'/g, "\\'")}', source: '${gaSource}_free_ticket' })`;
+        const stopPropagation = context === 'card' ? ' event.stopPropagation();' : '';
+        return `<a href="${url}" target="_blank" rel="noopener noreferrer" class="${btnClass}" onclick="${gaEvent};${stopPropagation}">Retirar Ingresso</a>`;
+    }
+
+    const cleanNumber = ticketInfo.replace(/\D/g, '');
+    const isPhoneNumber = /^[\d\s\-\(\)\+]+$/.test(ticketInfo) && cleanNumber.length >= 8;
+    if (isPhoneNumber) {
+        const waUrl = `https://wa.me/55${cleanNumber}`;
+        const gaEvent = `trackGAEvent('click_ticket', { event_name: '${eventName.replace(/'/g, "\\'")}', source: '${gaSource}_whatsapp' })`;
+        const stopPropagation = context === 'card' ? ' event.stopPropagation();' : '';
+        return `<a href="${waUrl}" target="_blank" rel="noopener noreferrer" class="${waBtnClass}" onclick="${gaEvent};${stopPropagation}">Comprar via WhatsApp</a>`;
+    }
+
+    const isUrl = /^(https?:\/\/|www\.)/i.test(ticketInfo) || ticketInfo.includes('.com') || ticketInfo.includes('.br') || ticketInfo.includes('.live') || ticketInfo.includes('.ee') || ticketInfo.includes('sympla') || ticketInfo.includes('shotgun') || ticketInfo.includes('outgo');
+    if (isUrl) {
+        let url = ticketInfo;
+        if (!/^(https?:\/\/)/i.test(url)) url = 'https://' + url;
+        const gaEvent = `trackGAEvent('click_ticket', { event_name: '${eventName.replace(/'/g, "\\'")}', source: '${gaSource}' })`;
+        const stopPropagation = context === 'card' ? ' event.stopPropagation();' : '';
+        return `<a href="${url}" target="_blank" rel="noopener noreferrer" class="${btnClass}" onclick="${gaEvent};${stopPropagation}">Comprar Ingresso</a>`;
+    }
+
+    return `<span class="${freeBtnClass}">${ticketUrl}</span>`;
+}
+
 /**
  * Formata a string de horário com a primeira letra maiúscula.
  * @param {string} startTime - O horário de início.
@@ -1816,34 +1842,8 @@ function openModal(event) {
         ticketActionHtml = `<span class="share-btn tickets-btn tickets-btn--free event-card__status--highlight">Evento já realizado</span>`;
     } else if (inProgress) {
         ticketActionHtml = `<span class="share-btn tickets-btn tickets-btn--free" style="color: #2ecc71; border-color: rgba(46, 204, 113, 0.3); background-color: rgba(46, 204, 113, 0.1);">Evento em andamento</span>`;
-    } else if (ticketUrl) {
-        const ticketInfo = ticketUrl.toLowerCase().trim();
-        if (ticketInfo === 'gratuito') {
-            ticketActionHtml = `<span class="share-btn tickets-btn tickets-btn--free">Gratuito</span>`;
-        } else if (ticketInfo === 'couvert') {
-            ticketActionHtml = `<span class="share-btn tickets-btn tickets-btn--free">Couvert no local</span>`;
-        } else {
-            // Verifica se é um número de telefone (WhatsApp)
-            const cleanNumber = ticketInfo.replace(/\D/g, '');
-            const isPhoneNumber = /^[\d\s\-\(\)\+]+$/.test(ticketInfo) && cleanNumber.length >= 8;
-
-            if (isPhoneNumber) {
-                const waUrl = `https://wa.me/55${cleanNumber}`;
-                ticketActionHtml = `<a href="${waUrl}" target="_blank" rel="noopener noreferrer" class="share-btn tickets-btn whatsapp-btn" onclick="trackGAEvent('click_ticket', { event_name: '${name.replace(/'/g, "\\'")}', source: 'modal_whatsapp' })">Comprar via WhatsApp</a>`;
-            } else {
-                ticketActionHtml = `<a href="${ticketUrl}" target="_blank" rel="noopener noreferrer" class="share-btn tickets-btn" onclick="trackGAEvent('click_ticket', { event_name: '${name.replace(/'/g, "\\'")}', source: 'modal' })">Comprar Ingresso</a>`;
-                const isUrl = /^(https?:\/\/|www\.)/i.test(ticketInfo) || ticketInfo.includes('.com') || ticketInfo.includes('.br') || ticketInfo.includes('.live') || ticketInfo.includes('.ee') || ticketInfo.includes('sympla') || ticketInfo.includes('shotgun') || ticketInfo.includes('outgo');
-                if (isUrl) {
-                    let finalUrl = ticketUrl;
-                    if (!/^https?:\/\//i.test(finalUrl)) finalUrl = 'https://' + finalUrl;
-                    ticketActionHtml = `<a href="${finalUrl}" target="_blank" rel="noopener noreferrer" class="share-btn tickets-btn" onclick="trackGAEvent('click_ticket', { event_name: '${name.replace(/'/g, "\\'")}', source: 'modal' })">Comprar Ingresso</a>`;
-                } else {
-                    ticketActionHtml = `<span class="share-btn tickets-btn tickets-btn--free">${ticketUrl}</span>`;
-                }
-            }
-        }
     } else {
-        ticketActionHtml = `<span class="share-btn tickets-btn tickets-btn--free">Vendas não divulgadas</span>`;
+        ticketActionHtml = getTicketButtonHtml(ticketUrl, name, 'modal');
     }
 
     // Botão Adicionar ao Calendário
@@ -2377,30 +2377,8 @@ function renderEventDetailPage(event, container, allEvents = []) {
         ticketActionHtml = `<span class="share-btn tickets-btn tickets-btn--free event-card__status--highlight">Evento já realizado</span>`;
     } else if (inProgress) {
         ticketActionHtml = `<span class="share-btn tickets-btn tickets-btn--free" style="color: #2ecc71; border-color: rgba(46, 204, 113, 0.3); background-color: rgba(46, 204, 113, 0.1);">Evento em andamento</span>`;
-    } else if (ticketUrl) {
-        const ticketInfo = ticketUrl.toLowerCase().trim();
-        if (ticketInfo === 'gratuito' || ticketInfo === 'couvert') {
-            ticketActionHtml = `<span class="share-btn tickets-btn tickets-btn--free">${ticketInfo === 'gratuito' ? 'Gratuito' : 'Couvert no local'}</span>`;
-        } else {
-            // Verifica se é um número de telefone (WhatsApp)
-            const cleanNumber = ticketInfo.replace(/\D/g, '');
-            const isPhoneNumber = /^[\d\s\-\(\)\+]+$/.test(ticketInfo) && cleanNumber.length >= 8;
-
-            if (isPhoneNumber) {
-                const waUrl = `https://wa.me/55${cleanNumber}`;
-                ticketActionHtml = `<a href="${waUrl}" target="_blank" class="share-btn tickets-btn whatsapp-btn" onclick="trackGAEvent('click_ticket', { event_name: '${name.replace(/'/g, "\\'")}', source: 'detail_page_whatsapp' })">Comprar via WhatsApp</a>`;
-            } else {
-                ticketActionHtml = `<a href="${ticketUrl}" target="_blank" class="share-btn tickets-btn" onclick="trackGAEvent('click_ticket', { event_name: '${name.replace(/'/g, "\\'")}', source: 'detail_page' })">Comprar Ingresso</a>`;
-                const isUrl = /^(https?:\/\/|www\.)/i.test(ticketInfo) || ticketInfo.includes('.com') || ticketInfo.includes('.br') || ticketInfo.includes('.live') || ticketInfo.includes('.ee') || ticketInfo.includes('sympla') || ticketInfo.includes('shotgun') || ticketInfo.includes('outgo');
-                if (isUrl) {
-                    let finalUrl = ticketUrl;
-                    if (!/^https?:\/\//i.test(finalUrl)) finalUrl = 'https://' + finalUrl;
-                    ticketActionHtml = `<a href="${finalUrl}" target="_blank" class="share-btn tickets-btn" onclick="trackGAEvent('click_ticket', { event_name: '${name.replace(/'/g, "\\'")}', source: 'detail_page' })">Comprar Ingresso</a>`;
-                } else {
-                    ticketActionHtml = `<span class="share-btn tickets-btn tickets-btn--free">${ticketUrl}</span>`;
-                }
-            }
-        }
+    } else {
+        ticketActionHtml = getTicketButtonHtml(ticketUrl, name, 'detail_page');
     }
 
     // Botão Adicionar ao Calendário na Página de Detalhes
