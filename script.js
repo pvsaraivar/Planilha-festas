@@ -363,7 +363,8 @@ const eventImageMap = {
     'ignis: modo bounce': 'assets/ignisbounce.jpg',
     'mickey house': 'assets/mickeyhouse.jpg',
     'beije no luzes': 'assets/beije3.jpg',
-    'house music brasil core': 'assets/kazabrasilcore.jpg'
+    'house music brasil core': 'assets/kazabrasilcore.jpg',
+    'rolê suave convida lola garcia': 'assets/rolesuavelola.jpg'
 
 }
 
