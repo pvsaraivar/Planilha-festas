@@ -366,7 +366,9 @@ const eventImageMap = {
     'house music brasil core': 'assets/kazabrasilcore.jpg',
     'rolê suave convida lola garcia': 'assets/rolesuavelola.jpg',
     'house of tenny no vila': 'assets/houseoftenny.jpg',
-    'numalaje na estação': 'assets/numalajeest3005.jpg'
+    'numalaje na estação': 'assets/numalajeest3005.jpg',
+    'lunatic - a dança de shiva': 'assets/lunaticdan.mp4',
+    'noktum records': 'assets/noktumrec.mp4'
 
 }
 
