@@ -654,6 +654,10 @@ function renderEvents(events, gridElement) {
     } else {
         if (width < 600) numCols = 2;
         else if (width < 900) numCols = 3;
+        else if (width < 1300) numCols = 4;
+        else if (width < 1600) numCols = 5;
+        else if (width < 1900) numCols = 6;
+        else numCols = 7;
     }
 
     // Cria as colunas
