@@ -364,7 +364,9 @@ const eventImageMap = {
     'mickey house': 'assets/mickeyhouse.jpg',
     'beije no luzes': 'assets/beije3.jpg',
     'house music brasil core': 'assets/kazabrasilcore.jpg',
-    'rolê suave convida lola garcia': 'assets/rolesuavelola.jpg'
+    'rolê suave convida lola garcia': 'assets/rolesuavelola.jpg',
+    'house of tenny no vila': 'assets/houseoftenny.jpg',
+    'numalaje na estação': 'assets/numalajeest3005.jpg'
 
 }
 
