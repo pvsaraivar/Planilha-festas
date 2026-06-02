@@ -340,7 +340,7 @@ const eventImageMap = {
     'bateu com fritas': 'assets/bcf10anos.png',
     'voyage les années 80': 'assets/voyageles.jpg',
     'marola - esquenta festa onda': 'assets/marola.jpg',
-    'festival cearense de música eletrônica': 'assets/festivalstratus.PNG',
+    'festival cearense de música eletrônica': 'assets/festivalstratus.jpg',
     'vitas house': 'assets/vitashouse.jpg',
     'fórum de música eletrônica': 'assets/festivalbelchior.jpg',
     'alma': 'assets/alma.jpg',
@@ -368,8 +368,12 @@ const eventImageMap = {
     'house of tenny no vila': 'assets/houseoftenny.jpg',
     'numalaje na estação': 'assets/numalajeest3005.jpg',
     'lunatic - a dança de shiva': 'assets/lunaticdan.mp4',
-    'noktum records': 'assets/noktumrec.mp4'
-
+    'noktum records': 'assets/noktumrec.mp4',
+    'casa brasil': 'assets/casabrasil1.jpg, assets/casabrasil2.jpg',
+    'rolê suave convida sammy dreams': 'assets/sammybrisa.jpg',
+    'guapo fiesta - ia': 'assets/guapo.mp4',
+    'mirage convida thalia': 'assets/miragethalia.jpg',
+    'fine discos': 'assets/finediscos.jpg'
 }
 
 /**
