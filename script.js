@@ -371,9 +371,9 @@ const eventImageMap = {
     'noktum records': 'assets/noktumrec.mp4',
     'casa brasil': 'assets/casabrasil1.jpg, assets/casabrasil2.jpg',
     'rolê suave convida sammy dreams': 'assets/sammybrisa.jpg',
-    'guapo fiesta - ia': 'assets/guapo.mp4',
     'mirage convida thalia': 'assets/miragethalia.jpg',
-    'fine discos': 'assets/finediscos.jpg'
+    'fine discos': 'assets/finediscos.jpg',
+    'tedeletechno': 'assets/tedeletechno.jpg'
 }
 
 /**
