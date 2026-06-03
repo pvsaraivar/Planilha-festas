@@ -373,7 +373,9 @@ const eventImageMap = {
     'rolê suave convida sammy dreams': 'assets/sammybrisa.jpg',
     'mirage convida thalia': 'assets/miragethalia.jpg',
     'fine discos': 'assets/finediscos.jpg',
-    'tedeletechno': 'assets/tedeletechno.jpg'
+    'tedeletechno': 'assets/tedeletechno.jpg',
+    'ryan e luna no luzes': 'assets/ryanluna.jpg',
+    'eletronika & friends': 'assets/eletronika3.jpg'
 }
 
 /**
