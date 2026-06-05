@@ -375,7 +375,13 @@ const eventImageMap = {
     'fine discos': 'assets/finediscos.jpg',
     'tedeletechno': 'assets/tedeletechno.jpg',
     'ryan e luna no luzes': 'assets/ryanluna.jpg',
-    'eletronika & friends': 'assets/eletronika3.jpg'
+    'eletronika & friends': 'assets/eletronika3.jpg',
+    'eterica tech': 'assets/eterica.mp4',
+    'arraia psicodelico': 'assets/arraiapsicodelico.jpg',
+    'baile do amor': 'assets/bailedoamor.jpg',
+    'risca faca': 'assets/riscafaca.jpg',
+    'brilha estrela': 'assets/brilhaestrela.jpg',
+    'sotão club': 'assets/sotaoclub.jpg'
 }
 
 /**
