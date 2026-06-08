@@ -381,7 +381,10 @@ const eventImageMap = {
     'baile do amor': 'assets/bailedoamor.jpg',
     'risca faca': 'assets/riscafaca.jpg',
     'brilha estrela': 'assets/brilhaestrela.jpg',
-    'sotão club': 'assets/sotaoclub.jpg'
+    'sotão club': 'assets/sotaoclub.jpg',
+    'wav & friends - hexa edition': 'assets/wavhexa1.jpg, assets/wavhexa2.jpg, assets/wavhexa3.jpg',
+    'facada suave': 'assets/facadasuave.jpg',
+    'kaza fanfest': 'assets/kazafanfest.mp4'
 }
 
 /**
