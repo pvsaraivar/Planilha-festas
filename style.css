@@ -56,6 +56,14 @@ body::before {
     background-size: cover;
     z-index: -1;
 }
+
+body.copa-theme::before {
+    background: linear-gradient(var(--background-overlay), var(--background-overlay)), url('assets/copa.jpg');
+}
+
+body.copa-theme {
+    --primary-color: #FFDF00; /* Amarelo Brasil para dar um destaque extra nos elementos da Copa */
+}
 .light-theme {
     color-scheme: light; 
 }

@@ -6,14 +6,15 @@ let favoritedEventSlugs = new Set(); // Armazena os slugs dos eventos favoritado
 
 let eventMap = null;
 let mapMarkersGroup = null;
+let currentGid = '0'; // GID da aba ativa no momento
 
 document.addEventListener('DOMContentLoaded', () => {
     const sheetId = '1LAfG4Nt2g_P12HMCx-wEmWpXoX3yp1qAKdw89eLbeWU';
-    const eventsGid = '0'; // GID da aba "eventos" (geralmente 0 se for a primeira aba criada)
     
-    // Adiciona um timestamp (cache-buster) para forçar o navegador a pegar os dados mais recentes
-    const cacheBuster = new Date().getTime();
-    const googleSheetUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/export?format=csv&gid=${eventsGid}&nocache=${cacheBuster}`;
+    const getSheetUrl = (gid) => {
+        const cacheBuster = new Date().getTime();
+        return `https://docs.google.com/spreadsheets/d/${sheetId}/export?format=csv&gid=${gid}&nocache=${cacheBuster}`;
+    };
     
     setupPromotionalBanner();
     setupThemeToggle();
@@ -21,8 +22,13 @@ document.addEventListener('DOMContentLoaded', () => {
     // Verifica se estamos na página de detalhes
     const detailContainer = document.getElementById('event-detail-container');
     if (detailContainer) {
+        const urlParams = new URLSearchParams(window.location.search);
+        currentGid = urlParams.get('gid') || '0';
+        
+        if (currentGid === '1076861730') document.body.classList.add('copa-theme');
+
         setupVideoObserver();
-        loadEventDetails(googleSheetUrl);
+        loadEventDetails(getSheetUrl(currentGid), currentGid);
         setupFloatingBackButton();
     } else {
         // Estamos na página inicial (index.html)
@@ -32,7 +38,53 @@ document.addEventListener('DOMContentLoaded', () => {
         loadFavorites(); 
         initEventMap();
         setupVideoObserver();
-        loadAndDisplayEvents(googleSheetUrl);
+        
+        const urlParams = new URLSearchParams(window.location.search);
+        currentGid = urlParams.get('gid') || '0';
+
+        if (currentGid === '1076861730') document.body.classList.add('copa-theme');
+
+        // Configura navegação das abas
+        const navButtons = document.querySelectorAll('.nav-btn');
+        navButtons.forEach(btn => {
+            if (btn.dataset.sheetGid === currentGid) {
+                navButtons.forEach(b => b.classList.remove('is-active'));
+                btn.classList.add('is-active');
+            }
+            
+            btn.addEventListener('click', (e) => {
+                if (currentGid === e.target.dataset.sheetGid) return; // Evita cliques duplicados
+                
+                navButtons.forEach(b => b.classList.remove('is-active'));
+                e.target.classList.add('is-active');
+                
+                currentGid = e.target.dataset.sheetGid;
+                
+                // Alterna o tema da Copa
+                if (currentGid === '1076861730') {
+                    document.body.classList.add('copa-theme');
+                } else {
+                    document.body.classList.remove('copa-theme');
+                }
+
+                // Limpa os filtros ao mudar de aba
+                const clearAllBtn = document.getElementById('clear-all-filters-btn');
+                if (clearAllBtn && !clearAllBtn.hidden) clearAllBtn.click();
+                
+                // Atualiza os parâmetros da URL
+                const params = new URLSearchParams(window.location.search);
+                params.set('gid', currentGid);
+                params.delete('search');
+                params.delete('genre');
+                params.delete('date');
+                const newUrl = `${window.location.pathname}?${params.toString()}`;
+                window.history.pushState({ path: newUrl }, '', newUrl);
+                
+                loadAndDisplayEvents(getSheetUrl(currentGid), currentGid);
+            });
+        });
+
+        loadAndDisplayEvents(getSheetUrl(currentGid), currentGid);
         setupFilters();
         setupModal();
         setupContactModal();
@@ -80,7 +132,7 @@ function setupPromotionalBanner() {
     // O slug é conhecido, então podemos montá-lo diretamente
     if (ctaBtn) {
         const eventSlug = 'tubulosa-submissa'; // Slug do evento
-        ctaBtn.href = `detalhes.html?event=${eventSlug}`;
+        ctaBtn.href = `detalhes.html?event=${eventSlug}&gid=0`;
         
         // Adiciona tracking do GA
         ctaBtn.addEventListener('click', () => {
@@ -477,15 +529,16 @@ function isEventInProgress(event) {
 /**
  * Orquestra o carregamento, análise e exibição dos eventos.
  * @param {string} csvPath - O caminho para o arquivo CSV.
+ * @param {string} gid - O ID da aba atual para cache.
  */
-async function loadAndDisplayEvents(csvPath) {
+async function loadAndDisplayEvents(csvPath, gid = '0') {
   const grid = document.getElementById('event-grid');
   if (!grid) {
     console.error("Erro Crítico: Container da grade de eventos não encontrado.");
     return;
   }
 
-  const cacheKey = 'events_cache';
+  const cacheKey = 'events_cache_' + gid;
 
   // Função para processar e renderizar os eventos a partir do texto CSV
   const processAndRender = (csvText) => {
@@ -1389,7 +1442,7 @@ function createEventCardElement(event) {
     card.addEventListener('click', () => {
         const eventSlug = createEventSlug(name);
         // Redireciona para a página de detalhes
-        window.location.href = `detalhes.html?event=${eventSlug}`;
+        window.location.href = `detalhes.html?event=${eventSlug}&gid=${currentGid}`;
     });
 
     // Lógica para tocar o vídeo ao clicar na imagem/botão (sem abrir o modal)
@@ -2301,7 +2354,7 @@ function setupVideoObserver() {
 /**
  * Carrega e exibe os detalhes do evento na página detalhes.html
  */
-async function loadEventDetails(csvPath) {
+async function loadEventDetails(csvPath, gid = '0') {
     const params = new URLSearchParams(window.location.search);
     const slug = params.get('event');
     const container = document.getElementById('event-detail-container');
@@ -2313,7 +2366,7 @@ async function loadEventDetails(csvPath) {
 
     try {
         // Tenta usar cache se disponível (mesma lógica da home)
-        const cacheKey = 'events_cache';
+            const cacheKey = 'events_cache_' + gid;
         let csvText = sessionStorage.getItem(cacheKey);
 
         if (!csvText) {
@@ -2747,7 +2800,7 @@ function updateMapMarkers(events) {
                         ${mediaHtml}
                         <h3>${name}</h3>
                         <p>${date}<br>${location}</p>
-                        <button onclick="window.location.href='detalhes.html?event=${slug}'" class="map-popup-btn">Ver Detalhes</button>
+                    <button onclick="window.location.href='detalhes.html?event=${slug}&gid=${currentGid}'" class="map-popup-btn">Ver Detalhes</button>
                     </div>
                 `;
 
