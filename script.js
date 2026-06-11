@@ -436,7 +436,11 @@ const eventImageMap = {
     'sotão club': 'assets/sotaoclub.jpg',
     'wav & friends - hexa edition': 'assets/wavhexa1.jpg, assets/wavhexa2.jpg, assets/wavhexa3.jpg',
     'facada suave': 'assets/facadasuave.jpg',
-    'kaza fanfest': 'assets/kazafanfest.mp4'
+    'kaza fanfest': 'assets/kazafanfest.mp4',
+    'copa na casinha': 'assets/casinhacopa1.jpg, assets/casinhacopa2.jpg',
+    'copa no vila': 'assets/vilatabajara.jpg',
+    'copa no cenário': 'assets/copanocenario.mp4',
+    
 }
 
 /**
