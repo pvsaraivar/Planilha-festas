@@ -1068,12 +1068,6 @@ function setupFilters() {
 
         let isScrolling = false;
         window.addEventListener('scroll', () => {
-            const anyFilterActive = !clearAllBtn.hidden;
-            const isScrolled = window.scrollY > 200;
-            if (anyFilterActive && isScrolled) {
-                floatingClearBtn.classList.add('visible');
-            } else {
-                floatingClearBtn.classList.remove('visible');
             if (!isScrolling) {
                 window.requestAnimationFrame(() => {
                     const anyFilterActive = !clearAllBtn.hidden;
@@ -2074,10 +2068,6 @@ function setupBackToTopButton() {
     let isScrolling = false;
     // Mostra ou esconde o botão com base na rolagem
     window.addEventListener('scroll', () => {
-        if (window.scrollY > 300) { // Mostra o botão após rolar 300px
-            backToTopBtn.classList.add('visible');
-        } else {
-            backToTopBtn.classList.remove('visible');
         if (!isScrolling) {
             window.requestAnimationFrame(() => {
                 if (window.scrollY > 300) { // Mostra o botão após rolar 300px
@@ -2089,7 +2079,6 @@ function setupBackToTopButton() {
             });
             isScrolling = true;
         }
-
     });
 
     // Rola para o topo ao clicar
@@ -2322,10 +2311,6 @@ function setupFloatingBackButton() {
     let isScrolling = false;
     // Mostra o botão apenas quando rolar a página, pois o header já tem um botão de voltar
     window.addEventListener('scroll', () => {
-        if (window.scrollY > 150) {
-            backBtn.classList.add('visible');
-        } else {
-            backBtn.classList.remove('visible');
         if (!isScrolling) {
             window.requestAnimationFrame(() => {
                 if (window.scrollY > 150) {
