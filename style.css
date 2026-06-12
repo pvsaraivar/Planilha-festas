@@ -781,8 +781,8 @@ a {
     padding: 0;
     z-index: 5;
     transition: transform 0.2s ease, background-color 0.2s ease;
-    backdrop-filter: blur(4px); /* Efeito de vidro fosco */
-    -webkit-backdrop-filter: blur(4px);
+    /* backdrop-filter: blur(4px); Removido por peso de performance */
+    /* -webkit-backdrop-filter: blur(4px); */
 }
 
 .favorite-btn:hover {
@@ -819,8 +819,8 @@ a {
     z-index: 5;
     text-transform: uppercase;
     box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-    backdrop-filter: blur(4px);
-    -webkit-backdrop-filter: blur(4px);
+    /* backdrop-filter: blur(4px); Removido por peso de performance */
+    /* -webkit-backdrop-filter: blur(4px); */
     border: 1px solid rgba(255, 255, 255, 0.2);
     letter-spacing: 0.5px;
     display: flex;
@@ -843,8 +843,8 @@ a {
     cursor: pointer;
     z-index: 4;
     transition: opacity 0.2s, transform 0.2s;
-    backdrop-filter: blur(4px);
-    -webkit-backdrop-filter: blur(4px);
+    /* backdrop-filter: blur(4px); Removido por peso de performance */
+    /* -webkit-backdrop-filter: blur(4px); */
     border: 1px solid rgba(255, 255, 255, 0.2);
 }
 

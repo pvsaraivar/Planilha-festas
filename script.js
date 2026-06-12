@@ -446,7 +446,13 @@ const eventImageMap = {
     'copa no tropi': 'assets/copanotropi.jpg',
     'copa no zé mex': 'assets/zemexicano.jpg',
     'ginga': 'assets/ginga.jpg',
-    'lambe lambe futebol clube': 'assets/lambelambe.jpg'
+    'lambe lambe futebol clube': 'assets/lambelambe.jpg',
+    'arena garden': 'assets/arenagarden.jpg',
+    'isaknaja convida aira': 'assets/isaknaja23.jpg, assets/isaknaja2.jpg',
+    'radar na copa': 'assets/radarnacopa.jpg',
+    'esquina da copa': 'esquinadacopa.jpg',
+    'arena arrumação': 'arenaarrum.jpg',
+    
 }
 
 /**
@@ -1060,6 +1066,7 @@ function setupFilters() {
             clearAllBtn.click(); // Reutiliza a lógica do botão principal
         });
 
+        let isScrolling = false;
         window.addEventListener('scroll', () => {
             const anyFilterActive = !clearAllBtn.hidden;
             const isScrolled = window.scrollY > 200;
@@ -1067,6 +1074,18 @@ function setupFilters() {
                 floatingClearBtn.classList.add('visible');
             } else {
                 floatingClearBtn.classList.remove('visible');
+            if (!isScrolling) {
+                window.requestAnimationFrame(() => {
+                    const anyFilterActive = !clearAllBtn.hidden;
+                    const isScrolled = window.scrollY > 200;
+                    if (anyFilterActive && isScrolled) {
+                        floatingClearBtn.classList.add('visible');
+                    } else {
+                        floatingClearBtn.classList.remove('visible');
+                    }
+                    isScrolling = false;
+                });
+                isScrolling = true;
             }
         });
     }
@@ -2052,12 +2071,23 @@ function setupBackToTopButton() {
     const backToTopBtn = document.getElementById('back-to-top-btn');
     if (!backToTopBtn) return;
 
+    let isScrolling = false;
     // Mostra ou esconde o botão com base na rolagem
     window.addEventListener('scroll', () => {
         if (window.scrollY > 300) { // Mostra o botão após rolar 300px
             backToTopBtn.classList.add('visible');
         } else {
             backToTopBtn.classList.remove('visible');
+        if (!isScrolling) {
+            window.requestAnimationFrame(() => {
+                if (window.scrollY > 300) { // Mostra o botão após rolar 300px
+                    backToTopBtn.classList.add('visible');
+                } else {
+                    backToTopBtn.classList.remove('visible');
+                }
+                isScrolling = false;
+            });
+            isScrolling = true;
         }
 
     });
@@ -2289,12 +2319,23 @@ function setupFloatingBackButton() {
     const backBtn = document.getElementById('floating-back-btn');
     if (!backBtn) return;
 
+    let isScrolling = false;
     // Mostra o botão apenas quando rolar a página, pois o header já tem um botão de voltar
     window.addEventListener('scroll', () => {
         if (window.scrollY > 150) {
             backBtn.classList.add('visible');
         } else {
             backBtn.classList.remove('visible');
+        if (!isScrolling) {
+            window.requestAnimationFrame(() => {
+                if (window.scrollY > 150) {
+                    backBtn.classList.add('visible');
+                } else {
+                    backBtn.classList.remove('visible');
+                }
+                isScrolling = false;
+            });
+            isScrolling = true;
         }
     });
 }
