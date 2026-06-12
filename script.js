@@ -442,7 +442,11 @@ const eventImageMap = {
     'copa no cenário': 'assets/copanocenario.mp4',
     'copa no giz': 'assets/copanogiz.jpg',
     'arena do goxtoso': 'assets/arenagoxtoso1.jpg, assets/arenagoxtoso2.jpg',
-    'arena neon': 'assets/arenaneon.jpg'
+    'arena neon': 'assets/arenaneon.jpg',
+    'copa no tropi': 'assets/copanotropi.jpg',
+    'copa no zé mex': 'assets/zemexicano.jpg',
+    'ginga': 'assets/ginga.jpg',
+    'lambe lambe futebol clube': 'assets/lambelambe.jpg'
 }
 
 /**
