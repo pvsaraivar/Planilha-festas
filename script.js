@@ -451,8 +451,8 @@ const eventImageMap = {
     'isaknaja convida aira': 'assets/isaknaja23.jpg, assets/isaknaja2.jpg',
     'radar na copa': 'assets/radarnacopa.jpg',
     'esquina da copa': 'assets/esquinadacopa.jpg',
-    'arena arrumação': 'assets/arenaarrum.jpg',
-    
+    'arena arrumação': 'assets/arenaarrum1.jpg',
+    'tj na copa': 'assets/tjnacopa.jpg'
 }
 
 /**
