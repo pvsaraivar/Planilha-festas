@@ -440,7 +440,9 @@ const eventImageMap = {
     'copa na casinha': 'assets/casinhacopa1.jpg, assets/casinhacopa2.jpg',
     'copa no vila': 'assets/vilatabajara.jpg',
     'copa no cenário': 'assets/copanocenario.mp4',
-    
+    'copa no giz': 'assets/copanogiz.jpg',
+    'arena do goxtoso': 'assets/arenagoxtoso1.jpg, assets/arenagoxtoso2.jpg',
+    'arena neon': 'assets/arenaneon.jpg'
 }
 
 /**
