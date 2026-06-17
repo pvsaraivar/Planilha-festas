@@ -452,7 +452,10 @@ const eventImageMap = {
     'radar na copa': 'assets/radarnacopa.jpg',
     'esquina da copa': 'assets/esquinadacopa.jpg',
     'arena arrumação': 'assets/arenaarrum1.jpg',
-    'tj na copa': 'assets/tjnacopa.jpg'
+    'tj na copa': 'assets/tjnacopa.jpg',
+    'kolaje pride': 'assets/kolajepride.jpg',
+    'tubulosa ritmada - aniversário de 2 anos': 'assets/tubulosa2anos.mp4',
+    'joga & joga': 'assets/jogaejoga.jpg'
 }
 
 /**
@@ -580,6 +583,7 @@ async function loadAndDisplayEvents(csvPath, gid = '0') {
         genreFilter.dispatchEvent(new Event('change'));
     } else {
         const futureEvents = allEvents.filter(event => !isEventOver(event));
+            populateGenreFilter(futureEvents);
         renderEvents(getSortedEvents(futureEvents), grid);
         if (typeof updateMapMarkers === 'function') updateMapMarkers(futureEvents);
     }
@@ -806,8 +810,10 @@ function populateGenreFilter(events) {
         genreFilter.appendChild(option);
     });
 
-    if (currentValue) {
+        if (currentValue && sortedGenres.includes(currentValue)) {
         genreFilter.value = currentValue;
+        } else {
+            genreFilter.value = '';
     }
 }
 
@@ -873,14 +879,73 @@ function setupFilters() {
     const applyFilters = () => {
         const searchTerm = searchInput.value.toLowerCase();
         const selectedDate = dateInput.value;
-        const selectedGenre = genreFilter.value;
+        let selectedGenre = genreFilter.value;
         const favoritesOnly = favoritesFilterBtn.classList.contains('is-active');
+
+        let filteredEvents;
+
+        // 1. Filtra por data PRIMEIRO, pois ele define a base de eventos.
+        if (selectedDate) {
+            const [year, month, day] = selectedDate.split('-');
+            const targetDay = parseInt(day, 10);
+            const targetMonth = parseInt(month, 10);
+            const targetYear = parseInt(year, 10);
+
+            filteredEvents = allEvents.filter(event => {
+                const eventDate = getProp(event, 'Data') || getProp(event, 'Date');
+                if (!eventDate) return false;
+                const parts = eventDate.split('/');
+                if (parts.length !== 3) return false;
+                
+                return parseInt(parts[0], 10) === targetDay && 
+                       parseInt(parts[1], 10) === targetMonth && 
+                       parseInt(parts[2], 10) === targetYear;
+            });
+        } else {
+            filteredEvents = allEvents.filter(event => !isEventOver(event));
+        }
+
+        // 2. Filtra por termo de busca (sobre o resultado do filtro de data)
+        if (searchTerm) {
+            filteredEvents = filteredEvents.filter(event => {
+                const name = (getProp(event, 'Evento') || getProp(event, 'Nome') || '').toLowerCase();
+                const location = (getProp(event, 'Local') || '').toLowerCase();
+                const producer = (getProp(event, 'Produtora') || '').toLowerCase(); // Adicionado
+                const attractions = (getProp(event, 'Atrações') || '').toLowerCase();
+                return name.includes(searchTerm) || location.includes(searchTerm) || attractions.includes(searchTerm) || producer.includes(searchTerm);
+            });
+        }
+
+        // Atualiza os gêneros disponíveis com base nos eventos filtrados até agora
+        populateGenreFilter(filteredEvents);
+        
+        // Atualiza o valor selecionado (caso tenha sido resetado pois o gênero sumiu da lista)
+        selectedGenre = genreFilter.value;
+
+        // 3. Filtra por gênero (sobre o resultado dos filtros anteriores)
+        if (selectedGenre) {
+            filteredEvents = filteredEvents.filter(event => {
+                const genresString = getProp(event, 'Gênero');
+                if (!genresString) return false;
+                // Converte a string de gêneros do evento para um array de minúsculas
+                const eventGenres = genresString.split(',').map(g => g.trim().toLowerCase());
+                // Verifica se o gênero selecionado está na lista de gêneros do evento
+                return eventGenres.includes(selectedGenre);
+            });
+        }
+
+        // 4. Filtra por favoritos (sobre o resultado dos filtros anteriores)
+        if (favoritesOnly) {
+            filteredEvents = filteredEvents.filter(event => {
+                const eventSlug = createEventSlug(getProp(event, 'Evento') || getProp(event, 'Nome'));
+                return favoritedEventSlugs.has(eventSlug);
+            });
+        }
 
         // Adiciona/remove a classe 'is-active' para feedback visual
         searchInput.classList.toggle('is-active', !!searchTerm);        
         dateInput.classList.toggle('is-active', !!selectedDate);
         genreFilter.classList.toggle('is-active', !!selectedGenre);
-        // O estado do botão de favoritos é controlado por clique, não aqui.
 
         // Mostra/esconde botões de limpar e define se algum filtro está ativo
         clearSearchBtn.hidden = !searchTerm;
@@ -927,60 +992,6 @@ function setupFilters() {
         
         // Usa replaceState para não poluir o histórico do navegador a cada tecla
         window.history.replaceState({ path: newUrl }, '', newUrl);
-
-        let filteredEvents;
-
-        // 1. Filtra por data PRIMEIRO, pois ele define a base de eventos.
-        if (selectedDate) {
-            const [year, month, day] = selectedDate.split('-');
-            const targetDay = parseInt(day, 10);
-            const targetMonth = parseInt(month, 10);
-            const targetYear = parseInt(year, 10);
-
-            filteredEvents = allEvents.filter(event => {
-                const eventDate = getProp(event, 'Data') || getProp(event, 'Date');
-                if (!eventDate) return false;
-                const parts = eventDate.split('/');
-                if (parts.length !== 3) return false;
-                
-                return parseInt(parts[0], 10) === targetDay && 
-                       parseInt(parts[1], 10) === targetMonth && 
-                       parseInt(parts[2], 10) === targetYear;
-            });
-        } else {
-            filteredEvents = allEvents.filter(event => !isEventOver(event));
-        }
-
-        // 2. Filtra por termo de busca (sobre o resultado do filtro de data)
-        if (searchTerm) {
-            filteredEvents = filteredEvents.filter(event => {
-                const name = (getProp(event, 'Evento') || getProp(event, 'Nome') || '').toLowerCase();
-                const location = (getProp(event, 'Local') || '').toLowerCase();
-                const producer = (getProp(event, 'Produtora') || '').toLowerCase(); // Adicionado
-                const attractions = (getProp(event, 'Atrações') || '').toLowerCase();
-                return name.includes(searchTerm) || location.includes(searchTerm) || attractions.includes(searchTerm) || producer.includes(searchTerm);
-            });
-        }
-
-        // 3. Filtra por gênero (sobre o resultado dos filtros anteriores)
-        if (selectedGenre) {
-            filteredEvents = filteredEvents.filter(event => {
-                const genresString = getProp(event, 'Gênero');
-                if (!genresString) return false;
-                // Converte a string de gêneros do evento para um array de minúsculas
-                const eventGenres = genresString.split(',').map(g => g.trim().toLowerCase());
-                // Verifica se o gênero selecionado está na lista de gêneros do evento
-                return eventGenres.includes(selectedGenre);
-            });
-        }
-
-        // 4. Filtra por favoritos (sobre o resultado dos filtros anteriores)
-        if (favoritesOnly) {
-            filteredEvents = filteredEvents.filter(event => {
-                const eventSlug = createEventSlug(getProp(event, 'Evento') || getProp(event, 'Nome'));
-                return favoritedEventSlugs.has(eventSlug);
-            });
-        }
 
         renderEvents(getSortedEvents(filteredEvents), grid);
         if (typeof updateMapMarkers === 'function') updateMapMarkers(filteredEvents);
