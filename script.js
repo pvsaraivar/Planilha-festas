@@ -463,7 +463,8 @@ const eventImageMap = {
     'fliperama': 'assets/fliperama.jpg',
     'houzeria showcase': 'assets/houzeriashow.jpg',
     'dabysha - tecido de mil sons': 'assets/dabysha2.jpg',
-    'darkeira junina': 'assets/darkeirajunina.jpg'
+    'darkeira junina': 'assets/darkeirajunina.jpg',
+    'batritinha pride': 'assets/batritinha.jpg'
 }
 
 /**
