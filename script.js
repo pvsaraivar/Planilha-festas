@@ -446,7 +446,7 @@ const eventImageMap = {
     'arena arrumação 2': 'assets/arenaarrum1.jpg',
     'tj na copa': 'assets/tjnacopa.jpg',
     'kolaje pride': 'assets/kolajepride.jpg',
-    'tubulosa ritmada - aniversário de 2 anos': 'assets/tubulosa2anos.mp4',
+    'tubulosa ritmada - aniversário de 2 anos': 'assets/tubulosa2anos.jpg',
     'joga & joga': 'assets/jogaejoga.jpg',
     'vai ter no hi five': 'assets/vaiterh5.jpg',
     'lambe lambe futebol clube 2': 'assets/lambelambe2.jpg',
@@ -854,6 +854,19 @@ function getSortedEvents(events) {
 
     // Ordena os eventos pela data, do mais antigo para o mais recente
     eventsToSort.sort((a, b) => {
+        const nameA = (getProp(a, 'Evento') || getProp(a, 'Nome') || '').toLowerCase();
+        const nameB = (getProp(b, 'Evento') || getProp(b, 'Nome') || '').toLowerCase();
+
+        const isTubulosaA = nameA.includes('tubulosa ritmada');
+        const isTubulosaB = nameB.includes('tubulosa ritmada');
+
+        if (isTubulosaA && !isTubulosaB) {
+            return -1; // a (Tubulosa) vem primeiro
+        }
+        if (!isTubulosaA && isTubulosaB) {
+            return 1; // b (Tubulosa) vem primeiro
+        }
+
         const dateA = parseDate(getProp(a, 'Data') || getProp(a, 'Date'));
         const dateB = parseDate(getProp(b, 'Data') || getProp(b, 'Date'));
 
@@ -1349,6 +1362,11 @@ function createEventCardElement(event) {
     const eventName = getProp(event, 'Evento') || getProp(event, 'Nome') || 'Evento sem nome';
 
     if (eventName.toLowerCase().includes('tubulosa club metal')) {
+        card.classList.add('event-card--featured');
+    }
+
+    // Destaque especial para Tubulosa Ritmada
+    if (eventName.toLowerCase().includes('tubulosa ritmada')) {
         card.classList.add('event-card--featured');
     }
 
