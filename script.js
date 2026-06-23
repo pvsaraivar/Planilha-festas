@@ -446,7 +446,7 @@ const eventImageMap = {
     'arena arrumação 2': 'assets/arenaarrum1.jpg',
     'tj na copa': 'assets/tjnacopa.jpg',
     'kolaje pride': 'assets/kolajepride.jpg',
-    'tubulosa ritmada - aniversário de 2 anos': 'assets/tubulosa2anos.jpg',
+    'tubulosa ritmada - aniversário de 2 anos': 'assets/tubulosa2anos.jpg, assets/tubulosa2anos2.jpg',
     'joga & joga': 'assets/jogaejoga.jpg',
     'vai ter no hi five': 'assets/vaiterh5.jpg',
     'lambe lambe futebol clube 2': 'assets/lambelambe2.jpg',
