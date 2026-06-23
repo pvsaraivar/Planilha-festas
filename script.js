@@ -464,7 +464,10 @@ const eventImageMap = {
     'houzeria showcase': 'assets/houzeriashow.jpg',
     'dabysha - tecido de mil sons': 'assets/dabysha2.jpg',
     'darkeira junina': 'assets/darkeirajunina.jpg',
-    'batritinha pride': 'assets/batritinha.jpg'
+    'batritinha pride': 'assets/batritinha.jpg',
+    'artranced': 'assets/artranced.jpg',
+    'suave sessions': 'assets/suavesessions.jpg',
+    'eletronika': 'assets/eletronika.jpg'
 }
 
 /**
