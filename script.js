@@ -16,7 +16,6 @@ document.addEventListener('DOMContentLoaded', () => {
         return `https://docs.google.com/spreadsheets/d/${sheetId}/export?format=csv&gid=${gid}&nocache=${cacheBuster}`;
     };
     
-    setupPromotionalBanner();
     setupThemeToggle();
 
     // Verifica se estamos na página de detalhes
@@ -26,16 +25,16 @@ document.addEventListener('DOMContentLoaded', () => {
         currentGid = urlParams.get('gid') || '0';
         
         if (currentGid === '1076861730') document.body.classList.add('copa-theme');
-
+        
+        setupImageObserver();
         setupVideoObserver();
         loadEventDetails(getSheetUrl(currentGid), currentGid);
         setupFloatingBackButton();
     } else {
         // Estamos na página inicial (index.html)
-        // setupMaintenanceMode();
-        
         applyFiltersFromURL();
         loadFavorites(); 
+        setupImageObserver();
         initEventMap();
         setupVideoObserver();
         
@@ -89,59 +88,10 @@ document.addEventListener('DOMContentLoaded', () => {
         setupModal();
         setupContactModal();
         setupBackToTopButton();
-        setupVideoRedirects();
-        initEventMap();
         setupViewToggle();
-        // setupSundayVideo();
     }
 });
 
-/**
- * Configura o banner promocional, se existir.
- */
-function setupPromotionalBanner() {
-    const banner = document.getElementById('promo-banner');
-    if (!banner) return;
-    
-    // Oculta o banner promocional, pois o evento em destaque já passou
-    banner.classList.add('hidden');
-    return;
-
-    const closeBtn = document.getElementById('promo-banner-close');
-    const ctaBtn = document.getElementById('promo-banner-cta');
-    const bannerId = 'promo-banner-tubulosa-submissa'; // Um ID único para este banner
-
-    // Verifica no sessionStorage se o banner já foi fechado nesta sessão
-    if (sessionStorage.getItem(bannerId) === 'closed') {
-        banner.classList.add('hidden');
-        // Desativa a transição para que ele desapareça instantaneamente no carregamento da página
-        banner.style.transition = 'none';
-        return;
-    }
-    
-    // Lógica para o botão de fechar
-    if (closeBtn) {
-        closeBtn.addEventListener('click', () => {
-            banner.classList.add('hidden');
-            // Salva o estado no sessionStorage para não mostrar novamente na mesma sessão
-            sessionStorage.setItem(bannerId, 'closed');
-        });
-    }
-
-    // Lógica para o botão CTA (Call to Action)
-    // O slug é conhecido, então podemos montá-lo diretamente
-    if (ctaBtn) {
-        const eventSlug = 'tubulosa-submissa'; // Slug do evento
-        ctaBtn.href = `detalhes.html?event=${eventSlug}&gid=0`;
-        
-        // Adiciona tracking do GA
-        ctaBtn.addEventListener('click', () => {
-            trackGAEvent('click_promo_banner', {
-                event_name: 'Tubulosa Submissa'
-            });
-        });
-    }
-}
 /**
  * Envia um evento para o Google Analytics.
  * @param {string} action - O nome da ação do evento (ex: 'click_button').
@@ -391,8 +341,8 @@ const eventImageMap = {
     'papoco x goelabaixo': 'assets/papocoxgoela.jpg',
     'bateu com fritas': 'assets/bcf10anos.png',
     'voyage les années 80': 'assets/voyageles.jpg',
-    'marola - esquenta festa onda': 'assets/marola.jpg',
-    'festival cearense de música eletrônica': 'assets/festivalstratus.jpg',
+    'marola - esquenta festa onda': 'assets/marola.jpg',    
+    'festival cearense de música eletrônica': 'assets/fcme.jpg, assets/fcme.mp4',
     'vitas house': 'assets/vitashouse.jpg',
     'fórum de música eletrônica': 'assets/festivalbelchior.jpg',
     'alma': 'assets/alma.jpg',
@@ -467,19 +417,21 @@ const eventImageMap = {
     'batritinha pride': 'assets/batritinha.jpg',
     'artranced': 'assets/artranced.jpg',
     'suave sessions': 'assets/suavesessions.jpg',
-    'eletronika': 'assets/eletronika.jpg'
+    'eletronika': 'assets/eletronika.jpg',
+    'calunia ato iv': 'assets/caluniaIV.jpg',
+    
 }
 
 /**
- * Verifica se o evento já terminou.
- * @param {Object} event - O objeto do evento.
+
+ * @param {Object} event - Ojeto do evento.
  * @returns {boolean} True se o evento já passou.
  */
 function isEventOver(event) {
     let dateStr = getProp(event, 'Data') || getProp(event, 'Date');
     if (!dateStr) return true;
 
-    // Remove horário se estiver junto da data
+    // Remove o horário se estiver junto da data
     dateStr = dateStr.split(' ')[0].trim();
     const parts = dateStr.split('/');
     if (parts.length !== 3) return true;
@@ -732,57 +684,59 @@ function parseCSV(text) {
  * @param {HTMLElement} gridElement - O elemento container onde os eventos serão inseridos.
  */
 function renderEvents(events, gridElement) {
-    const dateInput = document.getElementById('date-filter');
-    const selectedDate = dateInput ? dateInput.value : null;
-    
-    loadFavorites(); // Garante que os favoritos estejam atualizados.
-    gridElement.innerHTML = ''; // Limpa os skeletons ou a mensagem anterior.
+    // Usar requestAnimationFrame torna a transição mais suave, especialmente ao filtrar.
+    // O navegador limpa a grid e, no próximo frame, começa a adicionar os novos elementos.
+    requestAnimationFrame(() => {
+        const dateInput = document.getElementById('date-filter');
+        const selectedDate = dateInput ? dateInput.value : null;
+        
+        loadFavorites(); // Garante que os favoritos estejam atualizados.
+        gridElement.innerHTML = ''; // Limpa os skeletons ouO a mensagem anterior.
 
-    if (events.length === 0) {
-        if (selectedDate) {
-            gridElement.innerHTML = '<p class="empty-grid-message">Nenhuma festa agendada para esta data.</p>';
-        } else {
-            gridElement.innerHTML = '<p class="empty-grid-message">Nenhuma festa encontrada com os filtros aplicados.</p>';
+        if (events.length === 0) {
+            if (selectedDate) {
+                gridElement.innerHTML = '<p class="empty-grid-message">Nenhuma festa agendada para esta data.</p>';
+            } else {
+                gridElement.innerHTML = '<p class="empty-grid-message">Nenhuma festa encontrada com os filtros aplicados.</p>';
+            }
+            return;
         }
-        return;
-    }
 
-    // Determina o número de colunas com base na largura da tela
-    const width = window.innerWidth;
-    let numCols = 4;
+        // Determina o número de colunas com base na largura da tela
+        const width = window.innerWidth;
+        let numCols = 4;
 
-    if (gridElement.id === 'precarnaval-grid') {
-        if (width < 600) numCols = 1;
-        else if (width < 900) numCols = 2;
-        else numCols = 3;
-    } else {
-        if (width < 600) numCols = 2;
-        else if (width < 900) numCols = 3;
-        else if (width < 1300) numCols = 4;
-        else if (width < 1600) numCols = 5;
-        else if (width < 1900) numCols = 6;
-        else numCols = 7;
-    }
+        if (gridElement.id === 'precarnaval-grid') {
+            if (width < 600) numCols = 1;
+            else if (width < 900) numCols = 2;
+            else numCols = 3;
+        } else {
+            if (width < 600) numCols = 2;
+            else if (width < 900) numCols = 3;
+            else if (width < 1300) numCols = 4;
+            else if (width < 1600) numCols = 5;
+            else if (width < 1900) numCols = 6;
+            else numCols = 7;
+        }
 
-    // Cria as colunas
-    const columns = [];
-    for (let i = 0; i < numCols; i++) {
-        const col = document.createElement('div');
-        col.className = 'masonry-column';
-        columns.push(col);
-        gridElement.appendChild(col);
-    }
+        // Cria as colunas
+        const columns = [];
+        for (let i = 0; i < numCols; i++) {
+            const col = document.createElement('div');
+            col.className = 'masonry-column';
+            columns.push(col);
+            gridElement.appendChild(col);
+        }
 
-    // Distribui os cards nas colunas (Round-Robin: 1 na col 1, 2 na col 2, etc.)
-    events.forEach((event, index) => {
-        const card = createEventCardElement(event);
-        columns[index % numCols].appendChild(card);
+        // Distribui os cards nas colunas (Round-Robin: 1 na col 1, 2 na col 2, etc.)
+        events.forEach((event, index) => {
+            const card = createEventCardElement(event);
+            columns[index % numCols].appendChild(card);
+        });
+
+        // Reativa os observadores para as novas mídias adicionadas ao DOM
+        observeDynamicMedia(gridElement);
     });
-
-    // Observa os vídeos recém-criados para carregar e tocar apenas quando rolados para a tela
-    if (window.videoObserver) {
-        gridElement.querySelectorAll('video').forEach(video => window.videoObserver.observe(video));
-    }
 }
 
 /**
@@ -1127,163 +1081,6 @@ function setupFilters() {
 }
 
 /**
- * Configura o vídeo especial de domingo.
- * Verifica se é domingo (dia 0). Se for, mostra o vídeo e configura o redirecionamento.
- */
-async function setupSundayVideo() {
-    const wrapper = document.getElementById('sunday-video-wrapper');
-    const video = document.getElementById('sunday-video');
-    
-    if (!wrapper || !video) return;
-
-    const today = new Date().getDay();
-    
-    // 0 representa Domingo no JavaScript
-    // Verificação ajustada para teste imediato (true)
-    if (today === 0 || window.location.search.includes('teste')) {
-        document.body.classList.add('sunday-mode');
-        wrapper.style.display = 'block';
-        
-        // Esconde os demais elementos da página para foco total no vídeo
-        const elementsToHide = [
-            '.site-header',
-            '.main-nav', 
-            '.filters-wrapper', 
-            '#event-grid',
-            '.site-footer',
-            '#back-to-top-btn',
-            '#floating-clear-filters-btn'
-        ];
-
-        elementsToHide.forEach(selector => {
-            const el = document.querySelector(selector);
-            if (el) el.style.setProperty('display', 'none', 'important');
-        });
-
-        // Estilização para centralizar o vídeo como uma "Splash Screen"
-        wrapper.style.position = 'fixed';
-        wrapper.style.top = '0';
-        wrapper.style.left = '0';
-        wrapper.style.width = '100%';
-        wrapper.style.height = '100%';
-        wrapper.style.maxWidth = 'none';
-        wrapper.style.padding = '0';
-        wrapper.style.margin = '0';
-        wrapper.style.display = 'flex';
-        wrapper.style.alignItems = 'center';
-        wrapper.style.justifyContent = 'center';
-        wrapper.style.zIndex = '9999';
-        wrapper.style.backgroundColor = '#000';
-
-        // Mensagem de aviso
-        const message = document.createElement('div');
-        message.className = 'rotate-message';
-        // Estado inicial: Carregando
-        message.innerHTML = `
-            <div class="video-loader"></div>
-            <span id="loading-progress-text">Carregando experiência... 0%</span>
-        `;
-        wrapper.appendChild(message);
-
-        // Ajustes para o vídeo cobrir a tela inteira e remover autoplay
-        video.style.width = '100%';
-        video.style.height = '100%';
-        video.style.maxWidth = 'none';
-        video.style.borderRadius = '0';
-        video.style.boxShadow = 'none';
-        video.style.objectFit = 'contain';
-        
-        // Lógica de Carregamento do Blob (Cache Local)
-        const videoUrl = 'assets/clubmetal.mp4';
-        try {
-            let blob = await getBlob(videoUrl);
-            if (!blob) {
-                // Download com progresso usando XMLHttpRequest para feedback visual
-                blob = await new Promise((resolve, reject) => {
-                    const xhr = new XMLHttpRequest();
-                    xhr.open('GET', videoUrl, true);
-                    xhr.responseType = 'blob';
-
-                    xhr.onprogress = (event) => {
-                        if (event.lengthComputable) {
-                            const percent = Math.floor((event.loaded / event.total) * 100);
-                            const progressText = document.getElementById('loading-progress-text');
-                            if (progressText) progressText.textContent = `Carregando experiência... ${percent}%`;
-                        }
-                    };
-
-                    xhr.onload = () => {
-                        if (xhr.status === 200) resolve(xhr.response);
-                        else reject(new Error(`Erro no download: ${xhr.status}`));
-                    };
-
-                    xhr.onerror = () => reject(new Error('Erro de rede'));
-                    xhr.send();
-                });
-
-                // Salva em background para próximos acessos
-                saveBlob(videoUrl, blob).catch(console.warn);
-            } else {
-                const progressText = document.getElementById('loading-progress-text');
-                if (progressText) progressText.textContent = `Carregando experiência... 100%`;
-            }
-            video.src = URL.createObjectURL(blob);
-        } catch (e) {
-            console.error('Erro ao carregar vídeo via blob, usando fallback:', e);
-            video.src = videoUrl;
-        }
-
-        // Atualiza para a mensagem de "Vire a tela" após o carregamento
-        message.innerHTML = `
-            <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="rotate-icon">
-                <rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect>
-                <path d="M12 18h.01"></path>
-            </svg>
-            <span>Vire a tela</span>
-        `;
-
-        video.muted = false; 
-        video.style.opacity = '0';
-
-        let hasStarted = false;
-
-        const startVideo = () => {
-            if (hasStarted) return;
-            hasStarted = true;
-            message.style.display = 'none';
-            video.style.opacity = '1';
-            video.muted = false;
-            video.volume = 1.0;
-            video.play().catch(e => console.warn("Autoplay com som bloqueado:", e));
-        };
-
-        // Timer de segurança (5 segundos) caso o usuário não vire a tela
-        const timer = setTimeout(startVideo, 5000);
-
-        // Detecta a rotação da tela para iniciar o vídeo imediatamente
-        const handleOrientationChange = () => {
-            if (window.innerWidth > window.innerHeight) {
-                clearTimeout(timer);
-                startVideo();
-                window.removeEventListener('resize', handleOrientationChange);
-            }
-        };
-
-        window.addEventListener('resize', handleOrientationChange);
-
-        // Se já estiver em landscape, inicia mais rápido
-        if (window.innerWidth > window.innerHeight) {
-            clearTimeout(timer);
-            setTimeout(startVideo, 1500); // Pequeno delay para leitura
-        }
-
-        video.addEventListener('ended', () => {
-            window.location.href = 'https://stratussounds.com/tubulosa-club-metal';
-        });
-    }
-}
-
-/**
  * Configura o botão para alternar entre tema claro e escuro.
  */
 function setupThemeToggle() {
@@ -1367,6 +1164,11 @@ function createEventCardElement(event) {
 
     // Destaque especial para Tubulosa Ritmada
     if (eventName.toLowerCase().includes('tubulosa ritmada')) {
+        card.classList.add('event-card--featured');
+    }
+
+    // Destaque para o Festival Cearense de Música Eletrônica
+    if (eventName.toLowerCase().includes('festival cearense de música eletrônica')) {
         card.classList.add('event-card--featured');
     }
 
@@ -1479,7 +1281,10 @@ function createEventCardElement(event) {
             <div class="video-play-button">${playIconSvg}</div>
         `;
     } else {
-        mediaHtml = `<img src="${imageUrl || placeholderSvg}" alt="${name}" class="event-card__image" loading="lazy" decoding="async" onerror="this.src='${errorSvg}';">`;
+        // Usando data-src para lazy loading customizado com IntersectionObserver.
+        // O src inicial é um placeholder de baixíssima qualidade para evitar layout shift.
+        const lqip = "data:image/gif;base64,R0lGODlhAQABAIAAAMLCwgAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw=="; // Cinza claro
+        mediaHtml = `<img src="${lqip}" data-src="${imageUrl || placeholderSvg}" alt="${name}" class="event-card__image lazy-image" loading="lazy" decoding="async" onerror="this.onerror=null;this.src='${errorSvg}';">`;
     }
 
     card.innerHTML = `
@@ -1780,12 +1585,6 @@ function toggleFavorite(event, clickedButtonElement) {
     if (document.getElementById('favorites-filter-btn').classList.contains('is-active')) applyFilters();
 }
 
-/**
- * Renderiza os eventos favoritados na seção "Meus Favoritos".
- */
-function renderFavorites() {
-    const favoritesSection = document.getElementById('favorites-section');
-}
 /**
  * Configura os listeners para abrir e fechar o modal.
  */
@@ -2260,89 +2059,6 @@ async function getBlob(key) {
 }
 
 /**
- * Configura a tela de manutenção.
- */
-function setupMaintenanceMode() {
-    const wrapper = document.createElement('div');
-    wrapper.style.position = 'fixed';
-    wrapper.style.top = '0';
-    wrapper.style.left = '0';
-    wrapper.style.width = '100%';
-    wrapper.style.height = '100%';
-    wrapper.style.backgroundColor = '#000';
-    wrapper.style.zIndex = '99999';
-    wrapper.style.display = 'flex';
-    wrapper.style.flexDirection = 'column';
-    wrapper.style.alignItems = 'center';
-    wrapper.style.justifyContent = 'center';
-    wrapper.style.color = '#fff';
-    wrapper.style.textAlign = 'center';
-    wrapper.style.padding = '2rem';
-
-    wrapper.innerHTML = `
-        <h1 style="font-size: 2rem; margin-bottom: 1rem; font-weight: 700;">Site em manutenção</h1>
-        <p style="font-size: 1.2rem; color: #ccc; margin-bottom: 1.5rem;">Retornaremos na segunda-feira às 12h.</p>
-        <div id="maintenance-countdown" style="font-size: 1.5rem; font-family: monospace; font-weight: 700; color: #FDF5E6;"></div>
-    `;
-
-    document.body.appendChild(wrapper);
-    document.body.style.overflow = 'hidden';
-
-    // Lógica da contagem regressiva
-    const now = new Date();
-    const day = now.getDay(); // 0 = Domingo, 1 = Segunda...
-    let daysUntilMonday = (1 + 7 - day) % 7;
-    
-    // Se for segunda e já passou das 12h, conta para a próxima semana
-    if (day === 1 && now.getHours() >= 12) {
-        daysUntilMonday = 7;
-    }
-
-    const targetDate = new Date(now);
-    targetDate.setDate(now.getDate() + daysUntilMonday);
-    targetDate.setHours(12, 0, 0, 0);
-
-    const countdownEl = document.getElementById('maintenance-countdown');
-
-    function updateCountdown() {
-        const currentTime = new Date();
-        const diff = targetDate - currentTime;
-
-        if (diff <= 0) {
-            countdownEl.textContent = "Em instantes...";
-            return;
-        }
-
-        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-        const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-        const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-
-        const h = hours.toString().padStart(2, '0');
-        const m = minutes.toString().padStart(2, '0');
-        const s = seconds.toString().padStart(2, '0');
-
-        let text = '';
-        if (days > 0) text += `${days}d `;
-        text += `${h}h ${m}m ${s}s`;
-
-        countdownEl.textContent = text;
-    }
-
-    updateCountdown();
-    setInterval(updateCountdown, 1000);
-}
-
-async function saveBlob(key, blob) {
-    const db = await openDB();
-    return new Promise((resolve, reject) => {
-        const request = db.transaction(STORE_NAME, 'readwrite').objectStore(STORE_NAME).put(blob, key);
-        request.onsuccess = () => resolve();
-        request.onerror = () => reject(request.error);
-    });
-}
-
-/**
  * Configura o botão flutuante de voltar na página de detalhes.
  */
 function setupFloatingBackButton() {
@@ -2367,6 +2083,39 @@ function setupFloatingBackButton() {
 }
 
 /**
+ * Configura o IntersectionObserver para imagens (lazy loading).
+ * Isso garante que as imagens só sejam carregadas quando estiverem visíveis na tela.
+ */
+function setupImageObserver() {
+    if (!('IntersectionObserver' in window)) return;
+
+    window.imageObserver = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const lazyImage = entry.target;
+                    const highQualitySrc = lazyImage.dataset.src;
+
+                    // Cria uma imagem temporária em memória para carregar a imagem de alta qualidade
+                    const tempImage = new Image();
+                    tempImage.src = highQualitySrc;
+
+                    tempImage.onload = () => {
+                        // Quando a imagem de alta qualidade estiver pronta, a aplica no elemento real
+                        lazyImage.src = highQualitySrc;
+                        lazyImage.classList.add('loaded'); // Adiciona classe para a transição de fade-in
+                    };
+
+                    // Para de observar esta imagem para não recarregar
+                    observer.unobserve(lazyImage);
+                }
+            });
+        }, {
+            rootMargin: '400px 0px', // Começa a carregar imagens que estão a 400px de distância da viewport
+            threshold: 0.01
+        });
+    document.querySelectorAll('img.lazy-image').forEach(image => window.imageObserver.observe(image));
+}
+/**
  * Configura o IntersectionObserver para vídeos.
  * Isso garante que os vídeos só toquem quando estiverem visíveis na tela,
  * economizando MUITA performance e dados.
@@ -2376,25 +2125,7 @@ function setupVideoObserver() {
         window.videoObserver = new IntersectionObserver((entries, observer) => {
             entries.forEach(entry => {
                 const media = entry.target;
-                const wrapper = media.closest('.event-card__image-wrapper');
-                const playBtn = wrapper ? wrapper.querySelector('.video-play-button') : null;
-
                 if (entry.isIntersecting) {
-                    // Carrega Imagens dinamicamente (pré-carregamento em memória)
-                        if (media.tagName === 'IMG' && media.dataset.src) {
-                        const realSrc = media.dataset.src;
-                        media.removeAttribute('data-src');
-                        
-                        const tempImg = new Image();
-                        tempImg.onload = () => {
-                            media.src = realSrc;
-                        };
-                        tempImg.src = realSrc;
-                        
-                        observer.unobserve(media); 
-                    }
-                    
-                    // Carrega e toca Vídeos
                     if (media.tagName === 'VIDEO') {
                         if (media.dataset.src) {
                             media.src = media.dataset.src;
@@ -2404,6 +2135,8 @@ function setupVideoObserver() {
                         const playPromise = media.play();
                         if (playPromise !== undefined) {
                             playPromise.then(() => {
+                                const wrapper = media.closest('.event-card__image-wrapper');
+                                const playBtn = wrapper ? wrapper.querySelector('.video-play-button') : null;
                                 if (playBtn) {
                                     playBtn.style.opacity = '0';
                                     playBtn.style.pointerEvents = 'none';
@@ -2411,21 +2144,34 @@ function setupVideoObserver() {
                             }).catch(() => {});
                         }
                     }
-                } else {
-                        if (media.tagName === 'VIDEO' && !media.paused) {
+                } else { // Pausa o vídeo quando ele sai da tela
+                    if (media.tagName === 'VIDEO' && !media.paused) {
+                        const wrapper = media.closest('.event-card__image-wrapper');
+                        const playBtn = wrapper ? wrapper.querySelector('.video-play-button') : null;
                         media.pause();
                         if (playBtn) {
                             playBtn.style.opacity = '1';
                             playBtn.style.pointerEvents = 'auto';
                         }
-                    }
                 }
-            });
-    }, { 
-        rootMargin: '400px 0px', // Reduzido de 800px para 400px para evitar carregamento massivo simultâneo
-        threshold: 0.01
-    }); 
+            }
+        });
+    }, {
+        rootMargin: '200px 0px', // Um buffer menor para carregar vídeos um pouco antes de entrarem na tela
+        threshold: 0.01 // Inicia a ação assim que 1% do elemento estiver visível
+    });
     }
+}
+
+/**
+ * Aplica os observadores de mídia a um container específico.
+ * @param {HTMLElement} container - O elemento que contém as imagens e vídeos a serem observados.
+ */
+function observeDynamicMedia(container) {
+    if (!container) return;
+
+    if (window.imageObserver) container.querySelectorAll('img.lazy-image').forEach(img => window.imageObserver.observe(img));
+    if (window.videoObserver) container.querySelectorAll('video.lazy-video').forEach(video => window.videoObserver.observe(video));
 }
 
 /**
@@ -2680,33 +2426,13 @@ function renderEventDetailPage(event, container, allEvents = []) {
                 relatedGrid.appendChild(card);
             });
             
-            // Observa os vídeos recém-criados nos eventos relacionados para carregar preguiçosamente
-            if (window.videoObserver) {
-                relatedGrid.querySelectorAll('video').forEach(video => window.videoObserver.observe(video));
-            }
+            observeDynamicMedia(relatedGrid);
         } else {
             document.getElementById('related-events-section').style.display = 'none';
         }
     } else {
         document.getElementById('related-events-section').style.display = 'none';
     }
-}
-
-/**
- * Configura redirecionamento automático ao fim de vídeos específicos.
- * Procura por vídeos com o atributo 'data-redirect-url'.
- */
-function setupVideoRedirects() {
-    const videos = document.querySelectorAll('video[data-redirect-url]');
-    
-    videos.forEach(video => {
-        video.addEventListener('ended', () => {
-            const url = video.getAttribute('data-redirect-url');
-            if (url) {
-                window.location.href = url;
-            }
-        });
-    });
 }
 
 /**

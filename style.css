@@ -633,6 +633,17 @@ a {
     transform: scale(1.05);
 }
 
+/* Estilos para Lazy Loading de Imagens */
+.lazy-image {
+    opacity: 0; /* Começa invisível */
+    transition: opacity 0.4s ease-in-out; /* Transição suave */
+}
+
+.lazy-image.loaded {
+    opacity: 1; /* Fica visível após o carregamento */
+}
+
+
 /* Estilo para forçar a imagem a ser contida, em vez de cortada, para flyers específicos */
 .event-card--contain-image .event-card__image {
     object-fit: contain;
