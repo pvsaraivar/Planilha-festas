@@ -378,7 +378,7 @@ const eventImageMap = {
     'tedeletechno': 'assets/tedeletechno.jpg',
     'ryan e luna no luzes': 'assets/ryanluna.jpg',
     'eletronika & friends': 'assets/eletronika3.jpg',
-    'eterica tech': 'assets/eterica.mp4',
+    'eterica tech': 'assets/eterica.jpg',
     'arraia psicodelico': 'assets/arraiapsicodelico.jpg',
     'baile do amor': 'assets/bailedoamor.jpg',
     'risca faca': 'assets/riscafaca.jpg',
@@ -2124,7 +2124,10 @@ function setupImageObserver() {
  * economizando MUITA performance e dados.
  */
 function setupVideoObserver() {
-    if ('IntersectionObserver' in window) {
+    // Garante que o observador seja criado apenas uma vez.
+    if (!('IntersectionObserver' in window) || window.videoObserver) return;
+
+    try {
         window.videoObserver = new IntersectionObserver((entries, observer) => {
             entries.forEach(entry => {
                 const media = entry.target;
@@ -2159,10 +2162,12 @@ function setupVideoObserver() {
                 }
             }
         });
-    }, {
-        rootMargin: '200px 0px', // Um buffer menor para carregar vídeos um pouco antes de entrarem na tela
-        threshold: 0.01 // Inicia a ação assim que 1% do elemento estiver visível
-    });
+        }, {
+            rootMargin: '200px 0px', // Um buffer menor para carregar vídeos um pouco antes de entrarem na tela
+            threshold: 0.01 // Inicia a ação assim que 1% do elemento estiver visível
+        });
+    } catch (e) {
+        console.error("Falha ao criar o IntersectionObserver para vídeos:", e);
     }
 }
 
