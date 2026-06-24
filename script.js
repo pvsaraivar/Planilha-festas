@@ -421,7 +421,7 @@ const eventImageMap = {
     'calúnia ato iv': 'assets/caluniaIV.jpg',
     'meveillon': 'assets/meveilon.jpg',
     'alter ego': 'assets/alterego.jpg',
-    'festa lá em cima': 'flec2.PNG'
+    'festa lá em cima': 'assets/flec2.PNG'
     
 }
 
