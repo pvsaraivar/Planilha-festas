@@ -419,7 +419,9 @@ const eventImageMap = {
     'suave sessions': 'assets/suavesessions.jpg',
     'eletronika': 'assets/eletronika.jpg',
     'calúnia ato iv': 'assets/caluniaIV.jpg',
-    'meveillon': 'meveilon.jpg', 
+    'meveillon': 'assets/meveilon.jpg',
+    'alter ego': 'assets/alterego.jpg',
+    'festa lá em cima': 'flec2.PNG'
     
 }
 
