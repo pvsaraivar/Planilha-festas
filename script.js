@@ -342,7 +342,7 @@ const eventImageMap = {
     'bateu com fritas': 'assets/bcf10anos.png',
     'voyage les années 80': 'assets/voyageles.jpg',
     'marola - esquenta festa onda': 'assets/marola.jpg',    
-    'festival cearense de música eletrônica': 'assets/fcme.jpg, assets/fcme.mp4',
+    'festival cearense de música eletrônica': 'assets/fcme.mp4',
     'vitas house': 'assets/vitashouse.jpg',
     'fórum de música eletrônica': 'assets/festivalbelchior.jpg',
     'alma': 'assets/alma.jpg',
@@ -418,7 +418,8 @@ const eventImageMap = {
     'artranced': 'assets/artranced.jpg',
     'suave sessions': 'assets/suavesessions.jpg',
     'eletronika': 'assets/eletronika.jpg',
-    'calunia ato iv': 'assets/caluniaIV.jpg',
+    'calúnia ato iv': 'assets/caluniaIV.jpg',
+    'meveillon': 'meveilon.jpg', 
     
 }
 
@@ -811,14 +812,14 @@ function getSortedEvents(events) {
         const nameA = (getProp(a, 'Evento') || getProp(a, 'Nome') || '').toLowerCase();
         const nameB = (getProp(b, 'Evento') || getProp(b, 'Nome') || '').toLowerCase();
 
-        const isTubulosaA = nameA.includes('tubulosa ritmada');
-        const isTubulosaB = nameB.includes('tubulosa ritmada');
+        const isFeaturedA = nameA.includes('tubulosa ritmada') || nameA.includes('festival cearense de música eletrônica');
+        const isFeaturedB = nameB.includes('tubulosa ritmada') || nameB.includes('festival cearense de música eletrônica');
 
-        if (isTubulosaA && !isTubulosaB) {
-            return -1; // a (Tubulosa) vem primeiro
+        if (isFeaturedA && !isFeaturedB) {
+            return -1; // a (evento em destaque) vem primeiro
         }
-        if (!isTubulosaA && isTubulosaB) {
-            return 1; // b (Tubulosa) vem primeiro
+        if (!isFeaturedA && isFeaturedB) {
+            return 1; // b (evento em destaque) vem primeiro
         }
 
         const dateA = parseDate(getProp(a, 'Data') || getProp(a, 'Date'));
