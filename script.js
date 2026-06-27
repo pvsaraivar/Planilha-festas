@@ -14,6 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const getSheetUrl = (gid) => {
         const cacheBuster = new Date().getTime();
         return `https://docs.google.com/spreadsheets/d/${sheetId}/export?format=csv&gid=${gid}&nocache=${cacheBuster}`;
+        return `https://docs.google.com/spreadsheets/d/${sheetId}/export?format=csv&gid=${gid}`;
     };
     
     setupThemeToggle();
