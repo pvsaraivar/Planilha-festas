@@ -1,4 +1,4 @@
-const CACHE_NAME = 'logistica-clubber-v18'; // Reintroduz o ícone de forma correta.
+const CACHE_NAME = 'logistica-clubber-v20'; // Implements robust fetch handling and ignores analytics.
 
 // Arquivos locais (App Shell) que podem ser cacheados de forma segura.
 const localUrlsToCache = [
@@ -7,7 +7,6 @@ const localUrlsToCache = [
   './detalhes.html',
   './style.css',
   './script.js',
-  './assets/logisticaclubber.png',
   './assets/mapa.jpg'
 ];
 
@@ -67,69 +66,78 @@ self.addEventListener('activate', event => {
     })
   );
 });
+
+// --- FETCH EVENT STRATEGIES ---
+
+/**
+ * Network First Strategy (for Google Sheets API)
+ * Tries network, falls back to cache, then to an error if both fail.
+ */
+function networkFirst(event) {
+  return caches.open(CACHE_NAME).then(cache => {
+    return fetch(event.request)
+      .then(networkResponse => {
+        if (networkResponse.ok) {
+          cache.put(event.request, networkResponse.clone());
+        }
+        return networkResponse;
+      })
+      .catch(async () => {
+        console.log('Network failed. Serving from cache for:', event.request.url);
+        const cachedResponse = await cache.match(event.request);
+        // If found in cache, return it. Otherwise, return a proper error response.
+        return cachedResponse || new Response(JSON.stringify({ error: "Network and cache failed" }), {
+          status: 503,
+          headers: { 'Content-Type': 'application/json' }
+        });
+      });
+  });
+}
+
+/**
+ * Cache First Strategy (for App Shell assets)
+ * Tries cache, falls back to network, then to a fallback page for navigation.
+ */
+function cacheFirst(event) {
+  return caches.match(event.request)
+    .then(response => {
+      if (response) {
+        return response;
+      }
+      return fetch(event.request).then(networkResponse => {
+        if (!networkResponse || networkResponse.status !== 200 || networkResponse.type === 'chrome-extension') {
+          return networkResponse;
+        }
+        const responseToCache = networkResponse.clone();
+        caches.open(CACHE_NAME).then(cache => cache.put(event.request, responseToCache));
+        return networkResponse;
+      });
+    })
+    .catch(error => {
+      console.error('SW: Fetch failed (network and cache). Request:', event.request.url, error);
+      if (event.request.mode === 'navigate') {
+        return caches.match('./index.html');
+      }
+      // For other assets like images, returning an error response is safer than undefined.
+      return new Response('', { status: 503, statusText: 'Service Unavailable' });
+    });
+}
+
 // Evento de Fetch: Intercepta as requisições de rede.
 self.addEventListener('fetch', event => {
   const requestUrl = new URL(event.request.url);
 
-  // Estratégia "Network First" para a planilha do Google:
-  // Tenta buscar na rede primeiro para ter dados sempre atualizados. Se falhar, usa o cache.
+  // 1. Ignore Google Analytics and other non-essential requests.
+  if (requestUrl.hostname.includes('google-analytics.com') || requestUrl.hostname.includes('googletagmanager.com')) {
+    return; // Let the browser handle it without interception.
+  }
+
+  // 2. Network First for Google Sheets data.
   if (requestUrl.href.includes('docs.google.com/spreadsheets')) {
-    event.respondWith(
-      caches.open(CACHE_NAME).then(cache => {
-        return fetch(event.request)
-          .then(networkResponse => {
-            // Se a resposta da rede for bem-sucedida, clona e guarda no cache para uso offline futuro.
-            if (networkResponse.ok) {
-              cache.put(event.request, networkResponse.clone());
-            }
-            return networkResponse;
-          })
-          .catch(() => {
-            // Se a rede falhar (offline), tenta pegar a última versão salva do cache.
-            console.log('Falha na rede. Servindo dados da planilha do cache.');
-            // Retorna undefined se não encontrar no cache, para que o erro de rede seja propagado.
-            return cache.match(event.request);
-          });
-      })
-    );
+    event.respondWith(networkFirst(event));
     return;
   }
 
-  // Verifica se a requisição é para um dos nossos recursos de terceiros cacheados
-  const isThirdPartyAsset = thirdPartyUrlsToCache.some(url => requestUrl.href.startsWith(new URL(url, self.location).origin));
-  const cacheMatchOptions = isThirdPartyAsset
-    ? { ignoreSearch: true } // Ignora query params para assets de CDN (ex: ?v=1.2.3)
-    : undefined;
-
-  // Estratégia "Cache First" para todos os outros arquivos:
-  // Responde imediatamente com o cache se o arquivo existir. Se não, busca na rede.
-  event.respondWith(
-    caches.match(event.request)
-      .then(response => {
-        // Se encontrarmos uma correspondência no cache, retornamos ela.
-        if (response) {
-          return response;
-        }
-        // Caso contrário, buscamos na rede e tentamos cachear para uso futuro.
-        return fetch(event.request).then(networkResponse => {
-            // Não cacheia respostas de erro ou de extensões do chrome
-            if (!networkResponse || networkResponse.status !== 200 || networkResponse.type === 'chrome-extension') {
-              return networkResponse;
-            }
-            const responseToCache = networkResponse.clone();
-            caches.open(CACHE_NAME).then(cache => cache.put(event.request, responseToCache));
-            return networkResponse;
-          }
-        ).catch(error => {
-            // Se a busca na rede falhar (e não estava no cache), retorna um fallback.
-            console.error('SW: Falha no fetch (rede e cache). Request:', event.request.url, error);
-            // Para requisições de navegação (ex: abrir uma página), retorna a página principal.
-            if (event.request.mode === 'navigate') {
-              return caches.match('./index.html');
-            }
-            // Para outros tipos de requisição (imagens, css), a falha é simplesmente propagada.
-            // O navegador mostrará um ícone de imagem quebrada, por exemplo.
-          });
-      })
-  );
+  // 3. Cache First for all other requests (App Shell, assets, etc.).
+  event.respondWith(cacheFirst(event));
 });
