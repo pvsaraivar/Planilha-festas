@@ -9,7 +9,7 @@ const localUrlsToCache = [
   './script.js',
   './assets/mapa.jpg',
   './assets/copa.jpg', // Adiciona o fundo do tema da Copa para funcionamento offline
-  './assets/logisticaclubber.PNG' // Adiciona o ícone com o nome de arquivo correto
+  './assets/logisticaclubber.jpg' // Adiciona o ícone com o nome de arquivo correto
 ];
 
 // Arquivos de terceiros que precisam de tratamento especial de CORS.
