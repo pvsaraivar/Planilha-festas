@@ -1,4 +1,4 @@
-const CACHE_NAME = 'logistica-clubber-v22'; // Improves cache matching for third-party assets.
+const CACHE_NAME = 'logistica-clubber-v23'; // Adds background image to cache.
 
 // Arquivos locais (App Shell) que podem ser cacheados de forma segura.
 const localUrlsToCache = [
@@ -8,7 +8,7 @@ const localUrlsToCache = [
   './style.css',
   './script.js',
   './assets/logisticaclubber.png',
-  './assets/mapa.jpg'
+  './assets/mapa.jpg' // Adicionado para garantir que o fundo funcione offline
 ];
 
 // Arquivos de terceiros que precisam de tratamento especial de CORS.
