@@ -1,4 +1,4 @@
-const CACHE_NAME = 'logistica-clubber-v21'; // Re-integrates the app icon correctly.
+const CACHE_NAME = 'logistica-clubber-v22'; // Improves cache matching for third-party assets.
 
 // Arquivos locais (App Shell) que podem ser cacheados de forma segura.
 const localUrlsToCache = [
@@ -100,8 +100,14 @@ function networkFirst(event) {
  * Tries cache, falls back to network, then to a fallback page for navigation.
  */
 function cacheFirst(event) {
-  return caches.match(event.request)
+  // Para recursos de terceiros, a busca no cache precisa ser mais flexível
+  // para encontrar a resposta "opaca" salva durante a instalação.
+  const isThirdParty = thirdPartyUrlsToCache.some(url => event.request.url.startsWith(new URL(url, self.location).origin));
+  const matchOptions = isThirdParty ? { ignoreVary: true, ignoreSearch: true } : undefined;
+
+  return caches.match(event.request, matchOptions)
     .then(response => {
+      // Se encontrarmos no cache, retornamos a resposta.
       if (response) {
         return response;
       }
