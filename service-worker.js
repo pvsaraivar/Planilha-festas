@@ -1,4 +1,4 @@
-const CACHE_NAME = 'logistica-clubber-v13'; // Torna a busca no cache mais robusta para recursos de terceiros.
+const CACHE_NAME = 'logistica-clubber-v14'; // Implementa instalação de cache resiliente.
 
 // Arquivos locais (App Shell) que podem ser cacheados de forma segura.
 const localUrlsToCache = [
@@ -27,11 +27,13 @@ self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then((cache) => {
-        console.log('Service Worker: Iniciando instalação e cache de arquivos.');
-        // 1. Cacheia os arquivos locais essenciais. Se isso falhar, a instalação inteira falha.
-        const localCachePromise = cache.addAll(localUrlsToCache).catch(error => {
-          console.error('SW: Falha crítica ao cachear App Shell. A instalação será abortada.', error);
-          throw error; // Propaga o erro para falhar o event.waitUntil
+        console.log('Service Worker: Iniciando instalação resiliente de cache.');
+
+        // 1. Cacheia arquivos locais um por um para evitar falha total.
+        const localCachePromises = localUrlsToCache.map(url => {
+          return cache.add(url).catch(error => {
+            console.warn(`SW: Falha ao cachear recurso local (não-crítico): ${url}`, error);
+          });
         });
 
         // 2. Cacheia os arquivos de terceiros de forma resiliente.
@@ -43,7 +45,7 @@ self.addEventListener('install', event => {
         });
 
         // Promise.all garante que a instalação só termine após todas as tentativas de cache.
-        return Promise.all([localCachePromise, ...thirdPartyCachePromises]);
+        return Promise.all([...localCachePromises, ...thirdPartyCachePromises]);
       })
   );
 });
