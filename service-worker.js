@@ -1,13 +1,18 @@
-const CACHE_NAME = 'logistica-clubber-v6'; // Força a atualização para a versão mais recente e robusta.
-// Lista de arquivos essenciais para o funcionamento offline do aplicativo (App Shell).
-const urlsToCache = [
+const CACHE_NAME = 'logistica-clubber-v9'; // Força a atualização para a versão mais recente e robusta.
+
+// Arquivos locais (App Shell) que podem ser cacheados de forma segura.
+const localUrlsToCache = [
   './',
   './index.html',
   './detalhes.html',
   './style.css',
   './script.js',
   './assets/logisticaclubber.png',
-  './assets/mapa.jpg',
+  './assets/mapa.jpg'
+];
+
+// Arquivos de terceiros que precisam de tratamento especial de CORS.
+const thirdPartyUrlsToCache = [
   'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css',
   'https://api.fontshare.com/v2/css?f[]=satoshi@300,400,500,700&display=swap'
 ];
@@ -17,17 +22,19 @@ self.addEventListener('install', event => {
   self.skipWaiting(); // Força o novo Service Worker a se tornar ativo imediatamente.
   event.waitUntil(
     caches.open(CACHE_NAME)
-      .then(async (cache) => {
-        console.log('Service Worker: Instalando e adicionando arquivos ao cache.');
-        // Abordagem mais segura: adiciona um por um, ignorando falhas em recursos não essenciais.
-        for (const url of urlsToCache) {
-          try {
-            await cache.add(url);
-          } catch (error) {
-            // Se um arquivo externo (fonte, etc.) falhar, apenas loga o erro mas não impede a instalação.
-            console.warn(`SW: Falha ao cachear ${url}, mas a instalação continua.`, error);
-          }
+      .then((cache) => {
+        console.log('Service Worker: Adicionando arquivos locais ao cache.');
+        // Cacheia os arquivos locais primeiro.
+        const localCachePromise = cache.addAll(localUrlsToCache);
+
+        // Em paralelo, cacheia os arquivos de terceiros com modo 'no-cors'.
+        const thirdPartyCachePromises = thirdPartyUrlsToCache.map(url => {
+          const request = new Request(url, { mode: 'no-cors' });
+          return fetch(request).then(response => cache.put(request, response));
         });
+
+        // Espera todas as operações de cache terminarem.
+        return Promise.all([localCachePromise, ...thirdPartyCachePromises]);
       })
   );
 });
@@ -96,16 +103,16 @@ self.addEventListener('fetch', event => {
             caches.open(CACHE_NAME).then(cache => cache.put(event.request, responseToCache));
             return networkResponse;
           }
-        );
-      })
-      .catch(error => {
-        // Fallback de último recurso para requisições de navegação.
-        // Se tudo falhar, tenta servir o index.html para que o app não fique em branco.
-        console.error('SW Fetch Error:', error);
-        if (event.request.mode === 'navigate') {
-          console.log('Servindo index.html como fallback de navegação.');
-          return caches.match('./index.html');
-        }
+        ).catch(error => {
+            // Se a busca na rede falhar (e não estava no cache), retorna um fallback.
+            console.error('SW: Falha no fetch (rede e cache). Request:', event.request.url, error);
+            // Para requisições de navegação (ex: abrir uma página), retorna a página principal.
+            if (event.request.mode === 'navigate') {
+              return caches.match('./index.html');
+            }
+            // Para outros tipos de requisição (imagens, css), a falha é simplesmente propagada.
+            // O navegador mostrará um ícone de imagem quebrada, por exemplo.
+          });
       })
   );
 });
