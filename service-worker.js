@@ -1,4 +1,4 @@
-const CACHE_NAME = 'logistica-clubber-v1';
+const CACHE_NAME = 'logistica-clubber-v2'; // Incrementamos a versão do cache
 // Lista de arquivos essenciais para o funcionamento offline do aplicativo (App Shell).
 const urlsToCache = [
   '/',
@@ -6,7 +6,7 @@ const urlsToCache = [
   '/detalhes.html',
   '/style.css',
   '/script.js',
-  '/assets/logisticaclubber.png',
+  '/logisticaclubber.png',
   '/assets/mapa.jpg',
   'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css',
   'https://api.fontshare.com/v2/css?f[]=satoshi@300,400,500,700&display=swap'
@@ -17,12 +17,31 @@ self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then(cache => {
-        console.log('Cache aberto e arquivos do App Shell sendo armazenados.');
-        return cache.addAll(urlsToCache);
+        console.log('Service Worker: Evento de instalação. Cache aberto.');
+        // O addAll é atômico. Se um arquivo falhar, a instalação inteira falha.
+        return cache.addAll(urlsToCache).catch(error => {
+          console.error('Falha ao adicionar arquivos ao cache durante a instalação:', error);
+        });
       })
   );
 });
 
+// Evento de Ativação: Limpa caches antigos.
+// Isso é crucial para garantir que, ao atualizar o PWA, o usuário receba os novos arquivos.
+self.addEventListener('activate', event => {
+  event.waitUntil(
+    caches.keys().then(cacheNames => {
+      return Promise.all(
+        cacheNames.map(cacheName => {
+          if (cacheName !== CACHE_NAME) {
+            console.log('Service Worker: Limpando cache antigo:', cacheName);
+            return caches.delete(cacheName);
+          }
+        })
+      );
+    })
+  );
+});
 // Evento de Fetch: Intercepta as requisições de rede.
 self.addEventListener('fetch', event => {
   const requestUrl = new URL(event.request.url);
@@ -35,12 +54,15 @@ self.addEventListener('fetch', event => {
         return fetch(event.request)
           .then(networkResponse => {
             // Se a resposta da rede for bem-sucedida, clona e guarda no cache para uso offline futuro.
-            cache.put(event.request, networkResponse.clone());
+            if (networkResponse.ok) {
+              cache.put(event.request, networkResponse.clone());
+            }
             return networkResponse;
           })
           .catch(() => {
             // Se a rede falhar (offline), tenta pegar a última versão salva do cache.
             console.log('Falha na rede. Servindo dados da planilha do cache.');
+            // Retorna undefined se não encontrar no cache, para que o erro de rede seja propagado.
             return cache.match(event.request);
           });
       })
@@ -57,8 +79,17 @@ self.addEventListener('fetch', event => {
         if (response) {
           return response;
         }
-        // Caso contrário, buscamos na rede.
-        return fetch(event.request);
+        // Caso contrário, buscamos na rede e tentamos cachear para uso futuro.
+        return fetch(event.request).then(networkResponse => {
+            // Não cacheia respostas de erro ou de extensões do chrome
+            if (!networkResponse || networkResponse.status !== 200 || networkResponse.type === 'chrome-extension') {
+              return networkResponse;
+            }
+            const responseToCache = networkResponse.clone();
+            caches.open(CACHE_NAME).then(cache => cache.put(event.request, responseToCache));
+            return networkResponse;
+          }
+        );
       })
   );
 });
