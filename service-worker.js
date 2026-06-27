@@ -1,4 +1,4 @@
-const CACHE_NAME = 'logistica-clubber-v24'; // Remove all icon references for testing.
+const CACHE_NAME = 'logistica-clubber-v25'; // Adds all assets to cache and corrects icon path.
 
 // Arquivos locais (App Shell) que podem ser cacheados de forma segura.
 const localUrlsToCache = [
@@ -7,7 +7,9 @@ const localUrlsToCache = [
   './detalhes.html',
   './style.css',
   './script.js',
-  './assets/mapa.jpg' // Adicionado para garantir que o fundo funcione offline
+  './assets/mapa.jpg',
+  './assets/copa.jpg', // Adiciona o fundo do tema da Copa para funcionamento offline
+  './assets/logisticaclubber.PNG' // Adiciona o ícone com o nome de arquivo correto
 ];
 
 // Arquivos de terceiros que precisam de tratamento especial de CORS.
