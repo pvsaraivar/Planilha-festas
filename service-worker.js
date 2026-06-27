@@ -1,4 +1,4 @@
-const CACHE_NAME = 'logistica-clubber-v4'; // Força a atualização para a versão mais recente e robusta.
+const CACHE_NAME = 'logistica-clubber-v5'; // Força a atualização para a versão mais recente e robusta.
 // Lista de arquivos essenciais para o funcionamento offline do aplicativo (App Shell).
 const urlsToCache = [
   './',
