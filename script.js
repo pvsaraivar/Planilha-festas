@@ -2642,28 +2642,37 @@ function setupInstallButton() {
 
     if (!installButton || !installBanner) return;
 
-    window.addEventListener('beforeinstallprompt', (e) => {
+    // Usamos uma função nomeada para que possamos removê-la se necessário.
+    const handleInstallPrompt = (e) => {
         // Impede que o Chrome < 76 mostre o prompt automaticamente
         e.preventDefault();
         // Guarda o evento para que ele possa ser acionado mais tarde.
         deferredInstallPrompt = e;
         // Mostra nosso banner de instalação personalizado
         installBanner.hidden = false;
-        installBanner.classList.add('visible');
+        // Adiciona um pequeno atraso para garantir que a transição CSS funcione
+        setTimeout(() => installBanner.classList.add('visible'), 100);
 
         trackGAEvent('install_prompt_shown');
-    });
+    };
 
+    window.addEventListener('beforeinstallprompt', handleInstallPrompt);
+
+    // O clique agora é uma função assíncrona para lidar com a `userChoice`.
     installButton.addEventListener('click', async () => {
         if (!deferredInstallPrompt) return;
 
         // Mostra o prompt de instalação
         deferredInstallPrompt.prompt();
+        // Espera pela escolha do usuário
         const { outcome } = await deferredInstallPrompt.userChoice;
         trackGAEvent('install_prompt_result', { outcome });
 
         // Esconde o banner após a interação
         installBanner.hidden = true;
         deferredInstallPrompt = null;
+
+        // Remove o listener para não tentar mostrar o banner novamente nesta sessão.
+        window.removeEventListener('beforeinstallprompt', handleInstallPrompt);
     });
 }
