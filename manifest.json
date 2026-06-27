@@ -8,17 +8,17 @@
   "theme_color": "#121212",
   "icons": [
     {
-      "src": "logisticaclubber.png",
+      "src": "assets/logisticaclubber.PNG",
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "logisticaclubber.png",
+      "src": "assets/logisticaclubber.PNG",
       "sizes": "512x512",
       "type": "image/png"
     },
     {
-      "src": "logisticaclubber.png",
+      "src": "assets/logisticaclubber.PNG",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
