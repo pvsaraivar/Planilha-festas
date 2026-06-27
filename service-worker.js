@@ -1,4 +1,4 @@
-const CACHE_NAME = 'logistica-clubber-v12'; // Adiciona Leaflet JS ao cache.
+const CACHE_NAME = 'logistica-clubber-v13'; // Torna a busca no cache mais robusta para recursos de terceiros.
 
 // Arquivos locais (App Shell) que podem ser cacheados de forma segura.
 const localUrlsToCache = [
@@ -92,6 +92,12 @@ self.addEventListener('fetch', event => {
     );
     return;
   }
+
+  // Verifica se a requisição é para um dos nossos recursos de terceiros cacheados
+  const isThirdPartyAsset = thirdPartyUrlsToCache.some(url => requestUrl.href.startsWith(new URL(url, self.location).origin));
+  const cacheMatchOptions = isThirdPartyAsset
+    ? { ignoreSearch: true } // Ignora query params para assets de CDN (ex: ?v=1.2.3)
+    : undefined;
 
   // Estratégia "Cache First" para todos os outros arquivos:
   // Responde imediatamente com o cache se o arquivo existir. Se não, busca na rede.
