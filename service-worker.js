@@ -1,4 +1,4 @@
-const CACHE_NAME = 'logistica-clubber-v10'; // Versão com instalação de cache mais resiliente.
+const CACHE_NAME = 'logistica-clubber-v12'; // Adiciona Leaflet JS ao cache.
 
 // Arquivos locais (App Shell) que podem ser cacheados de forma segura.
 const localUrlsToCache = [
@@ -14,8 +14,10 @@ const localUrlsToCache = [
 // Arquivos de terceiros que precisam de tratamento especial de CORS.
 const thirdPartyUrlsToCache = [
   'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css',
+  'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js', // Garante que o mapa funcione offline
   'https://api.fontshare.com/v2/css?f[]=satoshi@300,400,500,700&display=swap',
   'https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css',
+  'https://cdn.jsdelivr.net/npm/flatpickr', // Adiciona o script principal do flatpickr
   'https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/pt.js'
 ];
 
@@ -33,12 +35,12 @@ self.addEventListener('install', event => {
         });
 
         // 2. Cacheia os arquivos de terceiros de forma resiliente.
-        const thirdPartyCachePromises = thirdPartyUrlsToCache.map(url =>
+        const thirdPartyCachePromises = thirdPartyUrlsToCache.map(url => {
           const request = new Request(url, { mode: 'no-cors' });
           return fetch(request)
             .then(response => cache.put(request, response))
-            .catch(err => console.warn(`SW: Falha ao cachear recurso de terceiro (não-crítico): ${url}`, err))
-        );
+            .catch(err => console.warn(`SW: Falha ao cachear recurso de terceiro (não-crítico): ${url}`, err));
+        });
 
         // Promise.all garante que a instalação só termine após todas as tentativas de cache.
         return Promise.all([localCachePromise, ...thirdPartyCachePromises]);
