@@ -1,4 +1,4 @@
-const CACHE_NAME = 'logistica-clubber-v20'; // Implements robust fetch handling and ignores analytics.
+const CACHE_NAME = 'logistica-clubber-v21'; // Re-integrates the app icon correctly.
 
 // Arquivos locais (App Shell) que podem ser cacheados de forma segura.
 const localUrlsToCache = [
@@ -7,6 +7,7 @@ const localUrlsToCache = [
   './detalhes.html',
   './style.css',
   './script.js',
+  './assets/logisticaclubber.png',
   './assets/mapa.jpg'
 ];
 
