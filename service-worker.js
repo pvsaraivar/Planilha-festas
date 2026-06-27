@@ -1,4 +1,4 @@
-const CACHE_NAME = 'logistica-clubber-v5'; // Força a atualização para a versão mais recente e robusta.
+const CACHE_NAME = 'logistica-clubber-v6'; // Força a atualização para a versão mais recente e robusta.
 // Lista de arquivos essenciais para o funcionamento offline do aplicativo (App Shell).
 const urlsToCache = [
   './',
@@ -97,6 +97,15 @@ self.addEventListener('fetch', event => {
             return networkResponse;
           }
         );
+      })
+      .catch(error => {
+        // Fallback de último recurso para requisições de navegação.
+        // Se tudo falhar, tenta servir o index.html para que o app não fique em branco.
+        console.error('SW Fetch Error:', error);
+        if (event.request.mode === 'navigate') {
+          console.log('Servindo index.html como fallback de navegação.');
+          return caches.match('./index.html');
+        }
       })
   );
 });
