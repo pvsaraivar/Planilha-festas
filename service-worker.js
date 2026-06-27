@@ -1,13 +1,13 @@
 const CACHE_NAME = 'logistica-clubber-v4'; // Força a atualização para a versão mais recente e robusta.
 // Lista de arquivos essenciais para o funcionamento offline do aplicativo (App Shell).
 const urlsToCache = [
-  '/',
-  '/index.html',
-  '/detalhes.html',
-  '/style.css',
-  '/script.js',
-  '/assets/logisticaclubber.PNG',
-  '/assets/mapa.jpg',
+  './',
+  './index.html',
+  './detalhes.html',
+  './style.css',
+  './script.js',
+  './assets/logisticaclubber.png',
+  './assets/mapa.jpg',
   'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css',
   'https://api.fontshare.com/v2/css?f[]=satoshi@300,400,500,700&display=swap'
 ];

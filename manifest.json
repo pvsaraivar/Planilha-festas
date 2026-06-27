@@ -2,7 +2,7 @@
   "name": "Logística Clubber",
   "short_name": "Logística",
   "description": "Sua agenda de festas e eventos de música eletrônica em Fortaleza.",
-  "start_url": "/index.html?source=pwa",
+  "start_url": "./index.html?source=pwa",
   "display": "standalone",
   "background_color": "#121212",
   "theme_color": "#121212",
