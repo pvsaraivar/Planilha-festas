@@ -1,4 +1,4 @@
-const CACHE_NAME = 'logistica-clubber-v9'; // Força a atualização para a versão mais recente e robusta.
+const CACHE_NAME = 'logistica-clubber-v10'; // Versão com instalação de cache mais resiliente.
 
 // Arquivos locais (App Shell) que podem ser cacheados de forma segura.
 const localUrlsToCache = [
@@ -14,7 +14,9 @@ const localUrlsToCache = [
 // Arquivos de terceiros que precisam de tratamento especial de CORS.
 const thirdPartyUrlsToCache = [
   'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css',
-  'https://api.fontshare.com/v2/css?f[]=satoshi@300,400,500,700&display=swap'
+  'https://api.fontshare.com/v2/css?f[]=satoshi@300,400,500,700&display=swap',
+  'https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css',
+  'https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/pt.js'
 ];
 
 // Evento de Instalação: Salva os arquivos do App Shell no cache.
@@ -23,17 +25,22 @@ self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then((cache) => {
-        console.log('Service Worker: Adicionando arquivos locais ao cache.');
-        // Cacheia os arquivos locais primeiro.
-        const localCachePromise = cache.addAll(localUrlsToCache);
-
-        // Em paralelo, cacheia os arquivos de terceiros com modo 'no-cors'.
-        const thirdPartyCachePromises = thirdPartyUrlsToCache.map(url => {
-          const request = new Request(url, { mode: 'no-cors' });
-          return fetch(request).then(response => cache.put(request, response));
+        console.log('Service Worker: Iniciando instalação e cache de arquivos.');
+        // 1. Cacheia os arquivos locais essenciais. Se isso falhar, a instalação inteira falha.
+        const localCachePromise = cache.addAll(localUrlsToCache).catch(error => {
+          console.error('SW: Falha crítica ao cachear App Shell. A instalação será abortada.', error);
+          throw error; // Propaga o erro para falhar o event.waitUntil
         });
 
-        // Espera todas as operações de cache terminarem.
+        // 2. Cacheia os arquivos de terceiros de forma resiliente.
+        const thirdPartyCachePromises = thirdPartyUrlsToCache.map(url =>
+          const request = new Request(url, { mode: 'no-cors' });
+          return fetch(request)
+            .then(response => cache.put(request, response))
+            .catch(err => console.warn(`SW: Falha ao cachear recurso de terceiro (não-crítico): ${url}`, err))
+        );
+
+        // Promise.all garante que a instalação só termine após todas as tentativas de cache.
         return Promise.all([localCachePromise, ...thirdPartyCachePromises]);
       })
   );
