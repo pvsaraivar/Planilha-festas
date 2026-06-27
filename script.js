@@ -87,6 +87,7 @@ document.addEventListener('DOMContentLoaded', () => {
         setupModal();
         setupContactModal();
         setupBackToTopButton();
+        setupInstallButton();
         setupViewToggle();
     }
 });
@@ -2626,5 +2627,43 @@ function updateMapMarkers(events) {
                     .addTo(mapMarkersGroup);
             }
         }
+    });
+}
+
+/**
+ * Configura o botão de instalação do PWA.
+ * O banner de instalação só será exibido se o navegador suportar e
+ * disparar o evento 'beforeinstallprompt'.
+ */
+function setupInstallButton() {
+    let deferredInstallPrompt = null;
+    const installButton = document.getElementById('install-pwa-btn');
+    const installBanner = document.getElementById('install-banner');
+
+    if (!installButton || !installBanner) return;
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+        // Impede que o Chrome < 76 mostre o prompt automaticamente
+        e.preventDefault();
+        // Guarda o evento para que ele possa ser acionado mais tarde.
+        deferredInstallPrompt = e;
+        // Mostra nosso banner de instalação personalizado
+        installBanner.hidden = false;
+        installBanner.classList.add('visible');
+
+        trackGAEvent('install_prompt_shown');
+    });
+
+    installButton.addEventListener('click', async () => {
+        if (!deferredInstallPrompt) return;
+
+        // Mostra o prompt de instalação
+        deferredInstallPrompt.prompt();
+        const { outcome } = await deferredInstallPrompt.userChoice;
+        trackGAEvent('install_prompt_result', { outcome });
+
+        // Esconde o banner após a interação
+        installBanner.hidden = true;
+        deferredInstallPrompt = null;
     });
 }
