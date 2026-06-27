@@ -6,8 +6,8 @@ const urlsToCache = [
   '/detalhes.html',
   '/style.css',
   '/script.js',
-  '/logisticaclubber.png',
-  '/mapa.jpg', // Caminho corrigido
+  '/assets/logisticaclubber.PNG',
+  '/assets/mapa.jpg',
   'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css',
   'https://api.fontshare.com/v2/css?f[]=satoshi@300,400,500,700&display=swap'
 ];
