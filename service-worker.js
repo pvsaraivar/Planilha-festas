@@ -1,4 +1,4 @@
-const CACHE_NAME = 'logistica-clubber-v2'; // Incrementamos a versão do cache
+const CACHE_NAME = 'logistica-clubber-v4'; // Força a atualização para a versão mais recente e robusta.
 // Lista de arquivos essenciais para o funcionamento offline do aplicativo (App Shell).
 const urlsToCache = [
   '/',
@@ -7,20 +7,26 @@ const urlsToCache = [
   '/style.css',
   '/script.js',
   '/logisticaclubber.png',
-  '/assets/mapa.jpg',
+  '/mapa.jpg', // Caminho corrigido
   'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css',
   'https://api.fontshare.com/v2/css?f[]=satoshi@300,400,500,700&display=swap'
 ];
 
 // Evento de Instalação: Salva os arquivos do App Shell no cache.
 self.addEventListener('install', event => {
+  self.skipWaiting(); // Força o novo Service Worker a se tornar ativo imediatamente.
   event.waitUntil(
     caches.open(CACHE_NAME)
-      .then(cache => {
-        console.log('Service Worker: Evento de instalação. Cache aberto.');
-        // O addAll é atômico. Se um arquivo falhar, a instalação inteira falha.
-        return cache.addAll(urlsToCache).catch(error => {
-          console.error('Falha ao adicionar arquivos ao cache durante a instalação:', error);
+      .then(async (cache) => {
+        console.log('Service Worker: Instalando e adicionando arquivos ao cache.');
+        // Abordagem mais segura: adiciona um por um, ignorando falhas em recursos não essenciais.
+        for (const url of urlsToCache) {
+          try {
+            await cache.add(url);
+          } catch (error) {
+            // Se um arquivo externo (fonte, etc.) falhar, apenas loga o erro mas não impede a instalação.
+            console.warn(`SW: Falha ao cachear ${url}, mas a instalação continua.`, error);
+          }
         });
       })
   );
@@ -29,6 +35,7 @@ self.addEventListener('install', event => {
 // Evento de Ativação: Limpa caches antigos.
 // Isso é crucial para garantir que, ao atualizar o PWA, o usuário receba os novos arquivos.
 self.addEventListener('activate', event => {
+  clients.claim(); // Faz com que o SW ativo controle todas as abas abertas imediatamente.
   event.waitUntil(
     caches.keys().then(cacheNames => {
       return Promise.all(
