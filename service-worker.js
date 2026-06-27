@@ -1,4 +1,4 @@
-const CACHE_NAME = 'logistica-clubber-v17'; // Remove todas as referências ao ícone para teste.
+const CACHE_NAME = 'logistica-clubber-v18'; // Reintroduz o ícone de forma correta.
 
 // Arquivos locais (App Shell) que podem ser cacheados de forma segura.
 const localUrlsToCache = [
@@ -7,6 +7,7 @@ const localUrlsToCache = [
   './detalhes.html',
   './style.css',
   './script.js',
+  './assets/logisticaclubber.png',
   './assets/mapa.jpg'
 ];
 
