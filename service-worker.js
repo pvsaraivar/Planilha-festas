@@ -1,4 +1,4 @@
-const CACHE_NAME = 'logistica-clubber-v14'; // Implementa instalação de cache resiliente.
+const CACHE_NAME = 'logistica-clubber-v15'; // Remove o ícone do cache para teste.
 
 // Arquivos locais (App Shell) que podem ser cacheados de forma segura.
 const localUrlsToCache = [
@@ -7,7 +7,6 @@ const localUrlsToCache = [
   './detalhes.html',
   './style.css',
   './script.js',
-  './assets/logisticaclubber.png',
   './assets/mapa.jpg'
 ];
 
