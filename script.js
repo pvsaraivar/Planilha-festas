@@ -23,8 +23,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const urlParams = new URLSearchParams(window.location.search);
         currentGid = urlParams.get('gid') || '0';
         
-        if (currentGid === '1076861730') document.body.classList.add('copa-theme');
-        
         setupImageObserver();
         setupVideoObserver();
         loadEventDetails(getSheetUrl(currentGid), currentGid);
@@ -39,8 +37,6 @@ document.addEventListener('DOMContentLoaded', () => {
         
         const urlParams = new URLSearchParams(window.location.search);
         currentGid = urlParams.get('gid') || '0';
-
-        if (currentGid === '1076861730') document.body.classList.add('copa-theme');
 
         // Configura navegação das abas
         const navButtons = document.querySelectorAll('.nav-btn');
@@ -57,13 +53,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 e.target.classList.add('is-active');
                 
                 currentGid = e.target.dataset.sheetGid;
-                
-                // Alterna o tema da Copa
-                if (currentGid === '1076861730') {
-                    document.body.classList.add('copa-theme');
-                } else {
-                    document.body.classList.remove('copa-theme');
-                }
 
                 // Limpa os filtros ao mudar de aba
                 const clearAllBtn = document.getElementById('clear-all-filters-btn');
@@ -2636,43 +2625,45 @@ function updateMapMarkers(events) {
  * disparar o evento 'beforeinstallprompt'.
  */
 function setupInstallButton() {
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+  const isInStandaloneMode = ('standalone' in window.navigator) && (window.navigator.standalone);
+
+  // Se for iOS e o app ainda não estiver instalado (não estiver em modo standalone)
+  if (isIOS && !isInStandaloneMode) {
+    const iosInstallBanner = document.getElementById('ios-install-banner');
+    if (iosInstallBanner) {
+      iosInstallBanner.hidden = false;
+      setTimeout(() => iosInstallBanner.classList.add('visible'), 100);
+      trackGAEvent('ios_install_instructions_shown');
+    }
+  } else {
+    // Lógica original para Android e Desktop
     let deferredInstallPrompt = null;
     const installButton = document.getElementById('install-pwa-btn');
     const installBanner = document.getElementById('install-banner');
 
     if (!installButton || !installBanner) return;
 
-    // Usamos uma função nomeada para que possamos removê-la se necessário.
     const handleInstallPrompt = (e) => {
-        // Impede que o Chrome < 76 mostre o prompt automaticamente
-        e.preventDefault();
-        // Guarda o evento para que ele possa ser acionado mais tarde.
-        deferredInstallPrompt = e;
-        // Mostra nosso banner de instalação personalizado
-        installBanner.hidden = false;
-        // Adiciona um pequeno atraso para garantir que a transição CSS funcione
-        setTimeout(() => installBanner.classList.add('visible'), 100);
-
-        trackGAEvent('install_prompt_shown');
+      e.preventDefault();
+      deferredInstallPrompt = e;
+      installBanner.hidden = false;
+      setTimeout(() => installBanner.classList.add('visible'), 100);
+      trackGAEvent('install_prompt_shown');
     };
 
     window.addEventListener('beforeinstallprompt', handleInstallPrompt);
 
-    // O clique agora é uma função assíncrona para lidar com a `userChoice`.
     installButton.addEventListener('click', async () => {
-        if (!deferredInstallPrompt) return;
+      if (!deferredInstallPrompt) return;
 
-        // Mostra o prompt de instalação
-        deferredInstallPrompt.prompt();
-        // Espera pela escolha do usuário
-        const { outcome } = await deferredInstallPrompt.userChoice;
-        trackGAEvent('install_prompt_result', { outcome });
+      deferredInstallPrompt.prompt();
+      const { outcome } = await deferredInstallPrompt.userChoice;
+      trackGAEvent('install_prompt_result', { outcome });
 
-        // Esconde o banner após a interação
-        installBanner.hidden = true;
-        deferredInstallPrompt = null;
-
-        // Remove o listener para não tentar mostrar o banner novamente nesta sessão.
-        window.removeEventListener('beforeinstallprompt', handleInstallPrompt);
+      installBanner.hidden = true;
+      deferredInstallPrompt = null;
+      window.removeEventListener('beforeinstallprompt', handleInstallPrompt);
     });
+  }
 }
