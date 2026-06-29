@@ -194,12 +194,12 @@ a {
 
 /* Banner de Instalação para iOS */
 .ios-install-banner {
-    background-color: var(--card-background);
-    color: var(--text-color);
+    background: linear-gradient(45deg, #007aff, #00c6ff); /* Gradiente azul, cor padrão do iOS */
+    color: #fff;
     padding: 1rem 1.5rem;
     margin-top: 1.5rem;
     border-radius: var(--border-radius);
-    display: flex;
+    display: block; /* Alterado para block */
     justify-content: center;
     align-items: center;
     text-align: center;
@@ -207,6 +207,7 @@ a {
     font-weight: 500;
     border: 1px solid var(--border-color);
     transition: all 0.5s ease-in-out;
+    line-height: 1.5;
     opacity: 0;
     transform: translateY(-20px);
 }
@@ -217,6 +218,19 @@ a {
 .ios-install-banner.visible {
     opacity: 1;
     transform: translateY(0);
+}
+
+.ios-install-content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.ios-share-icon {
+    display: inline-block;
+    vertical-align: middle;
 }
 .moon-icon {
     display: none; 
