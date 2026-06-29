@@ -29,47 +29,12 @@ document.addEventListener('DOMContentLoaded', () => {
         setupFloatingBackButton();
     } else {
         // Estamos na página inicial (index.html)
+        currentGid = '0'; // Define o GID padrão para a aba de festas
         applyFiltersFromURL();
         loadFavorites(); 
         setupImageObserver();
         initEventMap();
         setupVideoObserver();
-        
-        const urlParams = new URLSearchParams(window.location.search);
-        currentGid = urlParams.get('gid') || '0';
-
-        // Configura navegação das abas
-        const navButtons = document.querySelectorAll('.nav-btn');
-        navButtons.forEach(btn => {
-            if (btn.dataset.sheetGid === currentGid) {
-                navButtons.forEach(b => b.classList.remove('is-active'));
-                btn.classList.add('is-active');
-            }
-            
-            btn.addEventListener('click', (e) => {
-                if (currentGid === e.target.dataset.sheetGid) return; // Evita cliques duplicados
-                
-                navButtons.forEach(b => b.classList.remove('is-active'));
-                e.target.classList.add('is-active');
-                
-                currentGid = e.target.dataset.sheetGid;
-
-                // Limpa os filtros ao mudar de aba
-                const clearAllBtn = document.getElementById('clear-all-filters-btn');
-                if (clearAllBtn && !clearAllBtn.hidden) clearAllBtn.click();
-                
-                // Atualiza os parâmetros da URL
-                const params = new URLSearchParams(window.location.search);
-                params.set('gid', currentGid);
-                params.delete('search');
-                params.delete('genre');
-                params.delete('date');
-                const newUrl = `${window.location.pathname}?${params.toString()}`;
-                window.history.pushState({ path: newUrl }, '', newUrl);
-                
-                loadAndDisplayEvents(getSheetUrl(currentGid), currentGid);
-            });
-        });
 
         loadAndDisplayEvents(getSheetUrl(currentGid), currentGid);
         setupFilters();
