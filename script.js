@@ -766,10 +766,14 @@ function getSortedEvents(events) {
     // Ordena os eventos pela data, do mais antigo para o mais recente
     eventsToSort.sort((a, b) => {
         const nameA = (getProp(a, 'Evento') || getProp(a, 'Nome') || '').toLowerCase();
+        const dateAStr = getProp(a, 'Data') || getProp(a, 'Date') || '';
         const nameB = (getProp(b, 'Evento') || getProp(b, 'Nome') || '').toLowerCase();
+        const dateBStr = getProp(b, 'Data') || getProp(b, 'Date') || '';
 
         const isFeaturedA = nameA.includes('tubulosa ritmada') || nameA.includes('festival cearense de música eletrônica');
         const isFeaturedB = nameB.includes('tubulosa ritmada') || nameB.includes('festival cearense de música eletrônica');
+        const isFeaturedA = nameA.includes('tubulosa ritmada') || nameA.includes('festival cearense de música eletrônica') || (nameA.includes('bateu com fritas') && dateAStr.startsWith('08/08'));
+        const isFeaturedB = nameB.includes('tubulosa ritmada') || nameB.includes('festival cearense de música eletrônica') || (nameB.includes('bateu com fritas') && dateBStr.startsWith('08/08'));
 
         if (isFeaturedA && !isFeaturedB) {
             return -1; // a (evento em destaque) vem primeiro
@@ -1126,6 +1130,12 @@ function createEventCardElement(event) {
 
     // Destaque para o Festival Cearense de Música Eletrônica
     if (eventName.toLowerCase().includes('festival cearense de música eletrônica')) {
+        card.classList.add('event-card--featured');
+    }
+
+    // Destaque para Bateu com Fritas em 08/08
+    const eventDate = getProp(event, 'Data') || getProp(event, 'Date') || '';
+    if (eventName.toLowerCase().includes('bateu com fritas') && eventDate.startsWith('08/08')) {
         card.classList.add('event-card--featured');
     }
 
