@@ -386,7 +386,9 @@ const eventImageMap = {
     'warm up fortal': 'assets/warmupfortal.jpg',
     'after da guapo': 'assets/afterguapo.jpg',
     'gostoso: eden': 'assets/gostosoeden.jpg',
-    'wav sessions de férias': 'assets/wavferias.jpg'
+    'wav sessions de férias': 'assets/wavferias.jpg',
+    'housefi': 'assets/housefi.jpg',
+    'sado xtreme': 'assets/sadoxtreme.jpg'
 }
 
 /**
