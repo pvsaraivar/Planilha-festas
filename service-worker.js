@@ -1,4 +1,4 @@
-const CACHE_NAME = 'logistica-clubber-v30'; // Refactors install event for clarity and robustness.
+const CACHE_NAME = 'logistica-clubber-v31'; // Mude a versão a cada atualização importante de arquivos
 
 // Arquivos locais (App Shell) que podem ser cacheados de forma segura.
 const localUrlsToCache = [
