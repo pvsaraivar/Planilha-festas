@@ -1,6 +1,6 @@
 :root {
-    --primary-color: #FDF5E6; 
-    --background-start: #121212; 
+    --primary-color: #FDF5E6;
+    --background-start: #121212;
     --background-end: #181818;
     --card-background: #3f3d3d; 
     --text-color: #FFFFFF;
@@ -13,14 +13,16 @@
 }
 
 .light-theme {
-    --background-start: #FDFBF7; /* Um tom creme muito suave para o fundo principal */
-    --background-end: #FFFFFF;   /* Branco para os elementos, como o rodapé */
-    --card-background: #FFFFFF;  /* Cartões brancos para se destacarem sobre o fundo creme */
-    --text-color: #4A4A4A;       /* Cinza escuro em vez de preto para um texto mais suave */
-    --subtle-text: #6E6E73;
-    --border-color: #D2D2D7;
+    /* Paleta de cores renovada para o modo claro */
+    --primary-color: #D97706; /* Um laranja/âmbar vibrante que funciona bem em fundos claros */
+    --background-start: #F9FAFB; /* Um cinza muito claro para o fundo */
+    --background-end: #FFFFFF;
+    --card-background: #FFFFFF;
+    --text-color: #1F2937; /* Um cinza mais escuro para melhor contraste de texto */
+    --subtle-text: #6B7280;
+    --border-color: #E5E7EB;
     --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-    --background-overlay: rgba(253, 251, 247, 0.85); /* Sobreposição mais suave para revelar a textura do fundo */
+    --background-overlay: rgba(249, 250, 251, 0.85);
 }
 
 *,
@@ -949,19 +951,18 @@ a {
 /* Modo claro */
 
 .light-theme .event-card__tickets-btn {
-    background-color: var(--text-color);
-    color: var(--background-end); /* Garante que o texto seja claro no fundo escuro */
+    background-color: var(--primary-color);
+    color: #FFFFFF;
     border-color: transparent;
 }
 
 .light-theme .event-card__tickets-btn:hover {
-    background-color: #333;
-    color: var(--primary-color);
+    background-color: #B45309; /* Um tom mais escuro da cor primária para o hover */
 }
 
 .light-theme .tickets-btn {
-    background-color: var(--text-color);
-    color: var(--background-end);
+    background-color: var(--primary-color);
+    color: #FFFFFF;
 }
 
 .light-theme .event-card__date-badge {
@@ -972,6 +973,10 @@ a {
 
 .light-theme .event-card__date-day {
     color: var(--text-color);
+}
+
+.light-theme .event-card__date-month {
+    color: var(--primary-color);
 }
 
 .site-footer {
@@ -1689,6 +1694,14 @@ body:not(.light-theme) .leaflet-control-attribution {
     .genre-filter {
         padding-top: 0;
         padding-bottom: 0;
+        font-size: 16px; /* Evita o zoom automático em inputs no iOS */
+    }
+
+    #search-input, .search-input {
+        font-size: 16px; /* Evita o zoom automático em inputs no iOS */
+    }
+
+    .date-filter-value {
         padding-left: 1rem; 
         padding-right: 2.25rem;
     }
