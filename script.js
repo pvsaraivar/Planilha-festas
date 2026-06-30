@@ -478,10 +478,11 @@ async function loadAndDisplayEvents(csvPath, gid = '0') {
     return;
   }
 
-  const cacheKey = getSheetUrl(gid); // Usar a própria URL como chave de cache
+  const cacheKey = 'events_cache_' + gid;
 
   // Função para processar e renderizar os eventos a partir do texto CSV
   const processAndRender = (csvText) => {
+    hideSkeletonLoader(grid);
     const parsedEvents = parseCSV(csvText || '');
     
     allEvents = parsedEvents.filter(event => {
@@ -516,41 +517,31 @@ async function loadAndDisplayEvents(csvPath, gid = '0') {
     }
   };
 
-  // Estratégia Cache-First com atualização em segundo plano
-  const cache = await caches.open(CACHE_NAME);
-  const cachedResponse = await cache.match(cacheKey);
+  // Estratégia Cache-First (sessionStorage) com atualização em segundo plano
+  const cachedCsvText = sessionStorage.getItem(cacheKey);
 
-  if (cachedResponse) {
-    // Se tiver no cache, renderiza imediatamente
-    const cachedCsvText = await cachedResponse.text();
-    processAndRender(cachedCsvText);
+  if (cachedCsvText) {
+    processAndRender(cachedCsvText); // Renderiza com o cache imediatamente
   } else {
-    // Se não, mostra o skeleton loader
-    showSkeletonLoader(grid, 6);
+    showSkeletonLoader(grid, 6); // Mostra o skeleton se não houver nada em cache
   }
 
   // Sempre busca a versão mais recente em segundo plano
-  const networkFetch = fetch(csvPath)
-    .then(async (networkResponse) => {
-      if (!networkResponse.ok) throw new Error(`Falha na rede: ${networkResponse.statusText}`);
-      
-      // Clona a resposta para poder usar no cache e no processamento
-      const responseToCache = networkResponse.clone();
-      const freshCsvText = await networkResponse.text();
+  try {
+    const networkResponse = await fetch(csvPath);
+    if (!networkResponse.ok) throw new Error(`Falha na rede: ${networkResponse.statusText}`);
+    
+    const freshCsvText = await networkResponse.text();
+    sessionStorage.setItem(cacheKey, freshCsvText); // Atualiza o cache da sessão
 
-      // Atualiza o cache com a nova versão
-      await cache.put(cacheKey, responseToCache);
-
-      // Se não havia cache, renderiza a tela com os dados frescos
-      if (!cachedResponse) {
-        processAndRender(freshCsvText);
-      }
-      console.log("Dados dos eventos atualizados a partir da rede.");
-    })
-    .catch(error => {
-      console.error("Falha ao buscar novos dados dos eventos:", error);
-      if (!cachedResponse) grid.innerHTML = `<p class="empty-grid-message">Falha ao carregar eventos. Verifique sua conexão.</p>`;
-    });
+    // Se não havia cache ou o conteúdo mudou, re-renderiza
+    if (!cachedCsvText || cachedCsvText !== freshCsvText) {
+      processAndRender(freshCsvText);
+    }
+  } catch (error) {
+    console.error("Falha ao buscar novos dados dos eventos:", error);
+    if (!cachedCsvText) grid.innerHTML = `<p class="empty-grid-message">Falha ao carregar eventos. Verifique sua conexão.</p>`;
+  }
 }
 
 /**
@@ -1112,6 +1103,14 @@ function showSkeletonLoader(gridElement, count) {
     gridElement.appendChild(fragment);
 }
 
+/**
+ * Esconde a interface de "esqueleto".
+ * @param {HTMLElement} gridElement - O container onde os esqueletos estão.
+ */
+function hideSkeletonLoader(gridElement) {
+    // Simplesmente limpa o conteúdo se o skeleton estiver lá. A renderização dos eventos o substituirá.
+    if (gridElement.querySelector('.skeleton-card')) gridElement.innerHTML = '';
+}
 
 /**
  * Cria um único elemento de cartão de evento.
