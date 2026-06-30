@@ -375,8 +375,18 @@ const eventImageMap = {
     'calúnia ato iv': 'assets/caluniaIV.jpg',
     'meveillon': 'assets/meveilon.jpg',
     'alter ego': 'assets/alterego.jpg',
-    'festa lá em cima': 'assets/flec2.PNG'
-    
+    'festa lá em cima': 'assets/flec2.PNG',
+    'a noite mais triste do mundo': 'assets/anoitemaistriste.jpg',
+    'bixabomba': 'assets/bixabomba.jpg',
+    'ação fextinha': 'assets/fextinha.jpg',
+    'balanço no luzes': 'assets/balanluzes.jpg',
+    'mergulhe x balanço': 'assets/mergulhexbalan.jpg',
+    'rolê suave convida feitiço': 'assets/rolefeiti.jpg',
+    'matusa no arrumação': 'assets/matarrum.jpg',
+    'warm up fortal': 'assets/warmupfortal.jpg',
+    'after da guapo': 'assets/afterguapo.jpg',
+    'gostoso: eden': 'assets/gostosoeden.jpg',
+    'wav sessions de férias': 'assets/wavferias.jpg'
 }
 
 /**
