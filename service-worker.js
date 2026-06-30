@@ -1,4 +1,4 @@
-const CACHE_NAME = 'logistica-clubber-v32'; // Mude a versão a cada atualização importante de arquivos
+const CACHE_NAME = 'logistica-clubber-v33'; // Mude a versão a cada atualização importante de arquivos
 
 // Arquivos locais (App Shell) que podem ser cacheados de forma segura.
 const localUrlsToCache = [
@@ -91,6 +91,27 @@ function networkFirst(event) {
           headers: { 'Content-Type': 'application/json' }
         });
       });
+  });
+}
+
+/**
+ * Stale-While-Revalidate Strategy (for images and dynamic assets)
+ * Responds from cache immediately, then updates the cache from the network in the background.
+ */
+function staleWhileRevalidate(event) {
+  return caches.open(CACHE_NAME).then(cache => {
+    return cache.match(event.request).then(cachedResponse => {
+      // Fetch from network in the background to update the cache.
+      const fetchPromise = fetch(event.request).then(networkResponse => {
+        if (networkResponse.ok) {
+          cache.put(event.request, networkResponse.clone());
+        }
+        return networkResponse;
+      });
+
+      // Return cached response immediately if available, otherwise wait for the network.
+      return cachedResponse || fetchPromise;
+    });
   });
 }
 
