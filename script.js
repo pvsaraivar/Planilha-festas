@@ -382,7 +382,7 @@ const eventImageMap = {
     'balanço no luzes': 'assets/balanluzes.jpg',
     'mergulhe x balanço': 'assets/mergulhexbalan.jpg', 
     'rolê suave convida feitiço': 'assets/rolefeiti.jpg', 
-    'matusa no arrumação': 'assets/matusaarrum.jpg',
+    'matusa no arrumação': 'assets/matarrum.jpg',
     'warm up fortal': 'assets/warmupfortal.jpg',
     'after da guapo': 'assets/afterguapo.jpg',
     'gostoso: eden': 'assets/gostosoeden.jpg',
