@@ -478,11 +478,11 @@ async function loadAndDisplayEvents(csvPath, gid = '0') {
     return;
   }
 
-  const cacheKey = 'events_cache_' + gid;
+  const cacheKey = getSheetUrl(gid); // Usar a própria URL como chave de cache
 
   // Função para processar e renderizar os eventos a partir do texto CSV
   const processAndRender = (csvText) => {
-    const parsedEvents = parseCSV(csvText);
+    const parsedEvents = parseCSV(csvText || '');
     
     allEvents = parsedEvents.filter(event => {
       const oculto = (getProp(event, 'Oculto') || '').toLowerCase();
@@ -516,42 +516,41 @@ async function loadAndDisplayEvents(csvPath, gid = '0') {
     }
   };
 
-  // Tenta carregar do cache primeiro
-  const cachedData = sessionStorage.getItem(cacheKey);
-  if (cachedData) {
-    processAndRender(cachedData);
+  // Estratégia Cache-First com atualização em segundo plano
+  const cache = await caches.open(CACHE_NAME);
+  const cachedResponse = await cache.match(cacheKey);
+
+  if (cachedResponse) {
+    // Se tiver no cache, renderiza imediatamente
+    const cachedCsvText = await cachedResponse.text();
+    processAndRender(cachedCsvText);
   } else {
+    // Se não, mostra o skeleton loader
     showSkeletonLoader(grid, 6);
   }
 
-  // Busca os dados mais recentes em segundo plano
-  try {
-    const response = await fetch(csvPath);
-    if (!response.ok) {
-      throw new Error(`Falha ao carregar a planilha (Status: ${response.status})`);
-    }
-    const freshCsvText = await response.text();
+  // Sempre busca a versão mais recente em segundo plano
+  const networkFetch = fetch(csvPath)
+    .then(async (networkResponse) => {
+      if (!networkResponse.ok) throw new Error(`Falha na rede: ${networkResponse.statusText}`);
+      
+      // Clona a resposta para poder usar no cache e no processamento
+      const responseToCache = networkResponse.clone();
+      const freshCsvText = await networkResponse.text();
 
-    // Se os dados novos forem diferentes do cache (ou se não houver cache),
-    // atualiza a tela e o cache.
-    if (freshCsvText !== cachedData) {
-      sessionStorage.setItem(cacheKey, freshCsvText);
-      if (cachedData) { // Se já havia cache, significa que estamos atualizando
-        console.log("Dados dos eventos atualizados em segundo plano.");
+      // Atualiza o cache com a nova versão
+      await cache.put(cacheKey, responseToCache);
+
+      // Se não havia cache, renderiza a tela com os dados frescos
+      if (!cachedResponse) {
+        processAndRender(freshCsvText);
       }
-      processAndRender(freshCsvText);
-    }
-  } catch (error) {
-    console.error("Falha ao carregar ou renderizar os eventos:", error);
-    // Só mostra o erro na tela se não houver dados em cache para exibir.
-    if (!cachedData) {
-      if (error instanceof TypeError && error.message === 'Failed to fetch') {
-        grid.innerHTML = `<p style="color: #c0392b;"><b>Falha na conexão.</b> Verifique sua internet e tente recarregar a página.</p>`;
-      } else {
-        grid.innerHTML = `<p style="color: red;">Ocorreu um erro inesperado ao carregar os eventos. Verifique o console para mais detalhes.</p>`;
-      }
-    }
-  }
+      console.log("Dados dos eventos atualizados a partir da rede.");
+    })
+    .catch(error => {
+      console.error("Falha ao buscar novos dados dos eventos:", error);
+      if (!cachedResponse) grid.innerHTML = `<p class="empty-grid-message">Falha ao carregar eventos. Verifique sua conexão.</p>`;
+    });
 }
 
 /**
