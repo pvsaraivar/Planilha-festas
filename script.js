@@ -389,7 +389,6 @@ const eventImageMap = {
     'wav sessions de férias': 'assets/wavferias.jpg',
     'housefi': 'assets/housefi.jpg',
     'sado xtreme': 'assets/sadoxtreme.jpg',
-    'aniversário do matusa': 'assets/matusa30.PNG'
 }
 
 /**
