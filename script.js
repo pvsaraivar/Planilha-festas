@@ -388,7 +388,8 @@ const eventImageMap = {
     'gostoso: eden': 'assets/gostosoeden.jpg',
     'wav sessions de férias': 'assets/wavferias.jpg',
     'housefi': 'assets/housefi.jpg',
-    'sado xtreme': 'assets/sadoxtreme.jpg'
+    'sado xtreme': 'assets/sadoxtreme.jpg',
+    'aniversário do matusa': 'assets/matusa30.PNG'
 }
 
 /**
