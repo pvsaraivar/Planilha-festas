@@ -41,6 +41,7 @@ document.addEventListener('DOMContentLoaded', () => {
         setupModal();
         setupContactModal();
         setupBackToTopButton();
+    setupNotifications();
         setupInstallButton();
         setupViewToggle();
     }
@@ -2657,4 +2658,135 @@ function setupInstallButton() {
       window.removeEventListener('beforeinstallprompt', handleInstallPrompt);
     });
   }
+}
+
+/**
+ * Configura o botão e a lógica para notificações push.
+ */
+function setupNotifications() {
+    const notificationsBtn = document.getElementById('notifications-btn');
+    if (!('serviceWorker' in navigator && 'PushManager' in window)) {
+        console.warn('Push Notifications não são suportadas neste navegador.');
+        return;
+    }
+
+    notificationsBtn.style.display = 'flex'; // Mostra o botão se a API for suportada
+
+    const bellIcon = document.getElementById('bell-icon');
+    const bellOffIcon = document.getElementById('bell-off-icon');
+
+    // Função para atualizar a UI do botão
+    const updateButtonUI = (permission) => {
+        if (permission === 'granted') {
+            bellIcon.style.display = 'block';
+            bellOffIcon.style.display = 'none';
+            notificationsBtn.title = 'Desativar notificações';
+        } else {
+            bellIcon.style.display = 'none';
+            bellOffIcon.style.display = 'block';
+            notificationsBtn.title = 'Ativar notificações';
+        }
+    };
+
+    // Verifica o status da permissão ao carregar
+    navigator.serviceWorker.ready.then(registration => {
+        updateButtonUI(Notification.permission);
+    });
+
+    notificationsBtn.addEventListener('click', () => {
+        if (Notification.permission === 'granted') {
+            // Se já tem permissão, o clique serve para DESATIVAR
+            unsubscribeUser();
+        } else {
+            // Se não tem, o clique serve para PEDIR e ATIVAR
+            subscribeUser();
+        }
+    });
+}
+
+/**
+ * Pede permissão e inscreve o usuário para notificações push.
+ */
+async function subscribeUser() {
+    try {
+        const permission = await Notification.requestPermission();
+        updateButtonUI(permission);
+
+        if (permission !== 'granted') {
+            console.log('Permissão para notificações não concedida.');
+            trackGAEvent('notification_permission_denied');
+            return;
+        }
+
+        const registration = await navigator.serviceWorker.ready;
+        const subscription = await registration.pushManager.subscribe({
+            userVisibleOnly: true,
+            // A VAPID key precisa ser gerada no seu backend.
+            // Esta é uma chave de exemplo e DEVE ser substituída.
+            applicationServerKey: urlBase64ToUint8Array('SUA_VAPID_PUBLIC_KEY_AQUI')
+            // Substitua pela sua Chave Pública VAPID gerada.
+            applicationServerKey: urlBase64ToUint8Array('COLE_SUA_CHAVE_PUBLICA_VAPID_AQUI')
+        });
+
+        console.log('Usuário inscrito:', JSON.stringify(subscription));
+        // IMPORTANTE: Envie a 'subscription' para o seu backend!
+        // await fetch('https://seu-backend.com/subscribe', {
+        //     method: 'POST',
+        //     body: JSON.stringify(subscription),
+        //     headers: { 'Content-Type': 'application/json' }
+        // });
+        // Envia a inscrição para o seu backend Firebase.
+        await fetch('https://southamerica-east1-SEU_ID_DE_PROJETO.cloudfunctions.net/subscribe', {
+            method: 'POST',
+            body: JSON.stringify(subscription),
+            headers: { 'Content-Type': 'application/json' }
+        });
+        trackGAEvent('notification_subscription_success');
+
+    } catch (error) {
+        console.error('Falha ao inscrever o usuário: ', error);
+        trackGAEvent('notification_subscription_failed', { error: error.message });
+    }
+}
+
+/**
+ * Cancela a inscrição do usuário para notificações push.
+ */
+async function unsubscribeUser() {
+    try {
+        const registration = await navigator.serviceWorker.ready;
+        const subscription = await registration.pushManager.getSubscription();
+
+        if (subscription) {
+            await subscription.unsubscribe();
+            console.log('Inscrição cancelada.');
+            // IMPORTANTE: Informe seu backend para remover a 'subscription'.
+            // await fetch('https://seu-backend.com/unsubscribe', { ... });
+            // Informa seu backend para remover a inscrição.
+            await fetch('https://southamerica-east1-SEU_ID_DE_PROJETO.cloudfunctions.net/unsubscribe', {
+                method: 'POST',
+                body: JSON.stringify({ endpoint: subscription.endpoint }),
+                headers: { 'Content-Type': 'application/json' }
+            });
+            trackGAEvent('notification_unsubscribed');
+        }
+    } catch (error) {
+        console.error('Falha ao cancelar inscrição: ', error);
+    } finally {
+        updateButtonUI('denied'); // Atualiza a UI para o estado "desativado"
+    }
+}
+
+/**
+ * Converte uma string VAPID base64 para um Uint8Array.
+ */
+function urlBase64ToUint8Array(base64String) {
+    const padding = '='.repeat((4 - base64String.length % 4) % 4);
+    const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+    const rawData = window.atob(base64);
+    const outputArray = new Uint8Array(rawData.length);
+    for (let i = 0; i < rawData.length; ++i) {
+        outputArray[i] = rawData.charCodeAt(i);
+    }
+    return outputArray;
 }

@@ -1,0 +1,16 @@
+{
+  "name": "logistica-clubber-functions",
+  "description": "Backend para notificações do Logística Clubber",
+  "main": "index.js",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "firebase-admin": "^11.11.1",
+    "firebase-functions": "^4.5.0",
+    "node-fetch": "^2.7.0",
+    "web-push": "^3.6.6"
+  },
+  "engines": {
+    "node": "18"
+  },
+  "private": true
+}

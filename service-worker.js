@@ -168,3 +168,48 @@ self.addEventListener('fetch', event => {
   // 3. Cache First for all other requests (App Shell, assets, etc.).
   event.respondWith(cacheFirst(event));
 });
+
+// --- PUSH NOTIFICATION EVENTS ---
+
+/**
+ * Evento 'push': Chamado quando uma notificação push é recebida do servidor.
+ */
+self.addEventListener('push', event => {
+  let data;
+  try {
+    data = event.data.json();
+  } catch (e) {
+    console.error('SW: Push data não é um JSON válido.', e);
+    data = { title: 'Nova Notificação', body: event.data.text() };
+  }
+
+  const { title, body, icon, data: notificationData } = data;
+
+  const options = {
+    body: body,
+    icon: icon || './assets/logisticaclubber.jpg', // Ícone padrão
+    badge: './assets/logisticaclubber.jpg', // Ícone para a barra de status do Android
+    vibrate: [100, 50, 100], // Vibração [vibra, pausa, vibra]
+    data: notificationData || { url: './index.html' }, // Dados para usar no clique
+    actions: [
+      { action: 'explore', title: 'Ver Detalhes' }
+    ]
+  };
+
+  event.waitUntil(
+    self.registration.showNotification(title, options)
+  );
+});
+
+/**
+ * Evento 'notificationclick': Chamado quando o usuário clica na notificação.
+ */
+self.addEventListener('notificationclick', event => {
+  const notification = event.notification;
+  const urlToOpen = notification.data.url || './index.html';
+
+  notification.close(); // Fecha a notificação
+
+  // Abre a janela do PWA ou foca nela se já estiver aberta, e navega para a URL.
+  event.waitUntil(clients.openWindow(urlToOpen));
+});

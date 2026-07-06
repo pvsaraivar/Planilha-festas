@@ -85,6 +85,11 @@ a {
     gap: 1rem;
 }
 
+.header-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
 .site-header h1 {
     margin: 0 0 0.5rem 0;
     font-size: 2.5rem;
