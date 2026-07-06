@@ -2724,10 +2724,8 @@ async function subscribeUser() {
         const subscription = await registration.pushManager.subscribe({
             userVisibleOnly: true,
             // A VAPID key precisa ser gerada no seu backend.
-            // Esta é uma chave de exemplo e DEVE ser substituída.
-            applicationServerKey: urlBase64ToUint8Array('SUA_VAPID_PUBLIC_KEY_AQUI')
             // Substitua pela sua Chave Pública VAPID gerada.
-            applicationServerKey: urlBase64ToUint8Array('COLE_SUA_CHAVE_PUBLICA_VAPID_AQUI')
+            applicationServerKey: urlBase64ToUint8Array('COLOQUE_SUA_CHAVE_PUBLICA_VAPID_AQUI')
         });
 
         console.log('Usuário inscrito:', JSON.stringify(subscription));
