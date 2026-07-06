@@ -165,7 +165,14 @@ self.addEventListener('fetch', event => {
     return;
   }
 
-  // 3. Cache First for all other requests (App Shell, assets, etc.).
+  // 3. Stale-While-Revalidate for images and videos to ensure they update.
+  if (event.request.destination === 'image' || event.request.destination === 'video') {
+    event.respondWith(staleWhileRevalidate(event));
+    return;
+  }
+
+  // 4. Cache First for all other requests (App Shell, CSS, JS, etc.).
+  // This keeps the core app loading instantly.
   event.respondWith(cacheFirst(event));
 });
 
