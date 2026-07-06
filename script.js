@@ -1271,6 +1271,8 @@ function createEventCardElement(event) {
         // O src inicial é um placeholder de baixíssima qualidade para evitar layout shift.
         const lqip = "data:image/gif;base64,R0lGODlhAQABAIAAAMLCwgAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw=="; // Cinza claro
         mediaHtml = `<img src="${lqip}" data-src="${imageUrl || placeholderSvg}" alt="${name}" class="event-card__image lazy-image" loading="lazy" decoding="async" onerror="this.onerror=null;this.src='${errorSvg}';">`;
+        const lqip = "data:image/gif;base64,R0lGODlhAQABAIAAAMLCwgAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw==";
+        mediaHtml = `<img src="${lqip}" data-src="${imageUrl || placeholderSvg}" alt="${name}" class="event-card__image lazy-image" loading="lazy" decoding="async" onerror="this.onerror=null; this.src='${errorSvg}'; this.onerror=null;">`;
     }
 
     card.innerHTML = `
@@ -2089,6 +2091,12 @@ function setupImageObserver() {
                         // Quando a imagem de alta qualidade estiver pronta, a aplica no elemento real
                         lazyImage.src = highQualitySrc;
                         lazyImage.classList.add('loaded'); // Adiciona classe para a transição de fade-in
+                    };
+                    
+                    tempImage.onerror = () => {
+                        // Se a imagem de alta qualidade falhar, exibe o SVG de erro.
+                        lazyImage.src = "data:image/svg+xml,%3csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 400 300%27%3e%3crect width=%27100%25%27 height=%27100%25%27 fill=%27%23e9ecef%27/%3e%3ctext x=%2750%25%27 y=%2750%25%27 fill=%27%23dc3545%27 font-size=%2720%27 text-anchor=%27middle%27 dominant-baseline=%27middle%27%3eImagem Inválida%3c/text%3e%3c/svg%3e";
+                        lazyImage.classList.add('loaded');
                     };
 
                     // Para de observar esta imagem para não recarregar

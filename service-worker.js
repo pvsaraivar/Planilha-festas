@@ -154,6 +154,15 @@ function cacheFirst(event) {
 self.addEventListener('fetch', event => {
   const requestUrl = new URL(event.request.url);
 
+  // Estratégia de atualização proativa para a página principal (index.html).
+  // Isso força o navegador a verificar se há um novo Service Worker.
+  if (event.request.mode === 'navigate' && requestUrl.pathname.endsWith('/index.html')) {
+    event.respondWith(
+      fetch(event.request).catch(() => caches.match(event.request))
+    );
+    return;
+  }
+
   // 1. Ignore Google Analytics and other non-essential requests.
   if (requestUrl.hostname.includes('google-analytics.com') || requestUrl.hostname.includes('googletagmanager.com')) {
     return; // Let the browser handle it without interception.
