@@ -154,28 +154,21 @@ function cacheFirst(event) {
 self.addEventListener('fetch', event => {
   const requestUrl = new URL(event.request.url);
 
-  // Estratégia de atualização proativa para a página principal (index.html).
-  // Isso força o navegador a verificar se há um novo Service Worker.
-  if (event.request.mode === 'navigate' && requestUrl.pathname.endsWith('/index.html')) {
-    event.respondWith(
-      fetch(event.request).catch(() => caches.match(event.request))
-    );
-    return;
-  }
-
   // 1. Ignore Google Analytics and other non-essential requests.
   if (requestUrl.hostname.includes('google-analytics.com') || requestUrl.hostname.includes('googletagmanager.com')) {
     return; // Let the browser handle it without interception.
   }
 
-  // 2. Network First for Google Sheets data.
+  // 2. Network First for Google Sheets data (dados da planilha).
   if (requestUrl.href.includes('docs.google.com/spreadsheets')) {
     event.respondWith(networkFirst(event));
     return;
   }
 
-  // 3. Stale-While-Revalidate for images and videos to ensure they update.
-  if (event.request.destination === 'image' || event.request.destination === 'video') {
+  // 3. Stale-While-Revalidate para o App Shell (JS, CSS), imagens e vídeos.
+  // Isso garante que o app carregue rápido do cache, mas se atualize em segundo plano.
+  // É a solução definitiva para o problema de atualização de imagens.
+  if (['script', 'style', 'image', 'video'].includes(event.request.destination) || event.request.mode === 'navigate') {
     event.respondWith(staleWhileRevalidate(event));
     return;
   }
@@ -183,6 +176,7 @@ self.addEventListener('fetch', event => {
   // 4. Cache First for all other requests (App Shell, CSS, JS, etc.).
   // This keeps the core app loading instantly.
   event.respondWith(cacheFirst(event));
+
 });
 
 // --- PUSH NOTIFICATION EVENTS ---
