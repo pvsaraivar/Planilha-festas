@@ -367,7 +367,7 @@ const eventImageMap = {
     'radar na copa 2': 'assets/radarnacopa2.jpg',
     'fliperama': 'assets/fliperama.jpg',
     'houzeria showcase': 'assets/houzeriashow.jpg',
-    'dabysha - tecido de mil sons': 'assets/dabysha2.jpg',
+    'dabysha - tecido de mil sons': 'assets/dabysha3.jpg',
     'darkeira junina': 'assets/darkeirajunina.jpg',
     'batritinha pride': 'assets/batritinha.jpg',
     'artranced': 'assets/artranced.jpg',
