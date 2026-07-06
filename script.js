@@ -1265,12 +1265,8 @@ function createEventCardElement(event) {
         playButtonHtml = `
             <div class="event-video-loader" style="display: none;"></div>
             <div class="video-play-button">${playIconSvg}</div>
-        `;
-    } else {
-        // Usando data-src para lazy loading customizado com IntersectionObserver.
-        // O src inicial é um placeholder de baixíssima qualidade para evitar layout shift.
-        const lqip = "data:image/gif;base64,R0lGODlhAQABAIAAAMLCwgAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw=="; // Cinza claro
-        mediaHtml = `<img src="${lqip}" data-src="${imageUrl || placeholderSvg}" alt="${name}" class="event-card__image lazy-image" loading="lazy" decoding="async" onerror="this.onerror=null;this.src='${errorSvg}';">`;
+        `; 
+    } else { 
         const lqip = "data:image/gif;base64,R0lGODlhAQABAIAAAMLCwgAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw==";
         mediaHtml = `<img src="${lqip}" data-src="${imageUrl || placeholderSvg}" alt="${name}" class="event-card__image lazy-image" loading="lazy" decoding="async" onerror="this.onerror=null; this.src='${errorSvg}'; this.onerror=null;">`;
     }
