@@ -1,4 +1,4 @@
-const CACHE_NAME = 'logistica-clubber-v39'; // Mude a versão a cada atualização importante de arquivos
+const CACHE_NAME = 'logistica-clubber-v40'; // Mude a versão a cada atualização importante de arquivos
 
 // Arquivos locais (App Shell) que podem ser cacheados de forma segura.
 const localUrlsToCache = [
@@ -83,21 +83,28 @@ self.addEventListener('activate', event => {
  * Ideal para recursos que mudam com frequência, como imagens de eventos.
  */
 function networkFirst(event) {
-  return new Promise(async (resolve) => {
+  return new Promise(async (resolve, reject) => {
     const cache = await caches.open(CACHE_NAME);
-    try {
-      // 1. Tenta buscar da rede primeiro.
-      const networkResponse = await fetch(event.request);
-      // Se a resposta da rede for bem-sucedida, atualiza o cache e a retorna.
-      if (networkResponse.ok) {
-        cache.put(event.request, networkResponse.clone());
+    const request = event.request;
+
+    const networkResponsePromise = fetch(request);
+
+    networkResponsePromise.then(response => {
+      // Se a resposta da rede for bem-sucedida (2xx) ou se for 304 (não modificado),
+      // significa que a rede está funcionando e o conteúdo está atualizado.
+      if (response.ok) {
+        cache.put(request, response.clone());
       }
-      resolve(networkResponse);
-    } catch (error) {
-      // 2. Se a rede falhar, busca no cache como fallback.
-      const cachedResponse = await cache.match(event.request);
-      resolve(cachedResponse || Response.error()); // Retorna cache ou um erro de rede padrão.
+      // Retorna a resposta da rede, seja ela 200 (com conteúdo) ou 304 (vazia, mas sinalizando que o cache do navegador está OK).
+      resolve(response);
+    }).catch(async (error) => {
+      // A rede falhou completamente. Agora, e somente agora, usamos o cache.
+      console.warn(`SW: Network failed for ${request.url}. Serving from cache.`);
+      const cachedResponse = await cache.match(request);
+      // Retorna a resposta do cache se existir, senão, a promessa é rejeitada e o navegador mostra o erro padrão.
+      resolve(cachedResponse);
     }
+    );
   });
 }
 function staleWhileRevalidate(event) {
