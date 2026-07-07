@@ -1,4 +1,4 @@
-const CACHE_NAME = 'logistica-clubber-v35'; // Mude a versão a cada atualização importante de arquivos
+const CACHE_NAME = 'logistica-clubber-v37'; // Mude a versão a cada atualização importante de arquivos
 
 // Arquivos locais (App Shell) que podem ser cacheados de forma segura.
 const localUrlsToCache = [
@@ -77,85 +77,26 @@ self.addEventListener('activate', event => {
 });
 
 // --- FETCH EVENT STRATEGIES ---
-
-/**
- * Network First Strategy (for Google Sheets API)
- * Tries network, falls back to cache, then to an error if both fail.
- */
-function networkFirst(event) {
-  return new Promise(async (resolve) => {
-    const cache = await caches.open(CACHE_NAME);
-    try {
-      // 1. Tenta buscar da rede primeiro.
-      const networkResponse = await fetch(event.request);
-      // Se a resposta da rede for bem-sucedida, atualiza o cache e a retorna.
-      if (networkResponse.ok) {
-        cache.put(event.request, networkResponse.clone());
-      }
-      resolve(networkResponse);
-    } catch (error) {
-      // 2. Se a rede falhar, busca no cache como fallback.
-      console.warn(`SW: Network failed for ${event.request.url}. Serving from cache.`);
-      const cachedResponse = await cache.match(event.request);
-      // Retorna a resposta do cache ou uma resposta de erro se não houver nada.
-      resolve(cachedResponse || Response.error());
-    }
-  });
-}
-
-/**
- * Stale-While-Revalidate Strategy (for images and dynamic assets)
- * Responds from cache immediately, then updates the cache from the network in the background.
- */
 function staleWhileRevalidate(event) {
-  return new Promise(async (resolve) => {
+  return new Promise(async (resolve, reject) => {
     const cache = await caches.open(CACHE_NAME);
     const cachedResponse = await cache.match(event.request);
-    
-    // Inicia a busca na rede em segundo plano.
-    const networkFetch = fetch(event.request).then(networkResponse => {
-      if (networkResponse.ok) {
-        cache.put(event.request, networkResponse.clone());
-      }
-    });
-    // Retorna a resposta do cache imediatamente se existir, senão, aguarda a resposta da rede.
-    resolve(cachedResponse || networkFetch);
-  });
-}
 
-/**
- * Cache First Strategy (for App Shell assets)
- * Tries cache, falls back to network, then to a fallback page for navigation.
- */
-function cacheFirst(event) {
-  // Para recursos de terceiros, a busca no cache precisa ser mais flexível
-  // para encontrar a resposta "opaca" salva durante a instalação.
-  const isThirdParty = thirdPartyUrlsToCache.some(url => event.request.url.startsWith(new URL(url, self.location).origin));
-  const matchOptions = isThirdParty ? { ignoreVary: true, ignoreSearch: true } : undefined;
-
-  return caches.match(event.request, matchOptions)
-    .then(response => {
-      // Se encontrarmos no cache, retornamos a resposta.
-      if (response) {
-        return response;
-      }
-      return fetch(event.request).then(networkResponse => {
-        if (!networkResponse || networkResponse.status !== 200 || networkResponse.type === 'chrome-extension') {
-          return networkResponse;
+    // Inicia a busca na rede. Esta promessa será usada para atualizar o cache
+    // ou como fallback se não houver nada no cache.
+    const networkFetchPromise = fetch(event.request)
+      .then(networkResponse => {
+        if (networkResponse.ok) {
+          cache.put(event.request, networkResponse.clone());
         }
-        const responseToCache = networkResponse.clone();
-        caches.open(CACHE_NAME).then(cache => cache.put(event.request, responseToCache));
-        return networkResponse;
+        return networkResponse; // Retorna a resposta da rede para a cadeia de promessas.
       });
-    })
-    .catch(error => {
-      console.error('SW: Fetch failed (network and cache). Request:', event.request.url, error);
-      if (event.request.mode === 'navigate') {
-        return caches.match('./index.html');
-      }
-      // For other assets like images, returning an error response is safer than undefined.
-      return new Response('', { status: 503, statusText: 'Service Unavailable' });
-    });
+
+    // Se tivermos uma resposta no cache, a retornamos imediatamente.
+    // A busca na rede continuará em segundo plano para atualizar o cache para a próxima visita.
+    // Se não houver cache, aguardamos a resposta da rede (ou seu erro).
+    resolve(cachedResponse || networkFetchPromise);
+  });
 }
 
 // Evento de Fetch: Intercepta as requisições de rede.
@@ -173,28 +114,9 @@ self.addEventListener('fetch', event => {
     return; // Let the browser handle it without interception.
   }
 
-  // 2. Network First for Google Sheets data (dados da planilha).
-  if (requestUrl.href.includes('docs.google.com/spreadsheets')) {
-    event.respondWith(networkFirst(event));
-    return;
-  }
-
-  // 3. Stale-While-Revalidate para o App Shell (JS, CSS, fontes, navegação).
-  // Isso garante que o app carregue rápido do cache, mas se atualize em segundo plano para futuras visitas.
-  if (['script', 'style', 'font'].includes(event.request.destination) || event.request.mode === 'navigate') {
-    event.respondWith(staleWhileRevalidate(event));
-    return;
-  }
-
-  // 4. Network First para imagens e vídeos. Garante que o conteúdo visual esteja sempre atualizado.
-  if (['image', 'video'].includes(event.request.destination)) {
-    event.respondWith(networkFirst(event));
-    return;
-  }
-
-  // 4. Cache First for all other requests (App Shell, CSS, JS, etc.).
-  // This keeps the core app loading instantly.
-  event.respondWith(cacheFirst(event)); // Fallback para outros recursos.
+  // Estratégia Única: Stale-While-Revalidate para TUDO (exceto Analytics e ranges).
+  // Simples, rápido e garante atualização em segundo plano.
+  event.respondWith(staleWhileRevalidate(event));
 
 });
 
