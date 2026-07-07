@@ -1,4 +1,4 @@
-const CACHE_NAME = 'logistica-clubber-v42'; // Mude a versão a cada atualização importante de arquivos
+const CACHE_NAME = 'logistica-clubber-v43'; // Mude a versão a cada atualização importante de arquivos
 
 // Arquivos locais (App Shell) que podem ser cacheados de forma segura.
 const localUrlsToCache = [
@@ -140,6 +140,13 @@ self.addEventListener('fetch', event => {
   // 1. Ignore Google Analytics and other non-essential requests.
   if (requestUrl.hostname.includes('google-analytics.com') || requestUrl.hostname.includes('googletagmanager.com')) {
     return; // Let the browser handle it without interception.
+  }
+
+  // 2. Network First para o HTML principal. Garante que a estrutura do site esteja sempre atualizada.
+  // Isso quebra o ciclo de cache que impedia o script.js novo de ser carregado.
+  if (event.request.mode === 'navigate') {
+    event.respondWith(networkFirst(event));
+    return;
   }
 
   // 2. Deixa o navegador gerenciar o script.js diretamente (Network Only).
