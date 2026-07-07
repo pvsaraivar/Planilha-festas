@@ -67,14 +67,13 @@ self.addEventListener('activate', event => {
       // Força o SW a controlar todas as abas abertas imediatamente.
       await clients.claim();
 
-      // Notifica todos os clientes (abas) para que eles possam recarregar.
+      // Notifica todos os clientes (abas) para que eles possam recarregar, se necessário.
       const allClients = await clients.matchAll({ type: 'window' });
       allClients.forEach(client => {
         client.postMessage({ type: 'NEW_VERSION_ACTIVATED' });
-        })
-      );
-    })
-  );
+      });
+    })()
+  ); // A chamada da IIFE estava faltando e havia um parêntese extra.
 });
 
 // --- FETCH EVENT STRATEGIES ---
@@ -163,6 +162,12 @@ function cacheFirst(event) {
 // Evento de Fetch: Intercepta as requisições de rede.
 self.addEventListener('fetch', event => {
   const requestUrl = new URL(event.request.url);
+
+  // Ignora requisições de range (vídeos). O cache não suporta respostas parciais (206).
+  // Isso corrige o erro "Partial response (status code 206) is unsupported".
+  if (event.request.headers.has('range')) {
+    return; // Deixa o navegador lidar com a requisição diretamente.
+  }
 
   // 1. Ignore Google Analytics and other non-essential requests.
   if (requestUrl.hostname.includes('google-analytics.com') || requestUrl.hostname.includes('googletagmanager.com')) {
