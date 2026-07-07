@@ -1,4 +1,4 @@
-const CACHE_NAME = 'logistica-clubber-v37'; // Mude a versão a cada atualização importante de arquivos
+const CACHE_NAME = 'logistica-clubber-v38'; // Mude a versão a cada atualização importante de arquivos
 
 // Arquivos locais (App Shell) que podem ser cacheados de forma segura.
 const localUrlsToCache = [
@@ -77,6 +77,29 @@ self.addEventListener('activate', event => {
 });
 
 // --- FETCH EVENT STRATEGIES ---
+
+/**
+ * Network First Strategy: Tries network, falls back to cache.
+ * Ideal para recursos que mudam com frequência, como imagens de eventos.
+ */
+function networkFirst(event) {
+  return new Promise(async (resolve) => {
+    const cache = await caches.open(CACHE_NAME);
+    try {
+      // 1. Tenta buscar da rede primeiro.
+      const networkResponse = await fetch(event.request);
+      // Se a resposta da rede for bem-sucedida, atualiza o cache e a retorna.
+      if (networkResponse.ok) {
+        cache.put(event.request, networkResponse.clone());
+      }
+      resolve(networkResponse);
+    } catch (error) {
+      // 2. Se a rede falhar, busca no cache como fallback.
+      const cachedResponse = await cache.match(event.request);
+      resolve(cachedResponse || Response.error()); // Retorna cache ou um erro de rede padrão.
+    }
+  });
+}
 function staleWhileRevalidate(event) {
   return new Promise(async (resolve, reject) => {
     const cache = await caches.open(CACHE_NAME);
@@ -114,8 +137,14 @@ self.addEventListener('fetch', event => {
     return; // Let the browser handle it without interception.
   }
 
-  // Estratégia Única: Stale-While-Revalidate para TUDO (exceto Analytics e ranges).
-  // Simples, rápido e garante atualização em segundo plano.
+  // 2. Network First para imagens e vídeos. Garante que o conteúdo visual esteja sempre atualizado.
+  if (event.request.destination === 'image' || event.request.destination === 'video') {
+    event.respondWith(networkFirst(event));
+    return;
+  }
+
+  // 3. Stale-While-Revalidate para o resto (App Shell, CSS, JS, fontes, navegação).
+  // Isso garante que o app carregue rápido do cache, mas se atualize em segundo plano.
   event.respondWith(staleWhileRevalidate(event));
 
 });
