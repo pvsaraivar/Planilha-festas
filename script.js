@@ -17,7 +17,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     setupThemeToggle();
 
-    setupSWUpdater(); // Adiciona o listener para atualizações do Service Worker
+    // setupSWUpdater(); // DESATIVADO TEMPORARIAMENTE PARA RESOLVER PROBLEMA DE CACHE
     // Verifica se estamos na página de detalhes
     const detailContainer = document.getElementById('event-detail-container');
     if (detailContainer) {
