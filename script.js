@@ -529,31 +529,21 @@ async function loadAndDisplayEvents(csvPath, gid = '0') {
     return;
   }
 
-  showSkeletonLoader(grid, 6); // Mostra o skeleton enquanto carrega
-  const cacheKey = 'events_cache_' + gid; // Chave para o sessionStorage
+  showSkeletonLoader(grid, 6); // Mostra o skeleton loader enquanto os dados são carregados.
 
-  // Estratégia Network-First com fallback para o Cache
+  // Estratégia Network Only: Sempre busca os dados mais recentes da rede.
+  // Isso resolve definitivamente o problema de dados e imagens cacheadas.
   try {
-    // 1. Tenta buscar os dados mais recentes da rede
     const networkResponse = await fetch(csvPath);
     if (!networkResponse.ok) throw new Error(`Falha na rede: ${networkResponse.statusText}`);
 
     const freshCsvText = await networkResponse.text();
-    sessionStorage.setItem(cacheKey, freshCsvText); // Salva os dados novos no cache
-    processAndRender(freshCsvText); // Renderiza com os dados novos
+    processAndRender(freshCsvText); // Processa e renderiza os eventos com os dados mais recentes.
 
   } catch (error) {
-    console.warn("Falha ao buscar dados da rede, tentando usar o cache:", error);
-    // 2. Se a rede falhar, tenta usar o cache
-    const cachedCsvText = sessionStorage.getItem(cacheKey);
-    if (cachedCsvText) {
-      console.log("Renderizando eventos a partir do cache de sessão.");
-      processAndRender(cachedCsvText);
-    } else {
-      // 3. Se não houver nem rede nem cache, exibe uma mensagem de erro
-      hideSkeletonLoader(grid);
-      grid.innerHTML = `<p class="empty-grid-message">Falha ao carregar eventos. Verifique sua conexão e tente novamente.</p>`;
-    }
+    console.error("Falha crítica ao buscar dados dos eventos:", error);
+    hideSkeletonLoader(grid);
+    grid.innerHTML = `<p class="empty-grid-message">Não foi possível carregar os eventos. Verifique sua conexão e tente recarregar a página.</p>`;
   }
 }
 

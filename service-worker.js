@@ -1,4 +1,4 @@
-const CACHE_NAME = 'logistica-clubber-v33'; // Mude a versão a cada atualização importante de arquivos
+const CACHE_NAME = 'logistica-clubber-v34'; // Mude a versão a cada atualização importante de arquivos
 
 // Arquivos locais (App Shell) que podem ser cacheados de forma segura.
 const localUrlsToCache = [
@@ -180,12 +180,14 @@ self.addEventListener('fetch', event => {
     return;
   }
 
-  // 3. Stale-While-Revalidate para o App Shell (JS, CSS, navegação).
-  // Isso garante que o app carregue rápido do cache, mas se atualize em segundo plano.
-  if (['script', 'style'].includes(event.request.destination) || event.request.mode === 'navigate') {
+  // 3. Stale-While-Revalidate para o App Shell (JS, CSS, fontes, navegação).
+  // Isso garante que o app carregue rápido do cache, mas se atualize em segundo plano para futuras visitas.
+  if (['script', 'style', 'font'].includes(event.request.destination) || event.request.mode === 'navigate') {
     event.respondWith(staleWhileRevalidate(event));
     return;
   }
+
+  // 4. Network First para imagens e vídeos. Garante que o conteúdo visual esteja sempre atualizado.
   if (['image', 'video'].includes(event.request.destination)) {
     event.respondWith(networkFirst(event));
     return;
@@ -193,7 +195,7 @@ self.addEventListener('fetch', event => {
 
   // 4. Cache First for all other requests (App Shell, CSS, JS, etc.).
   // This keeps the core app loading instantly.
-  event.respondWith(cacheFirst(event));
+  event.respondWith(cacheFirst(event)); // Fallback para outros recursos.
 
 });
 
