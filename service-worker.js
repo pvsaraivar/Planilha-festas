@@ -1,4 +1,4 @@
-const CACHE_NAME = 'logistica-clubber-v34'; // Mude a versão a cada atualização importante de arquivos
+const CACHE_NAME = 'logistica-clubber-v35'; // Mude a versão a cada atualização importante de arquivos
 
 // Arquivos locais (App Shell) que podem ser cacheados de forma segura.
 const localUrlsToCache = [
@@ -83,23 +83,23 @@ self.addEventListener('activate', event => {
  * Tries network, falls back to cache, then to an error if both fail.
  */
 function networkFirst(event) {
-  return caches.open(CACHE_NAME).then(cache => {
-    return fetch(event.request)
-      .then(networkResponse => {
-        if (networkResponse.ok) {
-          cache.put(event.request, networkResponse.clone());
-        }
-        return networkResponse;
-      })
-      .catch(async () => {
-        console.log('Network failed. Serving from cache for:', event.request.url);
-        const cachedResponse = await cache.match(event.request);
-        // If found in cache, return it. Otherwise, return a proper error response.
-        return cachedResponse || new Response(JSON.stringify({ error: "Network and cache failed" }), {
-          status: 503,
-          headers: { 'Content-Type': 'application/json' }
-        });
-      });
+  return new Promise(async (resolve) => {
+    const cache = await caches.open(CACHE_NAME);
+    try {
+      // 1. Tenta buscar da rede primeiro.
+      const networkResponse = await fetch(event.request);
+      // Se a resposta da rede for bem-sucedida, atualiza o cache e a retorna.
+      if (networkResponse.ok) {
+        cache.put(event.request, networkResponse.clone());
+      }
+      resolve(networkResponse);
+    } catch (error) {
+      // 2. Se a rede falhar, busca no cache como fallback.
+      console.warn(`SW: Network failed for ${event.request.url}. Serving from cache.`);
+      const cachedResponse = await cache.match(event.request);
+      // Retorna a resposta do cache ou uma resposta de erro se não houver nada.
+      resolve(cachedResponse || Response.error());
+    }
   });
 }
 
@@ -108,19 +108,18 @@ function networkFirst(event) {
  * Responds from cache immediately, then updates the cache from the network in the background.
  */
 function staleWhileRevalidate(event) {
-  return caches.open(CACHE_NAME).then(cache => {
-    return cache.match(event.request).then(cachedResponse => {
-      // Fetch from network in the background to update the cache.
-      const fetchPromise = fetch(event.request).then(networkResponse => {
-        if (networkResponse.ok) {
-          cache.put(event.request, networkResponse.clone());
-        }
-        return networkResponse;
-      });
-
-      // Return cached response immediately if available, otherwise wait for the network.
-      return cachedResponse || fetchPromise;
+  return new Promise(async (resolve) => {
+    const cache = await caches.open(CACHE_NAME);
+    const cachedResponse = await cache.match(event.request);
+    
+    // Inicia a busca na rede em segundo plano.
+    const networkFetch = fetch(event.request).then(networkResponse => {
+      if (networkResponse.ok) {
+        cache.put(event.request, networkResponse.clone());
+      }
     });
+    // Retorna a resposta do cache imediatamente se existir, senão, aguarda a resposta da rede.
+    resolve(cachedResponse || networkFetch);
   });
 }
 
