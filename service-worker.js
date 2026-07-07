@@ -175,11 +175,14 @@ self.addEventListener('fetch', event => {
     return;
   }
 
-  // 3. Stale-While-Revalidate para o App Shell (JS, CSS), imagens e vídeos.
+  // 3. Stale-While-Revalidate para o App Shell (JS, CSS, navegação).
   // Isso garante que o app carregue rápido do cache, mas se atualize em segundo plano.
-  // É a solução definitiva para o problema de atualização de imagens.
-  if (['script', 'style', 'image', 'video'].includes(event.request.destination) || event.request.mode === 'navigate') {
+  if (['script', 'style'].includes(event.request.destination) || event.request.mode === 'navigate') {
     event.respondWith(staleWhileRevalidate(event));
+    return;
+  }
+  if (['image', 'video'].includes(event.request.destination)) {
+    event.respondWith(networkFirst(event));
     return;
   }
 
