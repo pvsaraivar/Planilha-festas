@@ -41,12 +41,48 @@ document.addEventListener('DOMContentLoaded', () => {
         setupModal();
         setupContactModal();
         setupBackToTopButton();
-    setupNotifications();
+        setupNotifications();
         setupInstallButton();
         setupViewToggle();
     }
 });
 
+/**
+ * Envia um evento para o Google Analytics.
+ * @param {string} action - O nome da ação do evento (ex: 'click_button').
+ */
+function setupSWUpdater() {
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.addEventListener('message', event => {
+            // Verifica se a mensagem é para recarregar a página após a ativação de um novo SW
+            if (event.data && event.data.type === 'NEW_VERSION_ACTIVATED') {
+                console.log('Nova versão ativada. Recarregando a página...');
+                
+                // Cria um overlay simples para notificar o usuário
+                const overlay = document.createElement('div');
+                overlay.style.position = 'fixed';
+                overlay.style.top = '0';
+                overlay.style.left = '0';
+                overlay.style.width = '100%';
+                overlay.style.height = '100%';
+                overlay.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
+                overlay.style.color = 'white';
+                overlay.style.display = 'flex';
+                overlay.style.alignItems = 'center';
+                overlay.style.justifyContent = 'center';
+                overlay.style.zIndex = '9999';
+                overlay.style.fontSize = '1.2rem';
+                overlay.innerHTML = '<p>Atualizando para a nova versão...</p>';
+                document.body.appendChild(overlay);
+
+                // Recarrega a página após um pequeno atraso para o usuário ver a mensagem
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1500);
+            }
+        });
+    }
+}
 /**
  * Envia um evento para o Google Analytics.
  * @param {string} action - O nome da ação do evento (ex: 'click_button').

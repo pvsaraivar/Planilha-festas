@@ -52,15 +52,25 @@ self.addEventListener('install', event => {
 // Evento de Ativação: Limpa caches antigos.
 // Isso é crucial para garantir que, ao atualizar o PWA, o usuário receba os novos arquivos.
 self.addEventListener('activate', event => {
-  clients.claim(); // Faz com que o SW ativo controle todas as abas abertas imediatamente.
   event.waitUntil(
-    caches.keys().then(cacheNames => {
-      return Promise.all(
-        cacheNames.map(cacheName => {
-          if (cacheName !== CACHE_NAME) {
+    (async () => {
+      // Limpa caches antigos
+      const cacheNames = await caches.keys();
+      await Promise.all(
+        cacheNames.filter(cacheName => cacheName !== CACHE_NAME)
+          .map(cacheName => {
             console.log('Service Worker: Limpando cache antigo:', cacheName);
             return caches.delete(cacheName);
-          }
+          })
+      );
+
+      // Força o SW a controlar todas as abas abertas imediatamente.
+      await clients.claim();
+
+      // Notifica todos os clientes (abas) para que eles possam recarregar.
+      const allClients = await clients.matchAll({ type: 'window' });
+      allClients.forEach(client => {
+        client.postMessage({ type: 'NEW_VERSION_ACTIVATED' });
         })
       );
     })
