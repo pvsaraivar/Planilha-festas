@@ -1,4 +1,4 @@
-const CACHE_NAME = 'logistica-clubber-v40'; // Mude a versão a cada atualização importante de arquivos
+const CACHE_NAME = 'logistica-clubber-v41'; // Mude a versão a cada atualização importante de arquivos
 
 // Arquivos locais (App Shell) que podem ser cacheados de forma segura.
 const localUrlsToCache = [
@@ -83,25 +83,23 @@ self.addEventListener('activate', event => {
  * Ideal para recursos que mudam com frequência, como imagens de eventos.
  */
 function networkFirst(event) {
-  return new Promise(async (resolve, reject) => {
-    const cache = await caches.open(CACHE_NAME);
-    const request = event.request;
-
-    const networkResponsePromise = fetch(request);
-
-    networkResponsePromise.then(response => {
-      // Se a resposta da rede for bem-sucedida (2xx) ou se for 304 (não modificado),
-      // significa que a rede está funcionando e o conteúdo está atualizado.
-      if (response.ok) {
-        cache.put(request, response.clone());
+  return new Promise((resolve) => {
+    // 1. Tenta buscar da rede primeiro.
+    fetch(event.request).then(networkResponse => {
+      // Se a resposta da rede for bem-sucedida (status 200-299),
+      // atualiza o cache e retorna a nova resposta.
+      if (networkResponse.ok) {
+        caches.open(CACHE_NAME).then(cache => {
+          cache.put(event.request, networkResponse.clone());
+        });
       }
-      // Retorna a resposta da rede, seja ela 200 (com conteúdo) ou 304 (vazia, mas sinalizando que o cache do navegador está OK).
-      resolve(response);
-    }).catch(async (error) => {
-      // A rede falhou completamente. Agora, e somente agora, usamos o cache.
-      console.warn(`SW: Network failed for ${request.url}. Serving from cache.`);
-      const cachedResponse = await cache.match(request);
-      // Retorna a resposta do cache se existir, senão, a promessa é rejeitada e o navegador mostra o erro padrão.
+      // Retorna a resposta da rede, seja ela 200 OK ou 304 Not Modified.
+      // O navegador saberá o que fazer com a resposta 304 (usar seu próprio cache).
+      resolve(networkResponse);
+    }).catch(async () => {
+      // 2. Se a rede falhar completamente (offline), busca no cache do Service Worker.
+      const cachedResponse = await caches.match(event.request);
+      // Retorna a resposta do cache ou, se não houver, deixa o navegador falhar.
       resolve(cachedResponse);
     }
     );
