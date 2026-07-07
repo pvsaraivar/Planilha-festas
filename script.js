@@ -529,41 +529,19 @@ async function loadAndDisplayEvents(csvPath, gid = '0') {
     return;
   }
 
-  const cacheKey = 'events_cache_' + gid;
   showSkeletonLoader(grid, 6); // Mostra o skeleton enquanto carrega
   const cacheKey = 'events_cache_' + gid; // Chave para o sessionStorage
 
-  // Função para processar e renderizar os eventos a partir do texto CSV
-  const processAndRender = (csvText) => {
-    hideSkeletonLoader(grid);
-    const parsedEvents = parseCSV(csvText || '');
   // Estratégia Network-First com fallback para o Cache
   try {
     // 1. Tenta buscar os dados mais recentes da rede
     const networkResponse = await fetch(csvPath);
     if (!networkResponse.ok) throw new Error(`Falha na rede: ${networkResponse.statusText}`);
-    
-    allEvents = parsedEvents.filter(event => {
-      const oculto = (getProp(event, 'Oculto') || '').toLowerCase();
-      return oculto !== 'sim' && oculto !== 'true';
-    });
-    
+
     const freshCsvText = await networkResponse.text();
     sessionStorage.setItem(cacheKey, freshCsvText); // Salva os dados novos no cache
     processAndRender(freshCsvText); // Renderiza com os dados novos
 
-    populateGenreFilter(allEvents);
-
-    // Verifica se há filtros ativos para reaplicá-los após o carregamento
-    const searchInput = document.getElementById('search-input');
-    const dateInput = document.getElementById('date-filter');
-    const genreFilter = document.getElementById('genre-filter');
-    const favoritesBtn = document.getElementById('favorites-filter-btn');
-    
-    const hasActiveFilters = (searchInput && searchInput.value) || (dateInput && dateInput.value) || (genreFilter && genreFilter.value) || (favoritesBtn && favoritesBtn.classList.contains('is-active'));
-
-    if (hasActiveFilters && genreFilter) {
-        genreFilter.dispatchEvent(new Event('change'));
   } catch (error) {
     console.warn("Falha ao buscar dados da rede, tentando usar o cache:", error);
     // 2. Se a rede falhar, tenta usar o cache
@@ -572,10 +550,6 @@ async function loadAndDisplayEvents(csvPath, gid = '0') {
       console.log("Renderizando eventos a partir do cache de sessão.");
       processAndRender(cachedCsvText);
     } else {
-        const futureEvents = allEvents.filter(event => !isEventOver(event));
-            populateGenreFilter(futureEvents);
-        renderEvents(getSortedEvents(futureEvents), grid);
-        if (typeof updateMapMarkers === 'function') updateMapMarkers(futureEvents);
       // 3. Se não houver nem rede nem cache, exibe uma mensagem de erro
       hideSkeletonLoader(grid);
       grid.innerHTML = `<p class="empty-grid-message">Falha ao carregar eventos. Verifique sua conexão e tente novamente.</p>`;
@@ -583,12 +557,6 @@ async function loadAndDisplayEvents(csvPath, gid = '0') {
   }
 }
 
-    if (eventSlugFromUrl) {
-      const eventToOpen = allEvents
-.find(e => createEventSlug(getProp(e, 'Evento') || getProp(e, 'Nome')) === eventSlugFromUrl);
-      if (eventToOpen) openModal(eventToOpen);
-    }
-  };
 /**
  * Processa o texto CSV e renderiza os eventos na tela.
  * @param {string} csvText - O conteúdo CSV a ser processado.
@@ -597,51 +565,31 @@ function processAndRender(csvText) {
   const grid = document.getElementById('event-grid');
   hideSkeletonLoader(grid);
   const parsedEvents = parseCSV(csvText || '');
-  
+
   allEvents = parsedEvents.filter(event => {
     const oculto = (getProp(event, 'Oculto') || '').toLowerCase();
     return oculto !== 'sim' && oculto !== 'true';
   });
 
-  // Estratégia Cache-First (sessionStorage) com atualização em segundo plano
-  const cachedCsvText = sessionStorage.getItem(cacheKey);
   populateGenreFilter(allEvents);
 
-  if (cachedCsvText) {
-    processAndRender(cachedCsvText); // Renderiza com o cache imediatamente
   // Verifica se há filtros ativos para reaplicá-los após o carregamento
   const searchInput = document.getElementById('search-input');
   const dateInput = document.getElementById('date-filter');
   const genreFilter = document.getElementById('genre-filter');
   const favoritesBtn = document.getElementById('favorites-filter-btn');
-  
+
   const hasActiveFilters = (searchInput && searchInput.value) || (dateInput && dateInput.value) || (genreFilter && genreFilter.value) || (favoritesBtn && favoritesBtn.classList.contains('is-active'));
 
   if (hasActiveFilters && genreFilter) {
       genreFilter.dispatchEvent(new Event('change'));
   } else {
-    showSkeletonLoader(grid, 6); // Mostra o skeleton se não houver nada em cache
       const futureEvents = allEvents.filter(event => !isEventOver(event));
       populateGenreFilter(futureEvents);
       renderEvents(getSortedEvents(futureEvents), grid);
       if (typeof updateMapMarkers === 'function') updateMapMarkers(futureEvents);
   }
 
-  // Sempre busca a versão mais recente em segundo plano
-  try {
-    const networkResponse = await fetch(csvPath);
-    if (!networkResponse.ok) throw new Error(`Falha na rede: ${networkResponse.statusText}`);
-    
-    const freshCsvText = await networkResponse.text();
-    sessionStorage.setItem(cacheKey, freshCsvText); // Atualiza o cache da sessão
-
-    // Se não havia cache ou o conteúdo mudou, re-renderiza
-    if (!cachedCsvText || cachedCsvText !== freshCsvText) {
-      processAndRender(freshCsvText);
-    }
-  } catch (error) {
-    console.error("Falha ao buscar novos dados dos eventos:", error);
-    if (!cachedCsvText) grid.innerHTML = `<p class="empty-grid-message">Falha ao carregar eventos. Verifique sua conexão.</p>`;
   if (eventSlugFromUrl) {
     const eventToOpen = allEvents.find(e => createEventSlug(getProp(e, 'Evento') || getProp(e, 'Nome')) === eventSlugFromUrl);
     if (eventToOpen) openModal(eventToOpen);
