@@ -1,4 +1,4 @@
-const CACHE_NAME = 'logistica-clubber-v41'; // Mude a versão a cada atualização importante de arquivos
+const CACHE_NAME = 'logistica-clubber-v42'; // Mude a versão a cada atualização importante de arquivos
 
 // Arquivos locais (App Shell) que podem ser cacheados de forma segura.
 const localUrlsToCache = [
@@ -142,11 +142,14 @@ self.addEventListener('fetch', event => {
     return; // Let the browser handle it without interception.
   }
 
-  // 2. Network First para recursos críticos que precisam estar sempre atualizados.
-  //    - script.js: Para garantir que o eventImageMap e outras lógicas estejam sempre na versão mais recente.
-  //    - Imagens e Vídeos: Para garantir que os flyers novos apareçam imediatamente.
+  // 2. Deixa o navegador gerenciar o script.js diretamente (Network Only).
+  // Isso resolve o problema de cache do script e garante que o eventImageMap esteja sempre atualizado.
+  if (requestUrl.pathname.endsWith('/script.js')) {
+    return; // Não intercepta, deixa a rede cuidar disso.
+  }
+
+  // 3. Network First para imagens e vídeos. Garante que o conteúdo visual esteja sempre atualizado.
   if (
-    event.request.destination === 'script' ||
     event.request.destination === 'image' ||
     event.request.destination === 'video'
   ) {
