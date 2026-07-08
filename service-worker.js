@@ -57,6 +57,12 @@ self.addEventListener('fetch', event => {
     return; // Não intercepta, deixa a rede cuidar disso.
   }
 
+  // **NOVO**: Ignora requisições para o Google Sheets para evitar problemas de CORS.
+  // Deixa o navegador lidar com a busca de dados da planilha diretamente.
+  if (url.hostname.includes('docs.google.com')) {
+    return; // Não intercepta, deixa a rede cuidar disso.
+  }
+
   // 1. **ESTRATÉGIA INFALÍVEL PARA ATUALIZAÇÃO**
   // Para requisições de navegação (HTML) e para o script.js, SEMPRE busca da rede.
   // Isso quebra o ciclo de cache e garante que o site e as imagens estejam sempre atualizados.
