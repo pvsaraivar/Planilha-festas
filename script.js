@@ -531,11 +531,13 @@ async function loadAndDisplayEvents(csvPath, gid = '0') {
 
   // Estratégia Network Only: Sempre busca os dados mais recentes da rede.
   // Isso resolve definitivamente o problema de dados e imagens cacheadas.
+  // Melhoria: Adiciona um timestamp para invalidar o cache do navegador apenas quando necessário,
+  // permitindo que o navegador use o cache em visitas repetidas para um carregamento mais rápido,
+  // mas ainda buscando novos dados periodicamente.
   try {
-    const networkResponse = await fetch(csvPath);
-    // Adicionado { cache: 'no-store' } para forçar uma requisição de rede limpa,
-    // ignorando o cache HTTP do navegador e resolvendo o erro 'Failed to fetch'.
-    const networkResponse = await fetch(csvPath, { cache: 'no-store' });
+    // Adiciona um parâmetro `v` com o timestamp atual para quebrar o cache do navegador.
+    const urlComVersao = `${csvPath}&v=${new Date().getTime()}`; // Quebra o cache
+    const networkResponse = await fetch(urlComVersao, { cache: 'no-store' }); // Força a busca na rede
     if (!networkResponse.ok) throw new Error(`Falha na rede: ${networkResponse.statusText}`);
 
     const freshCsvText = await networkResponse.text();
@@ -2213,7 +2215,7 @@ async function loadEventDetails(csvPath, gid = '0') {
     try {
         // Estratégia Network Only: Sempre busca os dados mais recentes da rede para garantir
         // que os detalhes do evento estejam sempre atualizados, evitando problemas de cache de sessão.
-        const response = await fetch(csvPath, { cache: 'no-store' });
+        const response = await fetch(`${csvPath}&v=${new Date().getTime()}`, { cache: 'no-store' });
         if (!response.ok) throw new Error('Falha ao carregar dados do evento');
         const csvText = await response.text();
 
