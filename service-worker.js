@@ -150,8 +150,10 @@ self.addEventListener('fetch', event => {
 
   // 3. Deixa o navegador gerenciar o script.js diretamente (Network Only, pois não está no cache).
   // Isso garante que o eventImageMap esteja sempre atualizado ao carregar a página.
+  // Esta é a correção definitiva para o problema de imagens de novos eventos não aparecerem.
   if (requestUrl.pathname.endsWith('/script.js')) {
-    return; // Não intercepta, deixa a rede cuidar disso.
+    event.respondWith(fetch(event.request)); // Força a busca na rede (Network Only)
+    return;
   }
 
   // 3. Stale-While-Revalidate para o resto (CSS, fontes, navegação).
