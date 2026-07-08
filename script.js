@@ -533,6 +533,9 @@ async function loadAndDisplayEvents(csvPath, gid = '0') {
   // Isso resolve definitivamente o problema de dados e imagens cacheadas.
   try {
     const networkResponse = await fetch(csvPath);
+    // Adicionado { cache: 'no-store' } para forçar uma requisição de rede limpa,
+    // ignorando o cache HTTP do navegador e resolvendo o erro 'Failed to fetch'.
+    const networkResponse = await fetch(csvPath, { cache: 'no-store' });
     if (!networkResponse.ok) throw new Error(`Falha na rede: ${networkResponse.statusText}`);
 
     const freshCsvText = await networkResponse.text();
