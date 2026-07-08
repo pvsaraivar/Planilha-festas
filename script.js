@@ -2751,19 +2751,15 @@ async function subscribeUser() {
         const subscription = await registration.pushManager.subscribe({
             userVisibleOnly: true,
             // A VAPID key precisa ser gerada no seu backend.
-            // Substitua pela sua Chave Pública VAPID gerada.
-            applicationServerKey: urlBase64ToUint8Array('COLOQUE_SUA_CHAVE_PUBLICA_VAPID_AQUI')
+            // SUBSTITUA PELA SUA CHAVE PÚBLICA VAPID REAL.
+            applicationServerKey: urlBase64ToUint8Array('BP...YOUR_PUBLIC_VAPID_KEY...=')
         });
 
         console.log('Usuário inscrito:', JSON.stringify(subscription));
         // IMPORTANTE: Envie a 'subscription' para o seu backend!
-        // await fetch('https://seu-backend.com/subscribe', {
-        //     method: 'POST',
-        //     body: JSON.stringify(subscription),
-        //     headers: { 'Content-Type': 'application/json' }
-        // });
         // Envia a inscrição para o seu backend Firebase.
-        await fetch('https://southamerica-east1-SEU_ID_DE_PROJETO.cloudfunctions.net/subscribe', {
+        // SUBSTITUA PELO URL REAL DA SUA CLOUD FUNCTION.
+        await fetch('https://southamerica-east1-SEU_PROJETO_ID.cloudfunctions.net/subscribe', {
             method: 'POST',
             body: JSON.stringify(subscription),
             headers: { 'Content-Type': 'application/json' }
@@ -2787,10 +2783,9 @@ async function unsubscribeUser() {
         if (subscription) {
             await subscription.unsubscribe();
             console.log('Inscrição cancelada.');
-            // IMPORTANTE: Informe seu backend para remover a 'subscription'.
-            // await fetch('https://seu-backend.com/unsubscribe', { ... });
             // Informa seu backend para remover a inscrição.
-            await fetch('https://southamerica-east1-SEU_ID_DE_PROJETO.cloudfunctions.net/unsubscribe', {
+            // SUBSTITUA PELO URL REAL DA SUA CLOUD FUNCTION.
+            await fetch('https://southamerica-east1-SEU_PROJETO_ID.cloudfunctions.net/unsubscribe', {
                 method: 'POST',
                 body: JSON.stringify({ endpoint: subscription.endpoint }),
                 headers: { 'Content-Type': 'application/json' }
