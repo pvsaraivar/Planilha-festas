@@ -50,6 +50,13 @@ self.addEventListener('fetch', event => {
   const { request } = event;
   const url = new URL(request.url);
 
+  // **NOVO**: Ignora requisições de range (vídeos). O cache não suporta respostas parciais (206).
+  // Isso corrige o erro "TypeError: Failed to fetch" e o 503 para vídeos.
+  // Deixa o navegador lidar com o streaming de vídeo diretamente.
+  if (request.headers.has('range')) {
+    return; // Não intercepta, deixa a rede cuidar disso.
+  }
+
   // 1. **ESTRATÉGIA INFALÍVEL PARA ATUALIZAÇÃO**
   // Para requisições de navegação (HTML) e para o script.js, SEMPRE busca da rede.
   // Isso quebra o ciclo de cache e garante que o site e as imagens estejam sempre atualizados.
