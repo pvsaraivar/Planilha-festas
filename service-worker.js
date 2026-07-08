@@ -4,9 +4,7 @@ const CACHE_NAME = 'logistica-clubber-v43'; // Mude a versão a cada atualizaç�
 const localUrlsToCache = [
   './',
   './index.html',
-  './detalhes.html',
   './style.css',
-  './script.js',
   './assets/mapa.jpg',
   './assets/logisticaclubber.jpg' // Adiciona o ícone com o nome de arquivo correto
 ];
