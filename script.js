@@ -2208,16 +2208,11 @@ async function loadEventDetails(csvPath, gid = '0') {
     }
 
     try {
-        // Tenta usar cache se disponível (mesma lógica da home)
-            const cacheKey = 'events_cache_' + gid;
-        let csvText = sessionStorage.getItem(cacheKey);
-
-        if (!csvText) {
-            const response = await fetch(csvPath);
-            if (!response.ok) throw new Error('Falha ao carregar dados');
-            csvText = await response.text();
-            sessionStorage.setItem(cacheKey, csvText);
-        }
+        // Estratégia Network Only: Sempre busca os dados mais recentes da rede para garantir
+        // que os detalhes do evento estejam sempre atualizados, evitando problemas de cache de sessão.
+        const response = await fetch(csvPath, { cache: 'no-store' });
+        if (!response.ok) throw new Error('Falha ao carregar dados do evento');
+        const csvText = await response.text();
 
         const events = parseCSV(csvText);
         const event = events.find(e => createEventSlug(getProp(e, 'Evento') || getProp(e, 'Nome')) === slug);
