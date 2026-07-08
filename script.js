@@ -17,7 +17,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     setupThemeToggle();
 
-    // setupSWUpdater(); // DESATIVADO TEMPORARIAMENTE PARA RESOLVER PROBLEMA DE CACHE
+    setupSWUpdater();
     // Verifica se estamos na página de detalhes
     const detailContainer = document.getElementById('event-detail-container');
     if (detailContainer) {

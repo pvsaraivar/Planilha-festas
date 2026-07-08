@@ -142,26 +142,16 @@ self.addEventListener('fetch', event => {
     return; // Let the browser handle it without interception.
   }
 
-  // 2. Network First para o HTML principal. Garante que a estrutura do site esteja sempre atualizada.
-  // Isso quebra o ciclo de cache que impedia o script.js novo de ser carregado.
-  if (event.request.mode === 'navigate') {
+  // 2. Network First para imagens e HTML. Garante que o conteúdo visual e a estrutura estejam sempre atualizados.
+  if (event.request.destination === 'image' || event.request.mode === 'navigate') {
     event.respondWith(networkFirst(event));
     return;
   }
 
-  // 2. Deixa o navegador gerenciar o script.js diretamente (Network Only).
-  // Isso resolve o problema de cache do script e garante que o eventImageMap esteja sempre atualizado.
+  // 3. Deixa o navegador gerenciar o script.js diretamente (Network Only, pois não está no cache).
+  // Isso garante que o eventImageMap esteja sempre atualizado ao carregar a página.
   if (requestUrl.pathname.endsWith('/script.js')) {
     return; // Não intercepta, deixa a rede cuidar disso.
-  }
-
-  // 3. Network First para imagens e vídeos. Garante que o conteúdo visual esteja sempre atualizado.
-  if (
-    event.request.destination === 'image' ||
-    event.request.destination === 'video'
-  ) {
-    event.respondWith(networkFirst(event));
-    return;
   }
 
   // 3. Stale-While-Revalidate para o resto (CSS, fontes, navegação).
