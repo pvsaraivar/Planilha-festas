@@ -53,6 +53,7 @@ document.addEventListener('DOMContentLoaded', () => {
  * @param {string} action - O nome da ação do evento (ex: 'click_button').
  */
 function setupSWUpdater() {
+    // Garante que o listener seja adicionado apenas uma vez.
     if ('serviceWorker' in navigator) {
         navigator.serviceWorker.addEventListener('message', event => {
             // Verifica se a mensagem é para recarregar a página após a ativação de um novo SW
