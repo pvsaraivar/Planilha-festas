@@ -66,13 +66,19 @@ self.addEventListener('fetch', event => {
   // 1. **ESTRATÉGIA INFALÍVEL PARA ATUALIZAÇÃO**
   // Para requisições de navegação (HTML) e para o script.js, SEMPRE busca da rede.
   // Isso quebra o ciclo de cache e garante que o site e as imagens estejam sempre atualizados.
+  // **MELHORIA**: Adicionado fallback para o cache, tornando o PWA funcional offline.
   if (request.mode === 'navigate' || url.pathname.endsWith('/script.js') || url.pathname.endsWith('/detalhes.html')) {
-    // Network Only: Ignora o cache e vai direto para a rede.
+    // Network falling back to Cache: Tenta a rede primeiro. Se falhar, serve do cache.
     event.respondWith(
-      fetch(request).catch(err => {
-        console.error(`SW: Falha ao buscar ${request.url} da rede.`, err);
-        // Como fallback, tenta servir do cache, mas é improvável que esteja lá.
-        return caches.match(request);
+      (async () => {
+        try {
+          // Tenta buscar da rede.
+          return await fetch(request);
+        } catch (error) {
+          // Se a rede falhar, busca no cache.
+          console.log(`SW: Falha na rede para ${request.url}. Servindo do cache.`);
+          return await caches.match(request);
+        }
       })
     );
     return;
