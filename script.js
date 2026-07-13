@@ -425,7 +425,8 @@ const eventImageMap = {
     'after da guapo': 'assets/afterguapo.jpg',
     'gostoso: eden': 'assets/gostosoeden.jpg',
     'sado xtreme': 'assets/sadoxtreme.jpg',
-    'ovo frito #18': 'assets/ovofrito18.jpg'
+    'ovo frito #18': 'assets/ovofrito18.jpg',
+    'after da papoco na rua': 'assets/afterpapoconarua.jpg'
 }
 
 /**
@@ -530,13 +531,10 @@ async function loadAndDisplayEvents(csvPath, gid = '0') {
   showSkeletonLoader(grid, 6); // Mostra o skeleton loader enquanto os dados são carregados.
 
   // Estratégia Network Only: Sempre busca os dados mais recentes da rede.
-  // Isso resolve definitivamente o problema de dados e imagens cacheadas.
-  // Melhoria: Adiciona um timestamp para invalidar o cache do navegador apenas quando necessário,
-  // permitindo que o navegador use o cache em visitas repetidas para um carregamento mais rápido,
-  // mas ainda buscando novos dados periodicamente.
+  // Adiciona um timestamp para invalidar o cache do navegador para o arquivo CSV,
+  // garantindo que os dados dos eventos sejam sempre os mais recentes.
   try {
-    // Adiciona um parâmetro `v` com o timestamp atual para quebrar o cache do navegador.
-    const urlComVersao = `${csvPath}&v=${new Date().getTime()}`; // Quebra o cache
+    const urlComVersao = `${csvPath}&_=${new Date().getTime()}`; // Cache buster
     const networkResponse = await fetch(urlComVersao, { cache: 'no-store' }); // Força a busca na rede
     if (!networkResponse.ok) throw new Error(`Falha na rede: ${networkResponse.statusText}`);
 
