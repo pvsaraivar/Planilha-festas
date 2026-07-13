@@ -237,7 +237,7 @@ a {
     vertical-align: middle;
     flex-shrink: 0;
     color: var(--primary-color);
-    margin: 0 0.2rem;
+    margin: 0 0.2rem -2px;
     transform: translateY(-2px);
 }
 .moon-icon {

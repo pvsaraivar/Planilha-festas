@@ -1,4 +1,4 @@
-const CACHE_NAME = 'logistica-clubber-v51'; // **IMPORTANTE**: Mude a versão a cada nova atualização
+const CACHE_NAME = 'logistica-clubber-v52'; // **IMPORTANTE**: Mude a versão a cada nova atualização
 
 // Arquivos essenciais do App Shell. `index.html` e `script.js` são omitidos de propósito.
 const APP_SHELL_ASSETS = [
@@ -104,25 +104,26 @@ self.addEventListener('fetch', event => {
     return;
   }
 
-  // 3. ESTRATÉGIA PARA IMAGENS E MÍDIAS DINÂMICAS
-  // Network First: Tenta a rede primeiro para ter sempre a imagem mais nova.
-  // Se a rede falhar (offline), serve a versão que estiver no cache.
+  // 3. ESTRATÉGIA PARA IMAGENS E MÍDIAS DINÂMICAS (Stale-While-Revalidate)
+  // Serve do cache imediatamente para velocidade. Em paralelo, busca na rede para atualizar o cache.
+  // Isso garante que as imagens sejam atualizadas na próxima visita sem bloquear a renderização inicial.
   if (request.destination === 'image' || request.destination === 'video') {
     event.respondWith(
-      caches.open(CACHE_NAME).then(async (cache) => {
-        try {
-          const networkResponse = await fetch(request);
-          // Se a resposta da rede for válida, armazena no cache e a retorna.
+      (async () => {
+        const cache = await caches.open(CACHE_NAME);
+        const cachedResponse = await cache.match(request);
+
+        const networkFetchPromise = fetch(request).then(networkResponse => {
           if (networkResponse.ok) {
             cache.put(request, networkResponse.clone());
           }
           return networkResponse;
-        } catch (error) {
-          // Se a rede falhar, busca no cache.
-          const cachedResponse = await cache.match(request);
-          return cachedResponse;
-        }
-      })
+        }).catch(err => {
+          console.warn(`SW: Falha ao buscar mídia ${request.url} em segundo plano.`, err);
+        });
+
+        return cachedResponse || networkFetchPromise;
+      })()
     );
     return;
   }
