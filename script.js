@@ -1416,22 +1416,6 @@ function addCacheBuster(url) {
 }
 
 /**
- * Formata a string de horário com a primeira letra maiúscula.
- * @param {string} name O nome do evento.
- * @returns {string} O slug formatado para URL.
- */
-function createEventSlug(name) {
-    if (!name) return 'evento-sem-nome';
-    return name
-        .toLowerCase()
-        .replace(/[^\w\s-]/g, '') // Remove todos os caracteres não alfanuméricos, exceto espaços e hífens
-        .normalize("NFD").replace(/[\u0300-\u036f]/g, "") // Remove acentos
-        .replace(/[^a-z0-9\s-]/g, '') // Remove caracteres especiais, exceto espaços e hífens
-        .trim()
-        .replace(/\s+/g, '-'); // Substitui espaços por hífens
-}
-
-/**
  * Gera o HTML do botão de ingresso com base na URL e no contexto.
  * @param {string} ticketUrl - O valor da coluna 'Ingressos (URL)'.
  * @param {string} eventName - O nome do evento para tracking.
