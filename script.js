@@ -1202,13 +1202,13 @@ function createEventCardElement(event) {
     const startTime = getProp(event, 'Início');
     const endTime = getProp(event, 'Fim');
     const attractions = getProp(event, 'Atrações') || '';
-    let imageUrl = getProp(event, 'Imagem (URL)');
+    let imageUrl = ''; // Inicializa como string vazia para evitar 'undefined'
     const genres = getProp(event, 'Gênero');
     const ticketUrl = getProp(event, 'Ingressos (URL)');
     const instagramUrl = getProp(event, 'Instagram (URL)');
     const coupon = getProp(event, 'Cupom');
 
-    let couponBadgeHtml = '';
+    let couponBadgeHtml = ''; 
     if (coupon) {
         const tagIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 4px;"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7.01" y2="7"></line></svg>`;
         couponBadgeHtml = `<div class="coupon-badge">${tagIcon} Cupom</div>`;
@@ -1220,10 +1220,11 @@ function createEventCardElement(event) {
     const errorSvg = "data:image/svg+xml,%3csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 400 300%27%3e%3crect width=%27100%25%27 height=%27100%25%27 fill=%27%23e9ecef%27/%3e%3ctext x=%2750%25%27 y=%2750%25%27 fill=%27%23dc3545%27 font-size=%2720%27 text-anchor=%27middle%27 dominant-baseline=%27middle%27%3eImagem Inválida%3c/text%3e%3c/svg%3e";
 
     // Verifica se há uma imagem local específica para este evento no mapa.
+    // Esta verificação agora tem prioridade.
     const eventNameLower = name.trim().toLowerCase();
     if (eventImageMap[eventNameLower]) {
         imageUrl = eventImageMap[eventNameLower];
-    }
+    } else { imageUrl = getProp(event, 'Imagem (URL)') || ''; } // Fallback para a planilha, se necessário
     
     // Se houver múltiplas imagens (carrossel), pega apenas a primeira para exibir no card principal
     if (imageUrl && imageUrl.includes(',')) {
