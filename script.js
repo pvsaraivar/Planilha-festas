@@ -7,6 +7,7 @@ let favoritedEventSlugs = new Set(); // Armazena os slugs dos eventos favoritado
 let eventMap = null;
 let mapMarkersGroup = null;
 let currentGid = '0'; // GID da aba ativa no momento
+const CACHE_VERSION = 'v53'; // Deve ser o mesmo sufixo do CACHE_NAME no service-worker.js
 
 document.addEventListener('DOMContentLoaded', () => {
     const sheetId = '1LAfG4Nt2g_P12HMCx-wEmWpXoX3yp1qAKdw89eLbeWU';
@@ -1289,7 +1290,7 @@ function createEventCardElement(event) {
     let playButtonHtml = '';
 
     if (isVideo) {
-        mediaHtml = `<video data-src="${imageUrl}#t=0.1" class="event-card__image lazy-video" loop muted playsinline webkit-playsinline preload="none" oncontextmenu="return false;" onerror='this.outerHTML="<img src=\\"${errorSvg}\\" class=\\"event-card__image\\" loading=\\"lazy\\" decoding=\\"async\\">"'></video>`;
+        mediaHtml = `<video data-src="${addCacheBuster(imageUrl)}#t=0.1" class="event-card__image lazy-video" loop muted playsinline webkit-playsinline preload="none" oncontextmenu="return false;" onerror='this.outerHTML="<img src=\\"${errorSvg}\\" class=\\"event-card__image\\" loading=\\"lazy\\" decoding=\\"async\\">"'></video>`;
         const playIconSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="white" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>`;
         playButtonHtml = `
             <div class="event-video-loader" style="display: none;"></div>
@@ -1297,7 +1298,7 @@ function createEventCardElement(event) {
         `; 
     } else { 
         const lqip = "data:image/gif;base64,R0lGODlhAQABAIAAAMLCwgAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw==";
-        mediaHtml = `<img src="${lqip}" data-src="${imageUrl || placeholderSvg}" alt="${name}" class="event-card__image lazy-image" loading="lazy" decoding="async" onerror="this.onerror=null; this.src='${errorSvg}'; this.onerror=null;">`;
+        mediaHtml = `<img src="${lqip}" data-src="${addCacheBuster(imageUrl || placeholderSvg)}" alt="${name}" class="event-card__image lazy-image" loading="lazy" decoding="async" onerror="this.onerror=null; this.src='${errorSvg}'; this.onerror=null;">`;
     }
 
     card.innerHTML = `
@@ -1392,6 +1393,27 @@ function createEventCardElement(event) {
     });
 
     return card;
+}
+
+/**
+ * Formata a string de horário com a primeira letra maiúscula.
+ * @param {string} name O nome do evento.
+ * @returns {string} O slug formatado para URL.
+ */
+function createEventSlug(name) {
+    if (!name) return 'evento-sem-nome';
+    return name
+        .toLowerCase()
+        .replace(/[^\w\s-]/g, '') // Remove todos os caracteres não alfanuméricos, exceto espaços e hífens
+        .normalize("NFD").replace(/[\u0300-\u036f]/g, "") // Remove acentos
+        .replace(/[^a-z0-9\s-]/g, '') // Remove caracteres especiais, exceto espaços e hífens
+        .trim()
+        .replace(/\s+/g, '-'); // Substitui espaços por hífens
+}
+
+function addCacheBuster(url) {
+    if (!url || url.startsWith('data:')) return url;
+    return `${url}?v=${CACHE_VERSION}`;
 }
 
 /**
@@ -1716,8 +1738,8 @@ function openModal(event) {
             const isVideo = /\.(mp4|webm|ogg)($|\?)/i.test(url);
             // Use data-src for lazy loading and a placeholder for the initial view
             const mediaTag = isVideo
-            ? `<video data-src="${url}" loop muted playsinline oncontextmenu="return false;" preload="none"></video>`
-                : `<img src="${placeholderSvg}" data-src="${url}" alt="${name}" onerror="this.src='${placeholderSvg}'">`;
+            ? `<video data-src="${addCacheBuster(url)}" loop muted playsinline oncontextmenu="return false;" preload="none"></video>`
+                : `<img src="${placeholderSvg}" data-src="${addCacheBuster(url)}" alt="${name}" onerror="this.src='${placeholderSvg}'">`;
             return `<div class="carousel-slide">${mediaTag}</div>`;
         }).join('');
 
@@ -1734,9 +1756,9 @@ function openModal(event) {
     } else if (mediaUrls.length === 1) {
         const url = mediaUrls[0];
         const isVideo = /\.(mp4|webm|ogg)($|\?)/i.test(url);
-        mediaHtml = isVideo ? `<video src="${url}" class="modal-image" controls autoplay loop muted playsinline></video>` : `<img src="${url || placeholderSvg}" alt="${name}" class="modal-image" onerror="this.src='${placeholderSvg}'">`;
+        mediaHtml = isVideo ? `<video src="${addCacheBuster(url)}" class="modal-image" controls autoplay loop muted playsinline></video>` : `<img src="${addCacheBuster(url || placeholderSvg)}" alt="${name}" class="modal-image" onerror="this.src='${placeholderSvg}'">`;
     } else {
-        mediaHtml = `<img src="${placeholderSvg}" alt="${name}" class="modal-image">`;
+        mediaHtml = `<img src="${addCacheBuster(placeholderSvg)}" alt="${name}" class="modal-image">`;
     }
 
     let locationHtml = `<span>${location}</span>`;
@@ -2264,8 +2286,8 @@ function renderEventDetailPage(event, container, allEvents = []) {
         const slides = mediaUrls.map(url => {
             const isVideo = /\.(mp4|webm|ogg)($|\?)/i.test(url);
             const mediaTag = isVideo
-            ? `<video data-src="${url}" loop muted playsinline oncontextmenu="return false;" preload="none"></video>`
-                : `<img src="${url}" alt="${name}" onerror="this.src='${placeholderSvg}'">`;
+            ? `<video data-src="${addCacheBuster(url)}" loop muted playsinline oncontextmenu="return false;" preload="none"></video>`
+                : `<img src="${addCacheBuster(url)}" alt="${name}" onerror="this.src='${placeholderSvg}'">`;
             return `<div class="carousel-slide">${mediaTag}</div>`;
         }).join('');
 
@@ -2282,9 +2304,9 @@ function renderEventDetailPage(event, container, allEvents = []) {
     } else if (mediaUrls.length === 1) {
         const url = mediaUrls[0];
         const isVideo = /\.(mp4|webm|ogg)($|\?)/i.test(url);
-        mediaHtml = isVideo ? `<video src="${url}" class="detail-page-image" controls autoplay loop muted playsinline></video>` : `<img src="${url || placeholderSvg}" alt="${name}" class="detail-page-image" onerror="this.src='${placeholderSvg}'">`;
+        mediaHtml = isVideo ? `<video src="${addCacheBuster(url)}" class="detail-page-image" controls autoplay loop muted playsinline></video>` : `<img src="${addCacheBuster(url || placeholderSvg)}" alt="${name}" class="detail-page-image" onerror="this.src='${placeholderSvg}'">`;
     } else {
-        mediaHtml = `<img src="${placeholderSvg}" alt="${name}" class="detail-page-image">`;
+        mediaHtml = `<img src="${addCacheBuster(placeholderSvg)}" alt="${name}" class="detail-page-image">`;
     }
 
     const timeString = formatTimeString(startTime, endTime);
@@ -2614,8 +2636,8 @@ function updateMapMarkers(events) {
                 const placeholderSvg = "data:image/svg+xml,%3csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 400 300%27%3e%3crect width=%27100%25%27 height=%27100%25%27 fill=%27%233f3d3d%27/%3e%3ctext x=%2750%25%27 y=%2750%25%27 fill=%27%23A7A7A7%27 font-size=%2720%27 text-anchor=%27middle%27 dominant-baseline=%27middle%27%3eSem Imagem%3c/text%3e%3c/svg%3e";
                 const isVideo = imageUrl && /\.(mp4|webm|ogg)($|\?)/i.test(imageUrl);
                 const mediaHtml = isVideo 
-                    ? `<video src="${imageUrl}#t=0.1" class="map-popup-image" loop muted playsinline autoplay></video>`
-                    : `<img src="${imageUrl || placeholderSvg}" alt="${name}" class="map-popup-image" onerror="this.src='${placeholderSvg}';">`;
+                    ? `<video src="${addCacheBuster(imageUrl)}#t=0.1" class="map-popup-image" loop muted playsinline autoplay></video>`
+                    : `<img src="${addCacheBuster(imageUrl || placeholderSvg)}" alt="${name}" class="map-popup-image" onerror="this.src='${placeholderSvg}';">`;
 
                 const popupHtml = `
                     <div class="map-popup-content">
