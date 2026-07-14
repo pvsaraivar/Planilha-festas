@@ -58,8 +58,28 @@ self.addEventListener('fetch', event => {
 
   // Ignora requisições que não são GET, requisições de range (vídeos) e para a API do Google.
   // O Service Worker não deve interceptar essas chamadas.
-  if (request.method !== 'GET' || request.headers.has('range') || url.hostname.includes('docs.google.com')) {
+  if (request.method !== 'GET' || request.headers.has('range')) {
     return; // Não intercepta, deixa a rede cuidar disso.
+  }
+
+  // 0. ESTRATÉGIA PARA DADOS DA PLANILHA (Stale-While-Revalidate)
+  // Essencial para o funcionamento offline e para resiliência.
+  // Serve os dados do cache imediatamente e busca uma atualização em segundo plano.
+  if (url.hostname.includes('docs.google.com')) {
+    event.respondWith(
+      (async () => {
+        const cache = await caches.open(CACHE_NAME);
+        const cachedResponse = await cache.match(request);
+        
+        const networkFetchPromise = fetch(request).then(networkResponse => {
+          cache.put(request, networkResponse.clone());
+          return networkResponse;
+        });
+
+        return cachedResponse || networkFetchPromise;
+      })()
+    );
+    return;
   }
 
   // 1. ESTRATÉGIA PARA PÁGINAS HTML (Navegação)

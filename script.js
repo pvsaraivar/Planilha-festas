@@ -521,30 +521,47 @@ function isEventInProgress(event) {
  * @param {string} csvPath - O caminho para o arquivo CSV.
  * @param {string} gid - O ID da aba atual para cache.
  */
-async function loadAndDisplayEvents(csvPath, gid = '0') {
+async function loadAndDisplayEvents(csvPath, gid = '0') { // Stale-While-Revalidate para os dados
   const grid = document.getElementById('event-grid');
   if (!grid) {
     console.error("Erro Crítico: Container da grade de eventos não encontrado.");
     return;
   }
 
-  showSkeletonLoader(grid, 6); // Mostra o skeleton loader enquanto os dados são carregados.
+  showSkeletonLoader(grid, 6);
 
-  // Estratégia Network Only: Sempre busca os dados mais recentes da rede.
-  // Adiciona um timestamp para invalidar o cache do navegador para o arquivo CSV,
-  // garantindo que os dados dos eventos sejam sempre os mais recentes.
+  // A URL agora usa a versão do cache, permitindo que o Service Worker a intercepte.
+  const urlComVersao = `${csvPath}&v=${CACHE_VERSION}`;
+
+  let initialDataLoaded = false;
+
+  // 1. Tenta buscar do cache primeiro (via Service Worker)
   try {
-    const urlComVersao = `${csvPath}&_=${new Date().getTime()}`; // Cache buster
-    const networkResponse = await fetch(urlComVersao, { cache: 'no-store' }); // Força a busca na rede
-    if (!networkResponse.ok) throw new Error(`Falha na rede: ${networkResponse.statusText}`);
+    const cachedResponse = await caches.match(urlComVersao);
+    if (cachedResponse) {
+      const csvText = await cachedResponse.text();
+      processAndRender(csvText);
+      initialDataLoaded = true;
+    }
+  } catch (cacheError) {
+    console.warn("Não foi possível ler do cache, aguardando a rede.", cacheError);
+  }
 
-    const freshCsvText = await networkResponse.text();
-    processAndRender(freshCsvText); // Processa e renderiza os eventos com os dados mais recentes.
-
+  // 2. Busca na rede para obter a versão mais recente
+  try {
+    const networkResponse = await fetch(urlComVersao);
+    if (networkResponse.ok) {
+      const freshCsvText = await networkResponse.text();
+      processAndRender(freshCsvText);
+    } else if (!initialDataLoaded) {
+      throw new Error(`Falha na rede: ${networkResponse.statusText}`);
+    }
   } catch (error) {
     console.error("Falha crítica ao buscar dados dos eventos:", error);
-    hideSkeletonLoader(grid);
-    grid.innerHTML = `<p class="empty-grid-message">Não foi possível carregar os eventos. Verifique sua conexão e tente recarregar a página.</p>`;
+    if (!initialDataLoaded) {
+      hideSkeletonLoader(grid);
+      grid.innerHTML = `<p class="empty-grid-message">Não foi possível carregar os eventos. Verifique sua conexão e tente recarregar a página.</p>`;
+    }
   }
 }
 
