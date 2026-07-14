@@ -426,7 +426,7 @@ const eventImageMap = {
     'gostoso: eden': 'assets/gostosoeden.jpg',
     'sado xtreme': 'assets/sadoxtreme.jpg',
     'ovo frito #18': 'assets/ovofrito18.jpg',
-    'after da papoco na rua': 'assets/afterpapoconarua.jpg'
+    'after da papoco na rua': 'assets/afterpapoconarua.jpg',
 }
 
 /**
@@ -1406,7 +1406,7 @@ function createEventSlug(name) {
     if (!name) return 'evento-sem-nome';
     return name
         .toLowerCase()
-        .replace(/[^\w\s-]/g, '') // Remove todos os caracteres não alfanuméricos, exceto espaços e hífens
+        .replace(/[^\w\s-#]/g, '') // Mantém o # para slugs como "ovo-frito-#18"
         .normalize("NFD").replace(/[\u0300-\u036f]/g, "") // Remove acentos
         .replace(/[^a-z0-9\s-]/g, '') // Remove caracteres especiais, exceto espaços e hífens
         .trim()
