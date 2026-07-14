@@ -104,25 +104,28 @@ self.addEventListener('fetch', event => {
     return;
   }
 
-  // 3. ESTRATÉGIA PARA IMAGENS E MÍDIAS DINÂMICAS (Network First)
-  // Tenta a rede primeiro para garantir que o conteúdo seja sempre o mais recente.
-  // Se a rede falhar, serve a versão que estiver no cache (comportamento offline).
+  // 3. ESTRATÉGIA PARA IMAGENS E MÍDIAS DINÂMICAS (Stale-While-Revalidate)
+  // Serve do cache imediatamente para velocidade. Em paralelo, busca uma nova versão na rede
+  // para atualizar o cache para a próxima visita. Isso garante que imagens novas apareçam
+  // e as existentes sejam atualizadas sem bloquear a renderização.
   if (request.destination === 'image' || request.destination === 'video') {
     event.respondWith(
-      caches.open(CACHE_NAME).then(async (cache) => {
-        try {
-          const networkResponse = await fetch(request);
-          // Se a resposta da rede for válida, armazena no cache e a retorna.
+      (async () => {
+        const cache = await caches.open(CACHE_NAME);
+        const cachedResponse = await cache.match(request);
+
+        const networkFetchPromise = fetch(request).then(networkResponse => {
           if (networkResponse.ok) {
             cache.put(request, networkResponse.clone());
           }
           return networkResponse;
-        } catch (error) {
-          // Se a rede falhar, busca no cache.
-          const cachedResponse = await cache.match(request);
-          return cachedResponse;
-        }
-      })
+        }).catch(err => {
+          console.warn(`SW: Falha ao buscar mídia ${request.url} em segundo plano.`, err);
+        });
+
+        // Retorna o cache se existir, senão, espera a rede (essencial para imagens novas).
+        return cachedResponse || networkFetchPromise;
+      })()
     );
     return;
   }
