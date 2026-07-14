@@ -895,8 +895,11 @@ function setupFilters() {
             });
         }
 
-        // Atualiza os gêneros disponíveis com base nos eventos filtrados até agora
-        populateGenreFilter(filteredEvents);
+        // Atualiza os gêneros disponíveis com base em TODOS os eventos futuros,
+        // para que o filtro não perca opções ao ser aplicado.
+        const futureEventsForGenrePopulation = allEvents.filter(event => !isEventOver(event));
+        populateGenreFilter(futureEventsForGenrePopulation);
+
         
         // Atualiza o valor selecionado (caso tenha sido resetado pois o gênero sumiu da lista)
         selectedGenre = genreFilter.value;
