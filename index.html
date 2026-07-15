@@ -198,7 +198,11 @@
     <!-- Flatpickr JS (Calendário visual) -->
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/pt.js"></script>
-    <script src="script.js"></script>
+    <script>
+        // Cache Busting: Adiciona a versão ao script.js para forçar a atualização
+        // e evitar que CDNs ou o cache do navegador sirvam uma versão antiga.
+        document.write('<script src="script.js?v=v54"><\/script>');
+    </script>
 
 </body>
 </html>
