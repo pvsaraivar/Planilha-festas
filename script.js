@@ -1316,8 +1316,7 @@ function createEventCardElement(event) {
             <div class="video-play-button">${playIconSvg}</div>
         `; 
     } else { 
-        const lqip = "data:image/gif;base64,R0lGODlhAQABAIAAAMLCwgAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw==";
-        mediaHtml = `<img src="${lqip}" data-src="${addCacheBuster(imageUrl || placeholderSvg)}" alt="${name}" class="event-card__image lazy-image" loading="lazy" decoding="async" onerror="this.onerror=null; this.src='${errorSvg}'; this.onerror=null;">`;
+        mediaHtml = `<img src="${addCacheBuster(imageUrl || placeholderSvg)}" alt="${name}" class="event-card__image" loading="lazy" decoding="async" onerror="this.onerror=null; this.src='${errorSvg}';">`;
     }
 
     card.innerHTML = `
