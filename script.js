@@ -428,14 +428,14 @@ const eventImageMap = {
     'after da papoco na rua': 'assets/afterpapoconarua.jpg',
     'mergulhe x balanço': 'assets/mergulhexbalan.jpg',
     'kolaje showcase': 'assets/kolajeshowcase.jpg',
-    'mare house - bakumarejadah': 'assets/marebaku.jpg',
+    'mare house bakumarejadah': 'assets/marebaku.jpg',
     'insana leque ataque': 'assets/insanalequeataque.jpg',
-    'papoco na rua 2': 'assets/papoconarua2.jpg',
-    'after da papooco na rua': 'assets/afterpapoconarua.jpg',
+    'papoco na rua 2': 'assets/papoconarua2.png',
+    'after da papooco na rua': 'assets/afterpapoconarua.png',
     'gasguita clandestina': 'assets/gasguita1ano.jpg',
     'aurora listening party': 'assets/aurora.jpg',
     'haus of nix': 'assets/hausofnix.jpg',
-    
+
 }
 
 /**
