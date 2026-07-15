@@ -145,7 +145,10 @@ self.addEventListener('fetch', event => {
     event.respondWith(
       (async () => {
         const cache = await caches.open(CACHE_NAME);
-        const cachedResponse = await cache.match(request);
+        // Ignora os parâmetros de busca (como ?v=...) ao procurar no cache.
+        // Isso permite que `assets/imagem.png?v=v55` encontre `assets/imagem.png` se já estiver cacheado.
+        // A requisição de rede (networkFetchPromise) ainda usa a URL original com o parâmetro.
+        const cachedResponse = await cache.match(request, { ignoreSearch: true });
 
         const networkFetchPromise = fetch(request).then(networkResponse => {
           if (networkResponse.ok) {
