@@ -1,4 +1,4 @@
-const CACHE_NAME = 'logistica-clubber-v53'; // **IMPORTANTE**: Mude a versão a cada nova atualização
+const CACHE_NAME = 'logistica-clubber-v54'; // **IMPORTANTE**: Mude a versão a cada nova atualização
 
 // Arquivos essenciais do App Shell. `index.html` e `script.js` são omitidos de propósito.
 const APP_SHELL_ASSETS = [
@@ -89,12 +89,25 @@ self.addEventListener('fetch', event => {
     event.respondWith(
       (async () => {
         try {
-          return await fetch(request);
+          return await fetch(request, { cache: 'no-store' }); // <-- adiciona isso
         } catch (error) {
           console.log(`SW: Falha na rede para navegação. Servindo do cache: ${request.url}`);
           return caches.match(request);
         }
       })()
+    );
+    return;
+  }
+
+  // 1.5. ESTRATÉGIA PARA script.js (Network-Only, ignora cache HTTP do navegador)
+  // Essencial: script.js contém o eventImageMap com os mapeamentos de imagem de cada evento.
+  // Sem isso, o navegador pode servir uma versão antiga via cache HTTP padrão,
+  // fazendo com que eventos novos fiquem sem imagem — principalmente no PWA
+  // instalado, onde o usuário nunca força um refresh manual.
+  if (url.pathname.endsWith('/script.js')) {
+    event.respondWith(
+      fetch(request, { cache: 'no-store' })
+      .catch(() => caches.match(request)) // fallback offline, se existir algo cacheado de antes
     );
     return;
   }

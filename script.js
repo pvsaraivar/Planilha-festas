@@ -7,7 +7,7 @@ let favoritedEventSlugs = new Set(); // Armazena os slugs dos eventos favoritado
 let eventMap = null;
 let mapMarkersGroup = null;
 let currentGid = '0'; // GID da aba ativa no momento
-const CACHE_VERSION = 'v53'; // Deve ser o mesmo sufixo do CACHE_NAME no service-worker.js
+const CACHE_VERSION = 'v54'; // Deve ser o mesmo sufixo do CACHE_NAME no service-worker.js
 
 document.addEventListener('DOMContentLoaded', () => {
     const sheetId = '1LAfG4Nt2g_P12HMCx-wEmWpXoX3yp1qAKdw89eLbeWU';
