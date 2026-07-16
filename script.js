@@ -437,7 +437,7 @@ const eventImageMap = {
     'haus of nix': 'assets/hausofnix.jpg',
     'houzeria na rua': 'assets/houzerianarua.jpg',
     'wav sessions #2': 'assets/wavsess2.jpg',
-    'groove room': 'assets/grooverom.jpg',
+    'groove room': 'assets/grooveroom.jpg',
     'fluxo de férias': 'assets/fluxodeferias.jpg',
     'mateusin convida': 'assets/mateusinconvida.jpg',
     'dark da lua': 'assets/darkdalua.jpg, assets/darkdalua2.jpg',
@@ -445,8 +445,9 @@ const eventImageMap = {
     'tem que ter house': 'assets/temqueterhouse.jpg',
     'baile do beco': 'assets/bailedobeco.jpg',
     'sunset dream bday gebra': 'assets/sunsetgebra.jpg',
-    'creme - groove all night': 'assets/creme.jpg',
-    'fred music & friends': 'assets/fredmusickz.jpg'
+    'creme': 'assets/creme.jpg',
+    'fred music & friends': 'assets/fredmusickz.jpg',
+    'muvzinha': 'assets/muvzinha.jpg'
 
 }
 
