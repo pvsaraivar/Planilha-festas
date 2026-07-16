@@ -413,7 +413,7 @@ const eventImageMap = {
     'calúnia ato iv': 'assets/caluniaIV.jpg',
     'meveillon': 'assets/meveilon.jpg',
     'alter ego': 'assets/alterego.jpg',
-    'festa lá em cima': 'assets/flec2.PNG',
+    'festa lá em cima': 'assets/flec2.jpg',
     'a noite mais triste do mundo': 'assets/noitemaistriste.jpg',
     'bixabomba': 'assets/bixabomba.jpg',
     'ação fextinha': 'assets/fextinha.jpg',
@@ -430,11 +430,12 @@ const eventImageMap = {
     'kolaje showcase': 'assets/kolajeshowcase.jpg',
     'mare house bakumarejadah': 'assets/marebaku.jpg',
     'insana leque ataque': 'assets/insanalequeataque.jpg',
-    'papoco na rua 2': 'assets/papoconarua2.PNG',
-    'after da papoco na rua': 'assets/afterpapoconarua.PNG',
-    'gasguita clandestina': 'assets/gasguita1ano.jpg',
+    'papoco na rua 2': 'assets/papoconarua2.png',
+    'after da papoco na rua': 'assets/afterpapoconarua.png',
+    'gasguita clandestina': 'assets/gasguita1ano.jpeg',
     'aurora listening party': 'assets/aurora.jpg',
     'haus of nix': 'assets/hausofnix.jpg',
+    'houzeria na rua': 'assets/houzerianarua.jpg'
 
 }
 
