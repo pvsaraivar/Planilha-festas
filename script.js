@@ -446,7 +446,10 @@ const eventImageMap = {
     'sunset dream bday gebra': 'assets/sunsetgebra.jpg',
     'creme': 'assets/creme.jpg',
     'fred music & friends': 'assets/fredmusickz.jpg',
-    'muvzinha': 'assets/muvzinha.jpg'
+    'muvzinha': 'assets/muvzinha.jpg',
+    'bateu na rua': 'assets/bateunarua.jpg',
+    'ddzin e lolost all night': 'assets/ddzinlolost.jpg',
+    'facada & melange': 'assets/facadamelange.jpg'
 
 }
 
