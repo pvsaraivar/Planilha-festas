@@ -449,7 +449,13 @@ const eventImageMap = {
     'muvzinha': 'assets/muvzinha.jpg',
     'bateu na rua': 'assets/bateunarua.jpg',
     'ddzin e lolost all night': 'assets/ddzinlolost.jpg',
-    'facada & melange': 'assets/facadamelange.jpg'
+    'facada & melange': 'assets/facadamelange.jpg',
+    '30 anos do rennó': 'assets/renno30.jpg',
+    'baile black & white': 'assets/baileblack.jpg',
+    'tygo club': 'assets/tygoclub.jpg',
+    'tedeletechno 2': 'assets/tedeletechno2.jpg',
+    'facada impulsiva': 'assets/facadaimpulsiva.jpg',
+    'raw sessions': 'assets/rawsessions.jpg'
 
 }
 
