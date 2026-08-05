@@ -461,7 +461,7 @@ const eventImageMap = {
     'feitiço no luzes': 'assets/feitiçoluzes.mp4',
     'balanço': 'assets/balanço.jpg',
     'laboratório 2 - fábrica de talentos': 'assets/laboratorio2.jpg',
-
+    'onda feat mergulhe': 'assets/ondamergulhe.jpg'
 }
 
 /**
