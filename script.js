@@ -455,7 +455,12 @@ const eventImageMap = {
     'tygo club': 'assets/tygoclub.jpg',
     'tedeletechno 2': 'assets/tedeletechno2.jpg',
     'facada impulsiva': 'assets/facadaimpulsiva.jpg',
-    'raw sessions': 'assets/rawsessions.jpg'
+    'raw sessions': 'assets/rawsessions.jpg',
+    'rolê suave - 05/08': 'assets/rolesuave508.jpg',
+    'matusa no pinhões': 'assets/matpin.jpg',
+    'feitiço no luzes': 'assets/feitiçoluzes.mp4',
+    'balanço': 'assets/balanço.jpg',
+    'laboratório 2 - fábrica de talentos': 'assets/laboratorio2.jpg',
 
 }
 
