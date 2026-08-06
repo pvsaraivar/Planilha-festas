@@ -330,7 +330,7 @@ const eventImageMap = {
     'papoco 5': 'assets/papoco1505.PNG',
     'wav sunset - maracanau': 'assets/wavsunsetmaracanau.jpg',
     'papoco x goelabaixo': 'assets/papocoxgoela.jpg',
-    'bateu com fritas': 'assets/bcf10.PNG',
+    'bateu com fritas': 'assets/bateu10anos.jpg',
     'voyage les années 80': 'assets/voyageles.jpg',
     'marola - esquenta festa onda': 'assets/marola.jpg',    
     'festival cearense de música eletrônica': 'assets/fcme.mp4',
