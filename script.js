@@ -330,7 +330,7 @@ const eventImageMap = {
     'papoco 5': 'assets/papoco1505.PNG',
     'wav sunset - maracanau': 'assets/wavsunsetmaracanau.jpg',
     'papoco x goelabaixo': 'assets/papocoxgoela.jpg',
-    'bateu com fritas': 'assets/bcf10anos.png',
+    'bateu com fritas': 'assets/bcf10.PNG',
     'voyage les années 80': 'assets/voyageles.jpg',
     'marola - esquenta festa onda': 'assets/marola.jpg',    
     'festival cearense de música eletrônica': 'assets/fcme.mp4',
@@ -461,7 +461,8 @@ const eventImageMap = {
     'feitiço no luzes': 'assets/feitiçoluzes.mp4',
     'balanço': 'assets/balanço.jpg',
     'laboratório 2 - fábrica de talentos': 'assets/laboratorio2.jpg',
-    'onda feat mergulhe': 'assets/ondamergulhe.jpg'
+    'onda feat mergulhe': 'assets/ondamergulhe.jpg',
+
 }
 
 /**
