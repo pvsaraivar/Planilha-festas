@@ -461,10 +461,16 @@ const eventImageMap = {
     'feitiço no luzes': 'assets/feitiçoluzes.mp4',
     'balanço': 'assets/balanço1508.PNG',
     'laboratório 2 - fábrica de talentos': 'assets/laboratorio2.jpg',
-    'onda feat mergulhe': 'assets/ondamergulhe.jpg',
+    'onda feat mergulhe': 'assets/ondaftmergulhe.jpg',
     'fine discos 2': 'assets/finediscos2.jpg',
     'numalaje + lakraya': 'assets/numalakraya.jpg',
-    '4rtin convida viana': 'assets/4rtinviana.jpg'
+    '4rtin convida viana': 'assets/4rtinviana.jpg',
+    'delito': 'assets/delito.jpg',
+    'wav sessions #3': 'assets/wavsess3.jpg',
+    'dubdogz - nostalgia': 'assets/nostalgia.jpg',
+    'baile do gato #2': 'assets/bailedogato2.jpg',
+    'sábado no maré': 'assets/marepub.jpg',
+    
 }
 
 /**
