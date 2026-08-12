@@ -431,7 +431,7 @@ const eventImageMap = {
     'insana leque ataque': 'assets/insanalequeataque.jpg',
     'papoco na rua 2': 'assets/papoconarua2.png',
     'after da papoco na rua': 'assets/afterpapoconarua.png',
-    'gasguita clandestina': 'assets/gasguita1ano.jpeg',
+    'gasguita clandestina': 'assets/gasguita1ano.jpg',
     'aurora listening party': 'assets/aurora.jpg',
     'haus of nix': 'assets/hausofnix.jpg',
     'houzeria na rua': 'assets/houzerianarua.jpg',
@@ -459,10 +459,12 @@ const eventImageMap = {
     'rolê suave - 05/08': 'assets/rolesuave508.jpg',
     'matusa no pinhões': 'assets/matpin.jpg',
     'feitiço no luzes': 'assets/feitiçoluzes.mp4',
-    'balanço': 'assets/balanço.jpg',
+    'balanço': 'assets/balanço1508.PNG',
     'laboratório 2 - fábrica de talentos': 'assets/laboratorio2.jpg',
     'onda feat mergulhe': 'assets/ondamergulhe.jpg',
-
+    'fine discos 2': 'assets/finediscos2.jpg',
+    'numalaje + lakraya': 'assets/numalakraya.jpg',
+    '4rtin convida viana': 'assets/4rtinviana.jpg'
 }
 
 /**
@@ -856,9 +858,9 @@ function getSortedEvents(events) {
         const nameB = (getProp(b, 'Evento') || getProp(b, 'Nome') || '').toLowerCase();
         const dateBStr = getProp(b, 'Data') || getProp(b, 'Date') || '';
 
-        // Nível 1 de Destaque (Super Destaque): Eventos "Tubulosa"
-        const isSuperFeaturedA = nameA.includes('tubulosa');
-        const isSuperFeaturedB = nameB.includes('tubulosa');
+        // Nível 1 de Destaque (Super Destaque)
+        const isSuperFeaturedA = nameA.includes('tubulosa') || nameA.includes('gasguita clandestina');
+        const isSuperFeaturedB = nameB.includes('tubulosa') || nameB.includes('gasguita clandestina');
 
         if (isSuperFeaturedA && !isSuperFeaturedB) return -1;
         if (!isSuperFeaturedA && isSuperFeaturedB) return 1;
@@ -1228,6 +1230,11 @@ function createEventCardElement(event) {
 
     // Destaque especial para Tubulosa Ritmada
     if (eventName.toLowerCase().includes('tubulosa ritmada')) {
+        card.classList.add('event-card--featured');
+    }
+
+    // Destaque para Gasguita Clandestina
+    if (eventName.toLowerCase().includes('gasguita clandestina')) {
         card.classList.add('event-card--featured');
     }
 
