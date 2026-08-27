@@ -130,9 +130,16 @@
     </header>
 
     <div class="main-content">
-        <main id="event-grid" class="container">
+        <main id="event-grid" class="container event-grid">
             <p>Carregando festas...</p>
         </main>
+        <!-- Container para carregar e exibir eventos passados -->
+        <div id="past-events-section" class="container" style="padding-top: 1rem;" hidden>
+            <div id="past-events-loader" style="text-align: center; padding: 2rem 0;">
+                <button id="load-past-events-btn" class="clear-all-filters-btn" style="padding: 0.75rem 2rem; font-size: 1rem;">Carregar eventos passados</button>
+            </div>
+            <div id="past-events-grid" class="container" style="padding: 0;"></div>
+        </div>
         <main id="map-view-container" class="container" style="display: none;">
         <div style="position: relative;">
             <div id="event-map" class="event-map-canvas"></div>

@@ -478,8 +478,6 @@ a {
 }
 
 #event-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
     display: flex;
     gap: 1.5rem;
     align-items: flex-start;
@@ -1665,7 +1663,7 @@ body:not(.light-theme) .leaflet-control-attribution {
 
 @media (max-width: 600px) {
     .site-header {
-        padding-top: 1.5rem;
+        padding-top: 1.5rem; 
         padding-bottom: 0.5rem;
     }
     .site-header h1 {

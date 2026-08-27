@@ -43,6 +43,7 @@ document.addEventListener('DOMContentLoaded', () => {
         setupModal();
         setupContactModal();
         setupBackToTopButton();
+        setupPastEventsLoader();
         setupInstallButton();
         setupViewToggle();
     }
@@ -470,7 +471,37 @@ const eventImageMap = {
     'dubdogz - nostalgia': 'assets/nostalgia.jpg',
     'baile do gato #2': 'assets/bailedogato2.jpg',
     'sábado no maré': 'assets/marepub.jpg',
-    
+    'você já teve medo?': 'assets/vcjatevemedo.jpg',
+    'lola convida': 'assets/lolaconvida.jpg',
+    'tech tônica': 'assets/techtonica.jpg',
+    'fervinho festival': 'assets/fervinho.jpg',
+    'fervinho festival': 'assets/fervinho.jpg',
+    'canelada': 'assets/canelada.jpg',
+    'facada & melange lunar': 'assets/facadamelangelunar.jpg',
+    'people dont dance no more': 'assets/peopledance.jpg',
+    'encosta': 'assets/encosta.jpg',
+    'house music culture 5': 'assets/hmc3.jpg',
+    'portal': 'assets/portal.jpg',
+    'raro day party': 'assets/raroday.jpg',
+    'ignis: modo acid': 'assets/modoacid.jpg',
+    'bateu na estação': 'assets/bateuest.jpg',
+    'bruta': 'assets/bruta.jpg',
+    'tedeletechno 3': 'assets/tedeletechno3.jpg',
+    'fritairia showcase no kaza': 'assets/fritariakz.jpg',
+    'tropicalhoca - after do fervinho': 'assets/tropicalhoca.jpg',
+    'animals in kaza': 'assets/animalskz.jpg',
+    'dark club - raw sessions': 'assets/dkclubraw.jpg',
+    'feitiço no parque': 'assets/feitparq.jpg',
+    'seja arte': 'assets/dragaonaz.jpg',
+    '4rtin 4 anos': 'assets/4rtin4.PNG',
+    'maré alta 4': 'assets/marealta4.jpg',
+    'after da maré alta': 'assets/maréaltaaft.jpg',
+    'bota tudo no brisa': 'assets/nandibrisa.jpg',
+    'disco voador 30 anos': 'assets/disco30.jpg',
+    'welcome party ondra l & nika': 'assets/welcome.jpg',
+    'after ignis - ondra l b2b nika': 'assets/afterwelcome.jpg',
+    'mitiê': 'assets/mitie.PNG',
+    'procedencia house - house com café': 'assets/procedenciahouse.jpg'
 }
 
 /**
@@ -733,16 +764,26 @@ function parseCSV(text) {
  * Renderiza a lista de eventos no elemento grid fornecido.
  * @param {Array<Object>} events - O array de eventos a ser renderizado.
  * @param {HTMLElement} gridElement - O elemento container onde os eventos serão inseridos.
+ * @param {HTMLElement} [titleElement=null] - Um elemento de título opcional para ser inserido antes dos cards.
  */
-function renderEvents(events, gridElement) {
+function renderEvents(events, gridElement, titleElement = null) {
     // Usar requestAnimationFrame torna a transição mais suave, especialmente ao filtrar.
     // O navegador limpa a grid e, no próximo frame, começa a adicionar os novos elementos.
     requestAnimationFrame(() => {
         const dateInput = document.getElementById('date-filter');
         const selectedDate = dateInput ? dateInput.value : null;
-        
         loadFavorites(); // Garante que os favoritos estejam atualizados.
         gridElement.innerHTML = ''; // Limpa os skeletons ouO a mensagem anterior.
+
+        // Mostra ou esconde o botão de carregar eventos passados.
+        // Isso deve ser feito antes de potencialmente sair da função.
+        const anyFilterActive = document.getElementById('search-input').value || document.getElementById('date-filter').value || document.getElementById('genre-filter').value || document.getElementById('favorites-filter-btn').classList.contains('is-active');
+        document.getElementById('past-events-section').hidden = anyFilterActive;
+
+        // Adiciona o título se ele for fornecido
+        if (titleElement) {
+            gridElement.appendChild(titleElement);
+        }
 
         if (events.length === 0) {
             if (selectedDate) {
@@ -2761,4 +2802,66 @@ function setupInstallButton() {
       window.removeEventListener('beforeinstallprompt', handleInstallPrompt);
     });
   }
+}
+
+/**
+ * Configura o botão para carregar eventos passados.
+ */
+function setupPastEventsLoader() {
+    const loadBtn = document.getElementById('load-past-events-btn');
+    const pastEventsGrid = document.getElementById('past-events-grid');
+    const loaderContainer = document.getElementById('past-events-loader');
+
+    if (!loadBtn || !pastEventsGrid || !loaderContainer) return;
+
+    loadBtn.addEventListener('click', () => {
+        // Mostra uma mensagem de carregamento e desabilita o botão
+        loadBtn.textContent = 'Carregando...';
+        loadBtn.disabled = true;
+
+        // Filtra para pegar apenas os eventos que já passaram
+        const pastEvents = allEvents.filter(event => isEventOver(event));
+
+        // Ordena os eventos passados do mais recente para o mais antigo
+        const sortedPastEvents = pastEvents.sort((a, b) => {
+            const parseDate = (dateString) => {
+                if (!dateString || typeof dateString !== 'string') return null;
+                const cleanDateStr = dateString.split(' ')[0].trim();
+                const parts = cleanDateStr.split('/');
+                if (parts.length !== 3) return null;
+                return new Date(parts[2], parts[1] - 1, parts[0]);
+            };
+            const dateA = parseDate(getProp(a, 'Data') || getProp(a, 'Date'));
+            const dateB = parseDate(getProp(b, 'Data') || getProp(b, 'Date'));
+            if (!dateB) return -1;
+            if (!dateA) return 1;
+            return dateB - dateA; // Ordem decrescente
+        });
+
+        // Esconde o botão após o clique
+        loaderContainer.hidden = true;
+
+        // Cria um título para a seção de eventos passados
+        const title = document.createElement('h2');
+        title.textContent = 'Eventos Passados';
+        title.style.textAlign = 'center';
+        title.style.marginBottom = '2rem';
+        title.style.color = 'var(--subtle-text)';
+
+        // Adiciona a classe 'event-grid' para reutilizar o estilo de layout
+        pastEventsGrid.classList.add('event-grid');
+
+        // Renderiza os eventos passados na sua própria grade
+        // A função renderEvents já lida com a criação de colunas masonry
+        renderEvents(sortedPastEvents, pastEventsGrid, title);
+
+        trackGAEvent('load_past_events');
+    });
+
+    // Garante que a seção de eventos passados seja escondida se um filtro for ativado
+    ['search-input', 'date-filter', 'genre-filter', 'favorites-filter-btn'].forEach(id => {
+        document.getElementById(id)?.addEventListener('change', () => {
+            document.getElementById('past-events-section').hidden = true;
+        });
+    });
 }
