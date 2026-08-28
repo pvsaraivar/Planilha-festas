@@ -482,12 +482,12 @@ const eventImageMap = {
     'encosta': 'assets/encosta.jpg',
     'house music culture 5': 'assets/hmc3.jpg',
     'portal': 'assets/portal.jpg',
-    'raro day party': 'assets/raroday.jpg',
+    'raro day party': 'assets/rarodayparty.jpg',
     'ignis: modo acid': 'assets/modoacid.jpg',
     'bateu na estação': 'assets/bateuest.jpg',
-    'bruta': 'assets/bruta.jpg',
+    'bruta!': 'assets/bruta.jpg',
     'tedeletechno 3': 'assets/tedeletechno3.jpg',
-    'fritairia showcase no kaza': 'assets/fritariakz.jpg',
+    'fritaria showcase no kaza': 'assets/fritariakz.jpg',
     'tropicalhoca - after do fervinho': 'assets/tropicalhoca.jpg',
     'animals in kaza': 'assets/animalskz.jpg',
     'dark club - raw sessions': 'assets/dkclubraw.jpg',
@@ -495,13 +495,12 @@ const eventImageMap = {
     'seja arte': 'assets/dragaonaz.jpg',
     '4rtin 4 anos': 'assets/4rtin4.PNG',
     'maré alta 4': 'assets/marealta4.jpg',
-    'after da maré alta': 'assets/maréaltaaft.jpg',
     'bota tudo no brisa': 'assets/nandibrisa.jpg',
     'disco voador 30 anos': 'assets/disco30.jpg',
     'welcome party ondra l & nika': 'assets/welcome.jpg',
     'after ignis - ondra l b2b nika': 'assets/afterwelcome.jpg',
     'mitiê': 'assets/mitie.PNG',
-    'procedencia house - house com café': 'assets/procedenciahouse.jpg'
+    'procedência house - house com café': 'assets/procedenciahouse.jpg'
 }
 
 /**
